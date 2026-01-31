@@ -1,0 +1,37 @@
+.footer {
+    border-top: 1px solid var(--border);
+    padding: 48px 0;
+    margin-top: auto;
+    background-color: var(--bg-primary);
+}
+
+.container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 24px;
+}
+
+.footer p {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.socials {
+    display: flex;
+    gap: 24px;
+}
+
+.socials a {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.socials a:hover {
+    color: var(--text-primary);
+}

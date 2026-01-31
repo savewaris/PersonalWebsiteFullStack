@@ -1,0 +1,133 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.title {
+    font-size: 1.5rem;
+    color: var(--text-primary);
+}
+
+.addButton {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background-color: var(--accent);
+    color: white;
+    border-radius: 6px;
+    font-weight: 600;
+    transition: background 0.2s;
+}
+
+.addButton:hover {
+    background-color: var(--accent-hover);
+}
+
+.formContainer {
+    background-color: var(--bg-secondary);
+    padding: 24px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+}
+
+.formContainer h2 {
+    margin-bottom: 16px;
+    color: var(--text-primary);
+}
+
+.form {
+    display: grid;
+    gap: 16px;
+    grid-template-columns: 1fr 1fr;
+}
+
+.input {
+    padding: 10px;
+    background-color: var(--bg-primary);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    border-radius: 4px;
+}
+
+.formActions {
+    grid-column: span 2;
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+}
+
+.saveButton {
+    padding: 8px 16px;
+    background-color: var(--accent);
+    color: white;
+    border-radius: 4px;
+}
+
+.cancelButton {
+    padding: 8px 16px;
+    background-color: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    border-radius: 4px;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 16px;
+}
+
+.card {
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border);
+    padding: 16px;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.cardInfo h3 {
+    color: var(--text-primary);
+    margin-bottom: 4px;
+}
+
+.cardInfo p {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.cardActions {
+    display: flex;
+    gap: 8px;
+}
+
+.iconButton {
+    padding: 8px;
+    color: var(--text-secondary);
+    border-radius: 4px;
+}
+
+.iconButton:hover {
+    background-color: var(--bg-primary);
+    color: var(--accent);
+}
+
+.iconButtonDelete {
+    padding: 8px;
+    color: var(--text-secondary);
+    border-radius: 4px;
+}
+
+.iconButtonDelete:hover {
+    background-color: var(--bg-primary);
+    color: #ef4444;
+}

@@ -1,0 +1,81 @@
+﻿
+> personal-website@0.1.0 build
+> next build
+
+Γû▓ Next.js 16.1.6 (Turbopack)
+- Environments: .env
+
+  Creating an optimized production build ...
+Γ£ô Compiled successfully in 1363.8ms
+  Running TypeScript ...
+node.exe : Failed to 
+compile.
+At C:\Program Files\no
+dejs\npm.ps1:29 char:3
++   & $NODE_EXE 
+$NPM_CLI_JS $args
++   ~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~
+    + CategoryInfo    
+          : NotSpeci  
+  fied: (Failed to    
+ compile.:String)     
+[], RemoteExcepti    
+on
+    + FullyQualifiedE 
+   rrorId : NativeCo  
+  mmandError
+ 
+
+./src/app/admin/experi
+ence/page.tsx:9:30
+Type error: Type '{ 
+id: string; role: 
+string; company: 
+string; location: 
+string | null; 
+startDate: Date; 
+endDate: Date | null; 
+description: string; 
+createdAt: Date; 
+updatedAt: Date; }[]' 
+is not assignable to 
+type 'Experience[]'.
+  Type '{ id: string; 
+role: string; 
+company: string; 
+location: string | 
+null; startDate: 
+Date; endDate: Date | 
+null; description: 
+string; createdAt: 
+Date; updatedAt: 
+Date; }' is not 
+assignable to type 
+'Experience'.
+    Types of property 
+'startDate' are 
+incompatible.
+      Type 'Date' is 
+not assignable to 
+type 'string'.
+
+[0m [90m  7 |[39m  
+   })[33m;[39m
+ [90m  8 |[39m
+[31m[1m>[22m[39m[
+90m  9 |[39m     
+[36mreturn[39m [33m
+<[39m[33mExperienceC
+lient[39m initialExpe
+rience[33m=[39m{expe
+rience} [33m/[39m[3
+3m>[39m[33m;[39m
+ [90m    |[39m      
+                      
+  [31m[1m^[22m[39m
+ [90m 10 |[39m }
+ [90m 11 |[39m[0m
+Next.js build worker 
+exited with code: 1 
+and signal: null
