@@ -40,8 +40,16 @@ export default async function Home() {
           {skills.length > 0 ? (
             skills.map((skill) => (
               <div key={skill.id} className={styles.skillBadge}>
-                {skill.icon && <span>{skill.icon}</span>}
-                <span>{skill.name}</span>
+                <div className={styles.skillInfo}>
+                  {skill.icon && <span className={styles.skillIcon}>{skill.icon}</span>}
+                  <span>{skill.name}</span>
+                </div>
+                <div className={styles.progressBar}>
+                  <div
+                    className={styles.progressFill}
+                    style={{ width: `${skill.proficiency}%` }}
+                  />
+                </div>
               </div>
             ))
           ) : (
@@ -57,13 +65,17 @@ export default async function Home() {
           {projects.length > 0 ? (
             projects.map((project) => (
               <div key={project.id} className={styles.projectCard}>
-                <div className={styles.projectImage} /> {/* Placeholder for real image */}
+                {project.imageUrl ? (
+                  <img src={project.imageUrl} alt={project.title} className={styles.projectImage} />
+                ) : (
+                  <div className={styles.projectImage} />
+                )}
                 <div className={styles.projectContent}>
                   <h3 className={styles.projectTitle}>{project.title}</h3>
                   <p className={styles.projectDesc}>{project.description}</p>
                   <div className={styles.projectLinks}>
-                    {project.demoUrl && <a href={project.demoUrl} target="_blank" className={styles.projectLink}>Live Demo</a>}
-                    {project.repoUrl && <a href={project.repoUrl} target="_blank" className={styles.projectLink}>GitHub</a>}
+                    {project.demoUrl && <a href={project.demoUrl.startsWith('http') ? project.demoUrl : `https://${project.demoUrl}`} target="_blank" rel="noopener noreferrer" className={styles.projectLink}>Live Demo</a>}
+                    {project.repoUrl && <a href={project.repoUrl.startsWith('http') ? project.repoUrl : `https://${project.repoUrl}`} target="_blank" rel="noopener noreferrer" className={styles.projectLink}>GitHub</a>}
                   </div>
                 </div>
               </div>

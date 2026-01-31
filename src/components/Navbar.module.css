@@ -39,6 +39,7 @@
     font-size: 0.95rem;
     font-weight: 500;
     color: var(--text-secondary);
+    white-space: nowrap;
 }
 
 .navLinks a:hover {
@@ -56,4 +57,47 @@
 .adminLink:hover {
     border-color: var(--accent);
     color: var(--accent) !important;
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 0 16px;
+    }
+
+    .navLinks {
+        gap: 16px;
+    }
+
+    .navLinks a {
+        font-size: 0.85rem;
+    }
+
+    .logo {
+        font-size: 1.25rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: 0 12px;
+    }
+
+    .logo {
+        font-size: 1.1rem;
+    }
+
+    .navLinks {
+        gap: 8px;
+    }
+
+    .navLinks a {
+        font-size: 0.75rem;
+    }
+
+    .adminLink {
+        display: block;
+        /* Ensure it's shown */
+        padding: 4px 8px;
+        font-size: 0.75rem;
+    }
 }
