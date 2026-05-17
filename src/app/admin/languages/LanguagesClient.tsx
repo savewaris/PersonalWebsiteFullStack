@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { FaEdit, FaTrash, FaPlus } from 'react-icons/fa';
 import styles from './languages.module.css';
+import { LANGUAGE_SUGGESTIONS } from '@/lib/recommendations';
 
 interface Language {
     id: string;
@@ -24,7 +25,6 @@ export default function LanguagesClient({ initialLanguages }: { initialLanguages
 
     const handleDelete = async (id: string) => {
         if (!confirm('Are you sure you want to delete this language?')) return;
-
         const res = await fetch(`/api/languages/${id}`, { method: 'DELETE' });
         if (res.ok) {
             setLanguages(languages.filter(l => l.id !== id));
@@ -55,6 +55,14 @@ export default function LanguagesClient({ initialLanguages }: { initialLanguages
         }
     };
 
+    const existingNames = new Set(languages.map(l => l.name.toLowerCase()));
+    const filteredSuggestions = LANGUAGE_SUGGESTIONS.filter(s => !existingNames.has(s.name.toLowerCase()));
+
+    const applyChip = (suggestion: typeof LANGUAGE_SUGGESTIONS[0]) => {
+        setCurrentLang({ name: suggestion.name, proficiency: suggestion.defaultProficiency });
+        setIsEditing(true);
+    };
+
     return (
         <div className={styles.container}>
             <div className={styles.header}>
@@ -63,6 +71,21 @@ export default function LanguagesClient({ initialLanguages }: { initialLanguages
                     <FaPlus /> Add Language
                 </button>
             </div>
+
+            {/* ── Recommendations ── */}
+            {filteredSuggestions.length > 0 && (
+                <div className={styles.recommendSection}>
+                    <span className={styles.recommendLabel}>✨ Suggestions — click to add</span>
+                    <div className={styles.chips}>
+                        {filteredSuggestions.map((s, i) => (
+                            <button key={i} className={styles.chip} onClick={() => applyChip(s)}>
+                                <span>{s.flag}</span>
+                                <span>{s.name}</span>
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            )}
 
             {isEditing && (
                 <div className={styles.formContainer}>

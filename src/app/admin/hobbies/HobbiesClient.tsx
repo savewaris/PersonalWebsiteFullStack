@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { FaEdit, FaTrash, FaPlus } from 'react-icons/fa';
 import styles from './hobbies.module.css';
+import { HOBBY_SUGGESTIONS } from '@/lib/recommendations';
 
 interface Hobby {
     id: string;
@@ -24,7 +25,6 @@ export default function HobbiesClient({ initialHobbies }: { initialHobbies: Hobb
 
     const handleDelete = async (id: string) => {
         if (!confirm('Are you sure you want to delete this hobby?')) return;
-
         const res = await fetch(`/api/hobbies/${id}`, { method: 'DELETE' });
         if (res.ok) {
             setHobbies(hobbies.filter(h => h.id !== id));
@@ -55,6 +55,28 @@ export default function HobbiesClient({ initialHobbies }: { initialHobbies: Hobb
         }
     };
 
+    const existingNames = new Set(hobbies.map(h => h.name.toLowerCase()));
+    const filteredSuggestions = HOBBY_SUGGESTIONS.filter(s => !existingNames.has(s.name.toLowerCase()));
+
+    const applyChip = (suggestion: typeof HOBBY_SUGGESTIONS[0]) => {
+        setCurrentHobby({ name: suggestion.name, emoji: suggestion.emoji });
+        setIsEditing(true);
+    };
+
+    // One-click save: directly POST without opening form
+    const quickAdd = async (suggestion: typeof HOBBY_SUGGESTIONS[0]) => {
+        const res = await fetch('/api/hobbies', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: suggestion.name, emoji: suggestion.emoji }),
+        });
+        if (res.ok) {
+            const saved = await res.json();
+            setHobbies([saved, ...hobbies]);
+            router.refresh();
+        }
+    };
+
     return (
         <div className={styles.container}>
             <div className={styles.header}>
@@ -63,6 +85,21 @@ export default function HobbiesClient({ initialHobbies }: { initialHobbies: Hobb
                     <FaPlus /> Add Hobby
                 </button>
             </div>
+
+            {/* ── Recommendations ── */}
+            {filteredSuggestions.length > 0 && (
+                <div className={styles.recommendSection}>
+                    <span className={styles.recommendLabel}>✨ Suggestions — click to instantly add</span>
+                    <div className={styles.chips}>
+                        {filteredSuggestions.map((s, i) => (
+                            <button key={i} className={styles.chip} onClick={() => quickAdd(s)}>
+                                <span>{s.emoji}</span>
+                                <span>{s.name}</span>
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            )}
 
             {isEditing && (
                 <div className={styles.formContainer}>

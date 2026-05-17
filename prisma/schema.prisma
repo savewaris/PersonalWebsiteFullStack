@@ -46,6 +46,7 @@ model Education {
   institution  String
   degree       String
   fieldOfStudy String
+  faculty      String?  // e.g. "Faculty of ICT"
   startDate    DateTime
   endDate      DateTime?
   score        String?
@@ -75,4 +76,13 @@ model Language {
   proficiency String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+model Message {
+  id        String   @id @default(uuid())
+  name      String
+  email     String
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
 }

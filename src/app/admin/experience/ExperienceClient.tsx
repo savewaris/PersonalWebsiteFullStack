@@ -122,7 +122,7 @@ export default function ExperienceClient({ initialExperience }: { initialExperie
                             </div>
                         </div>
                         <textarea
-                            placeholder="Description"
+                            placeholder="Description (Markdown Supported: - bullet points, **bold**, *italic*)"
                             value={currentExp.description || ''}
                             onChange={e => setCurrentExp({ ...currentExp, description: e.target.value })}
                             required

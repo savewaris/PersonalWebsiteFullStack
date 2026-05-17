@@ -10,6 +10,7 @@ interface Education {
     institution: string;
     degree: string;
     fieldOfStudy: string;
+    faculty: string | null;
     startDate: string;
     endDate: string | null;
     score: string | null;
@@ -101,6 +102,15 @@ export default function EducationClient({ initialEducation }: { initialEducation
                             />
                             <input
                                 type="text"
+                                placeholder="Faculty (e.g. Faculty of Information and Communication Technology)"
+                                value={currentEdu.faculty || ''}
+                                onChange={e => setCurrentEdu({ ...currentEdu, faculty: e.target.value })}
+                                className={styles.input}
+                            />
+                        </div>
+                        <div className={styles.row}>
+                            <input
+                                type="text"
                                 placeholder="Score / GPA (Optional)"
                                 value={currentEdu.score || ''}
                                 onChange={e => setCurrentEdu({ ...currentEdu, score: e.target.value })}
@@ -142,6 +152,7 @@ export default function EducationClient({ initialEducation }: { initialEducation
                         <div className={styles.cardInfo}>
                             <h3>{edu.institution}</h3>
                             <p className={styles.company}>{edu.degree} in {edu.fieldOfStudy}</p>
+                            {edu.faculty && <p className={styles.date} style={{ color: 'var(--accent)', fontStyle: 'italic' }}>🏛️ {edu.faculty}</p>}
                             <p className={styles.date}>
                                 {new Date(edu.startDate).toLocaleDateString()} - {edu.endDate ? new Date(edu.endDate).toLocaleDateString() : 'Present'}
                             </p>

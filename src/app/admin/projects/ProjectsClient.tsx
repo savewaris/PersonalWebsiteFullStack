@@ -81,7 +81,7 @@ export default function ProjectsClient({ initialProjects }: { initialProjects: P
                             className={styles.input}
                         />
                         <textarea
-                            placeholder="Description"
+                            placeholder="Description (Markdown Supported: **bold**, *italic*, [link](url))"
                             value={currentProject.description || ''}
                             onChange={e => setCurrentProject({ ...currentProject, description: e.target.value })}
                             required

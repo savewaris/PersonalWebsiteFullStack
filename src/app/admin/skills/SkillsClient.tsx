@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { FaEdit, FaTrash, FaPlus } from 'react-icons/fa';
 import styles from './skills.module.css';
+import { SKILL_SUGGESTIONS } from '@/lib/recommendations';
 
 interface Skill {
     id: string;
@@ -17,6 +18,7 @@ export default function SkillsClient({ initialSkills }: { initialSkills: Skill[]
     const [skills, setSkills] = useState<Skill[]>(initialSkills);
     const [isEditing, setIsEditing] = useState(false);
     const [currentSkill, setCurrentSkill] = useState<Partial<Skill>>({});
+    const [categoryFilter, setCategoryFilter] = useState<string>('All');
     const router = useRouter();
 
     const resetForm = () => {
@@ -26,7 +28,6 @@ export default function SkillsClient({ initialSkills }: { initialSkills: Skill[]
 
     const handleDelete = async (id: string) => {
         if (!confirm('Are you sure you want to delete this skill?')) return;
-
         const res = await fetch(`/api/skills/${id}`, { method: 'DELETE' });
         if (res.ok) {
             setSkills(skills.filter(s => s.id !== id));
@@ -57,6 +58,19 @@ export default function SkillsClient({ initialSkills }: { initialSkills: Skill[]
         }
     };
 
+    // Filter out already-added suggestions
+    const existingNames = new Set(skills.map(s => s.name.toLowerCase()));
+    const categories = ['All', ...Array.from(new Set(SKILL_SUGGESTIONS.map(s => s.category)))];
+    const filteredSuggestions = SKILL_SUGGESTIONS.filter(s =>
+        !existingNames.has(s.name.toLowerCase()) &&
+        (categoryFilter === 'All' || s.category === categoryFilter)
+    );
+
+    const applyChip = (suggestion: typeof SKILL_SUGGESTIONS[0]) => {
+        setCurrentSkill({ name: suggestion.name, proficiency: suggestion.proficiency, category: suggestion.category });
+        setIsEditing(true);
+    };
+
     return (
         <div className={styles.container}>
             <div className={styles.header}>
@@ -65,6 +79,33 @@ export default function SkillsClient({ initialSkills }: { initialSkills: Skill[]
                     <FaPlus /> Add Skill
                 </button>
             </div>
+
+            {/* ── Recommendations ── */}
+            {!isEditing && filteredSuggestions.length > 0 && (
+                <div className={styles.recommendSection}>
+                    <div className={styles.recommendHeader}>
+                        <span className={styles.recommendLabel}>✨ Suggestions — click to add</span>
+                        <div className={styles.filterTabs}>
+                            {categories.map(cat => (
+                                <button
+                                    key={cat}
+                                    className={`${styles.filterTab} ${categoryFilter === cat ? styles.filterTabActive : ''}`}
+                                    onClick={() => setCategoryFilter(cat)}
+                                >
+                                    {cat}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                    <div className={styles.chips}>
+                        {filteredSuggestions.map((s, i) => (
+                            <button key={i} className={styles.chip} onClick={() => applyChip(s)}>
+                                {s.name}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            )}
 
             {isEditing && (
                 <div className={styles.formContainer}>

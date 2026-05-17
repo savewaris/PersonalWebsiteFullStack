@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { FaEdit, FaTrash, FaPlus } from 'react-icons/fa';
 import styles from './interests.module.css';
+import { INTEREST_SUGGESTIONS } from '@/lib/recommendations';
 
 interface Interest {
     id: string;
@@ -24,7 +25,6 @@ export default function InterestsClient({ initialInterests }: { initialInterests
 
     const handleDelete = async (id: string) => {
         if (!confirm('Are you sure you want to delete this interest?')) return;
-
         const res = await fetch(`/api/interests/${id}`, { method: 'DELETE' });
         if (res.ok) {
             setInterests(interests.filter(i => i.id !== id));
@@ -55,6 +55,23 @@ export default function InterestsClient({ initialInterests }: { initialInterests
         }
     };
 
+    const existingNames = new Set(interests.map(i => i.name.toLowerCase()));
+    const filteredSuggestions = INTEREST_SUGGESTIONS.filter(s => !existingNames.has(s.name.toLowerCase()));
+
+    // One-click save
+    const quickAdd = async (suggestion: typeof INTEREST_SUGGESTIONS[0]) => {
+        const res = await fetch('/api/interests', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: suggestion.name, emoji: suggestion.emoji }),
+        });
+        if (res.ok) {
+            const saved = await res.json();
+            setInterests([saved, ...interests]);
+            router.refresh();
+        }
+    };
+
     return (
         <div className={styles.container}>
             <div className={styles.header}>
@@ -63,6 +80,21 @@ export default function InterestsClient({ initialInterests }: { initialInterests
                     <FaPlus /> Add Interest
                 </button>
             </div>
+
+            {/* ── Recommendations ── */}
+            {filteredSuggestions.length > 0 && (
+                <div className={styles.recommendSection}>
+                    <span className={styles.recommendLabel}>✨ Suggestions — click to instantly add</span>
+                    <div className={styles.chips}>
+                        {filteredSuggestions.map((s, i) => (
+                            <button key={i} className={styles.chip} onClick={() => quickAdd(s)}>
+                                <span>{s.emoji}</span>
+                                <span>{s.name}</span>
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            )}
 
             {isEditing && (
                 <div className={styles.formContainer}>

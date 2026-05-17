@@ -25,7 +25,16 @@
     background-color: var(--bg-secondary);
     border: 1px solid var(--border);
     padding: 24px;
-    border-radius: 12px;
+    border-radius: var(--radius-md);
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.statCard:hover {
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    border-color: var(--border-hover);
+    transform: translateY(-2px);
 }
 
 .statCard h3 {
@@ -36,4 +45,41 @@
 
 .statCard p {
     color: var(--text-secondary);
+}
+
+.cardHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.countBadge {
+    background-color: var(--bg-tertiary);
+    color: var(--text-primary);
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.previewList {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.previewList li {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.previewList li:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
 }

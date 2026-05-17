@@ -30,6 +30,9 @@ export default async function AdminLayout({
                     <Link href="/admin/hobbies" className={styles.navLink}>Hobbies</Link>
                     <Link href="/admin/interests" className={styles.navLink}>Interests</Link>
                     <Link href="/admin/languages" className={styles.navLink}>Languages</Link>
+                    <Link href="/admin/messages" className={styles.navLink}>Messages</Link>
+                    <Link href="/admin/import" className={styles.navLink}>Universal Import</Link>
+                    <Link href="/admin/resume" className={styles.navLink}>Tailored Resume</Link>
                     <Link href="/" className={styles.navLink}>View Site</Link>
                 </nav>
             </aside>

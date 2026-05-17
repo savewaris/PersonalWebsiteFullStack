@@ -139,3 +139,12 @@
     background-color: var(--bg-primary);
     color: #ef4444;
 }
+
+/* ── Recommendation Chips ── */
+.recommendSection { background: linear-gradient(135deg, rgba(99,102,241,0.06) 0%, rgba(139,92,246,0.06) 100%); border: 1px solid rgba(99,102,241,0.2); border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 14px; }
+.recommendLabel { font-size: 0.85rem; font-weight: 600; color: var(--accent); letter-spacing: 0.03em; text-transform: uppercase; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; background-color: var(--bg-secondary); border: 1px solid var(--border); border-radius: 999px; font-size: 0.85rem; color: var(--text-primary); cursor: pointer; transition: all 0.18s ease; white-space: nowrap; }
+.chip:hover { background-color: rgba(99,102,241,0.15); border-color: var(--accent); color: var(--accent); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(99,102,241,0.2); }
+.chip:active { transform: scale(0.96); }
+.chipMeta { font-size: 0.72rem; opacity: 0.6; font-weight: 400; }

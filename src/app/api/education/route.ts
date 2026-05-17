@@ -15,12 +15,13 @@ export async function GET() {
 export async function POST(request: Request) {
     try {
         const body = await request.json();
-        const { institution, degree, fieldOfStudy, startDate, endDate, score } = body;
+        const { institution, degree, fieldOfStudy, faculty, startDate, endDate, score } = body;
         const data = await prisma.education.create({
             data: {
                 institution,
                 degree,
                 fieldOfStudy,
+                faculty: faculty || null,
                 startDate: new Date(startDate),
                 endDate: endDate ? new Date(endDate) : null,
                 score,

@@ -5,40 +5,48 @@
 }
 
 .sidebar {
-    width: 250px;
+    width: 260px;
     background-color: var(--bg-secondary);
     border-right: 1px solid var(--border);
     display: flex;
     flex-direction: column;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    flex-shrink: 0;
 }
 
 .sidebarHeader {
-    padding: 24px;
+    padding: 32px 24px;
     border-bottom: 1px solid var(--border);
 }
 
 .sidebarHeader h2 {
-    font-size: 1.25rem;
+    font-size: 1.1rem;
+    font-weight: 600;
     color: var(--text-primary);
+    letter-spacing: 0.02em;
 }
 
 .nav {
-    padding: 24px;
+    padding: 24px 16px;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 4px;
 }
 
 .navLink {
-    padding: 12px;
-    border-radius: 6px;
+    padding: 10px 16px;
+    border-radius: var(--radius-sm);
     color: var(--text-secondary);
     font-weight: 500;
-    transition: all 0.2s;
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
 }
 
 .navLink:hover {
-    background-color: var(--bg-primary);
+    background-color: var(--bg-tertiary);
     color: var(--text-primary);
 }
 
@@ -46,4 +54,5 @@
     flex: 1;
     padding: 48px;
     overflow-y: auto;
+    background-color: var(--bg-primary);
 }
