@@ -52,8 +52,8 @@ export default function InterestsClient({ initialInterests }: { initialInterests
   const existingNames = new Set(interests.map((i) => i.name.toLowerCase()));
   const availableSuggestions = INTEREST_SUGGESTIONS.filter((s) => !existingNames.has(s.name.toLowerCase()));
 
-  const handleSelectPreset = async (preset: (typeof INTEREST_SUGGESTIONS)[0]) => {
-    await saveItem({ name: preset.name, emoji: preset.emoji });
+  const handleSelectPreset = async (preset: { name: string; emoji?: string | null }) => {
+    await saveItem({ name: preset.name, emoji: preset.emoji || '💡' });
   };
 
   return (
@@ -71,6 +71,8 @@ export default function InterestsClient({ initialInterests }: { initialInterests
         items={availableSuggestions}
         getLabel={(s) => `${s.emoji || ''} ${s.name}`}
         onSelect={handleSelectPreset}
+        allowWebSearch={true}
+        searchType="interests"
       />
 
       {error && <div className={styles.errorBanner}>{error}</div>}

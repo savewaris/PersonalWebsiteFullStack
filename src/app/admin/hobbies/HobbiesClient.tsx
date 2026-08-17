@@ -52,8 +52,8 @@ export default function HobbiesClient({ initialHobbies }: { initialHobbies: Hobb
   const existingNames = new Set(hobbies.map((h) => h.name.toLowerCase()));
   const availableSuggestions = HOBBY_SUGGESTIONS.filter((s) => !existingNames.has(s.name.toLowerCase()));
 
-  const handleSelectPreset = async (preset: (typeof HOBBY_SUGGESTIONS)[0]) => {
-    await saveItem({ name: preset.name, emoji: preset.emoji });
+  const handleSelectPreset = async (preset: { name: string; emoji?: string | null }) => {
+    await saveItem({ name: preset.name, emoji: preset.emoji || '✨' });
   };
 
   return (
@@ -71,6 +71,8 @@ export default function HobbiesClient({ initialHobbies }: { initialHobbies: Hobb
         items={availableSuggestions}
         getLabel={(s) => `${s.emoji || ''} ${s.name}`}
         onSelect={handleSelectPreset}
+        allowWebSearch={true}
+        searchType="hobbies"
       />
 
       {error && <div className={styles.errorBanner}>{error}</div>}

@@ -59,12 +59,12 @@ export default function SkillsClient({ initialSkills }: { initialSkills: Skill[]
   const existingNames = new Set(skills.map((s) => s.name.toLowerCase()));
   const availableSuggestions = SKILL_SUGGESTIONS.filter((s) => !existingNames.has(s.name.toLowerCase()));
 
-  const handleSelectPreset = (preset: (typeof SKILL_SUGGESTIONS)[0]) => {
+  const handleSelectPreset = (preset: { name: string; category?: string; proficiency?: number; icon?: string | null }) => {
     setFormData({
       name: preset.name,
-      proficiency: preset.proficiency,
-      category: preset.category,
-      icon: '',
+      proficiency: preset.proficiency || 80,
+      category: preset.category || 'General',
+      icon: preset.icon || '',
     });
     openCreate();
   };
@@ -84,6 +84,8 @@ export default function SkillsClient({ initialSkills }: { initialSkills: Skill[]
         items={availableSuggestions}
         getLabel={(s) => `${s.name} (${s.category})`}
         onSelect={handleSelectPreset}
+        allowWebSearch={true}
+        searchType="skills"
       />
 
       {error && <div className={styles.errorBanner}>{error}</div>}
