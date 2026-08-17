@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { FaEdit, FaTrash, FaExternalLinkAlt, FaCopy, FaGlobe } from 'react-icons/fa';
+import { FaEdit, FaTrash, FaCopy, FaGlobe } from 'react-icons/fa';
 import { useAdminCrud } from '@/lib/useAdminCrud';
 import { AdminPageHeader } from '@/components/admin/AdminPageHeader';
 import { AdminModal } from '@/components/admin/AdminModal';
@@ -108,7 +108,7 @@ export default function SocialsClient({ initialSocials }: { initialSocials: Soci
           {socials.map((social) => (
             <div key={social.id} className={styles.card}>
               <div className={styles.cardHeader}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1, minWidth: 0 }}>
                   <div
                     style={{
                       width: '40px',
@@ -121,20 +121,38 @@ export default function SocialsClient({ initialSocials }: { initialSocials: Soci
                       justifyContent: 'center',
                       fontSize: '1.25rem',
                       color: 'var(--text-primary)',
+                      flexShrink: 0,
                     }}
                   >
                     <PortfolioIcon platform={social.platform} url={social.url} icon={social.icon} size={20} />
                   </div>
-                  <div>
+                  <div style={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
                     <h3 className={styles.cardTitle}>{social.platform}</h3>
                     <div
-                      className={styles.cardSubtitle}
-                      style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: 'var(--text-secondary)' }}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        fontSize: '0.82rem',
+                        color: 'var(--text-secondary)',
+                        marginTop: '2px',
+                        minWidth: 0,
+                      }}
                     >
-                      <span>{social.url.replace(/^https?:\/\//, '')}</span>
                       <span
                         style={{
-                          fontSize: '0.72rem',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap',
+                          flexShrink: 1,
+                        }}
+                        title={social.url}
+                      >
+                        {social.url.replace(/^https?:\/\//, '').replace(/^mailto:/, '')}
+                      </span>
+                      <span
+                        style={{
+                          fontSize: '0.7rem',
                           padding: '1px 6px',
                           borderRadius: '8px',
                           background: social.actionType === 'copy' ? 'rgba(34, 197, 94, 0.15)' : 'rgba(94, 106, 210, 0.15)',
@@ -143,15 +161,16 @@ export default function SocialsClient({ initialSocials }: { initialSocials: Soci
                           display: 'inline-flex',
                           alignItems: 'center',
                           gap: '3px',
+                          flexShrink: 0,
                         }}
                       >
                         {social.actionType === 'copy' ? (
                           <>
-                            <FaCopy size={9} /> Copy
+                            <FaCopy size={8} /> Copy
                           </>
                         ) : (
                           <>
-                            <FaGlobe size={9} /> Redirect
+                            <FaGlobe size={8} /> Redirect
                           </>
                         )}
                       </span>

@@ -99,7 +99,7 @@ export default function SkillsClient({ initialSkills }: { initialSkills: Skill[]
           {skills.map((skill) => (
             <div key={skill.id} className={styles.card}>
               <div className={styles.cardHeader}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1, minWidth: 0 }}>
                   <div
                     style={{
                       width: '36px',
@@ -110,11 +110,12 @@ export default function SkillsClient({ initialSkills }: { initialSkills: Skill[]
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
+                      flexShrink: 0,
                     }}
                   >
                     <PortfolioIcon name={skill.name} icon={skill.icon} category={skill.category} size={18} />
                   </div>
-                  <div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
                     <h3 className={styles.cardTitle}>{skill.name}</h3>
                     <div className={styles.cardSubtitle}>{skill.category}</div>
                   </div>
