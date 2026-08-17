@@ -20,19 +20,28 @@ export async function POST(request: Request) {
     platform?: string;
     url?: string;
     icon?: string;
+    actionType?: string;
     order?: number;
   }>(request);
 
   if (error || !data?.platform || !data.url) {
-    return apiError('Platform name and URL are required', 400);
+    return apiError('Platform name and URL/handle are required', 400);
   }
+
+  const isCopy = data.actionType === 'copy';
+  const formattedUrl = isCopy
+    ? data.url.trim()
+    : (data.url.includes('@') && !data.url.startsWith('mailto:') && !data.url.startsWith('http'))
+    ? `mailto:${data.url.trim()}`
+    : ensureHttps(data.url) || data.url.trim();
 
   try {
     const social = await prisma.socialLink.create({
       data: {
         platform: data.platform.trim(),
-        url: ensureHttps(data.url) || data.url.trim(),
+        url: formattedUrl,
         icon: data.icon?.trim() || null,
+        actionType: isCopy ? 'copy' : 'redirect',
         order: Number(data.order) || 0,
       },
     });

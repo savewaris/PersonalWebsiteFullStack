@@ -88,11 +88,12 @@ model Message {
 }
 
 model SocialLink {
-  id        String   @id @default(uuid())
-  platform  String   // e.g., "GitHub", "LinkedIn", "Instagram", "X", "Email", "Discord", "YouTube"
-  url       String   // e.g., "https://github.com/savewaris"
-  icon      String?  // Optional custom emoji or icon class
-  order     Int      @default(0)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id         String   @id @default(uuid())
+  platform   String   // e.g., "GitHub", "LinkedIn", "Instagram", "X", "Email", "Discord", "YouTube"
+  url        String   // e.g., "https://github.com/savewaris" or "savewaris#0001"
+  icon       String?  // Optional custom emoji or icon class
+  actionType String   @default("redirect") // "redirect" | "copy"
+  order      Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }

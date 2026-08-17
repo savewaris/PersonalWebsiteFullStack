@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { FaEdit, FaTrash, FaExternalLinkAlt } from 'react-icons/fa';
+import { FaEdit, FaTrash, FaExternalLinkAlt, FaCopy, FaGlobe } from 'react-icons/fa';
 import { useAdminCrud } from '@/lib/useAdminCrud';
 import { AdminPageHeader } from '@/components/admin/AdminPageHeader';
 import { AdminModal } from '@/components/admin/AdminModal';
@@ -17,6 +17,7 @@ export interface SocialLink {
   platform: string;
   url: string;
   icon: string | null;
+  actionType: string;
   order: number;
 }
 
@@ -40,11 +41,18 @@ export default function SocialsClient({ initialSocials }: { initialSocials: Soci
     platform: '',
     url: '',
     icon: '',
+    actionType: 'redirect',
     order: socials.length + 1,
   });
 
   const handleOpenCreate = () => {
-    setFormData({ platform: '', url: '', icon: '', order: socials.length + 1 });
+    setFormData({
+      platform: '',
+      url: '',
+      icon: '',
+      actionType: 'redirect',
+      order: socials.length + 1,
+    });
     openCreate();
   };
 
@@ -62,10 +70,12 @@ export default function SocialsClient({ initialSocials }: { initialSocials: Soci
   const availableSuggestions = SOCIAL_SUGGESTIONS.filter((s) => !existingPlatforms.has(s.platform.toLowerCase()));
 
   const handleSelectPreset = (preset: (typeof SOCIAL_SUGGESTIONS)[0]) => {
+    const isCopyByDefault = preset.platform.toLowerCase().includes('discord');
     setFormData({
       platform: preset.platform,
-      url: preset.placeholderUrl.startsWith('mailto:') ? preset.placeholderUrl : preset.placeholderUrl,
+      url: preset.placeholderUrl,
       icon: '',
+      actionType: isCopyByDefault ? 'copy' : 'redirect',
       order: socials.length + 1,
     });
     openCreate();
@@ -117,15 +127,35 @@ export default function SocialsClient({ initialSocials }: { initialSocials: Soci
                   </div>
                   <div>
                     <h3 className={styles.cardTitle}>{social.platform}</h3>
-                    <a
-                      href={social.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
+                    <div
                       className={styles.cardSubtitle}
-                      style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', textDecoration: 'none', color: 'var(--accent)' }}
+                      style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: 'var(--text-secondary)' }}
                     >
-                      {social.url.replace(/^https?:\/\//, '')} <FaExternalLinkAlt size={10} />
-                    </a>
+                      <span>{social.url.replace(/^https?:\/\//, '')}</span>
+                      <span
+                        style={{
+                          fontSize: '0.72rem',
+                          padding: '1px 6px',
+                          borderRadius: '8px',
+                          background: social.actionType === 'copy' ? 'rgba(34, 197, 94, 0.15)' : 'rgba(94, 106, 210, 0.15)',
+                          color: social.actionType === 'copy' ? '#4ade80' : 'var(--accent)',
+                          border: `1px solid ${social.actionType === 'copy' ? 'rgba(34, 197, 94, 0.3)' : 'rgba(94, 106, 210, 0.3)'}`,
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '3px',
+                        }}
+                      >
+                        {social.actionType === 'copy' ? (
+                          <>
+                            <FaCopy size={9} /> Copy
+                          </>
+                        ) : (
+                          <>
+                            <FaGlobe size={9} /> Redirect
+                          </>
+                        )}
+                      </span>
+                    </div>
                   </div>
                 </div>
                 <span className={styles.badgeCount}>#{social.order || 1}</span>
@@ -162,22 +192,36 @@ export default function SocialsClient({ initialSocials }: { initialSocials: Soci
               required
               value={formData.platform || ''}
               onChange={(e) => setFormData({ ...formData, platform: e.target.value })}
-              placeholder="e.g. Gmail, X / Twitter, GitHub, LinkedIn, Discord"
+              placeholder="e.g. Gmail, X / Twitter, GitHub, Discord, WhatsApp"
             />
           </div>
 
-          <div className={styles.formGroup}>
-            <label>Profile / Channel URL</label>
-            <input
-              type="text"
-              required
-              value={formData.url || ''}
-              onChange={(e) => setFormData({ ...formData, url: e.target.value })}
-              placeholder="e.g. https://x.com/username or your.name@gmail.com"
-            />
-            <span style={{ fontSize: '0.78rem', color: 'var(--text-tertiary)', marginTop: '4px' }}>
-              Tip: Omitting https:// or mailto: will be automatically fulfilled for you.
-            </span>
+          <div className={styles.formRow}>
+            <div className={styles.formGroup} style={{ flex: 1.5 }}>
+              <label>Target URL / Handle / Text</label>
+              <input
+                type="text"
+                required
+                value={formData.url || ''}
+                onChange={(e) => setFormData({ ...formData, url: e.target.value })}
+                placeholder={
+                  formData.actionType === 'copy'
+                    ? 'e.g. savewaris#0001 or +66812345678'
+                    : 'e.g. https://x.com/username or your@email.com'
+                }
+              />
+            </div>
+
+            <div className={styles.formGroup} style={{ flex: 1 }}>
+              <label>Action on Click</label>
+              <select
+                value={formData.actionType || 'redirect'}
+                onChange={(e) => setFormData({ ...formData, actionType: e.target.value })}
+              >
+                <option value="redirect">🌐 Redirect (Open in New Tab)</option>
+                <option value="copy">📋 Copy to Clipboard</option>
+              </select>
+            </div>
           </div>
 
           <div className={styles.formRow}>

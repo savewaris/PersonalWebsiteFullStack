@@ -1,6 +1,6 @@
 import dynamic from 'next/dynamic';
 import { StaggerItem } from '@/components/MotionWrappers';
-import { PortfolioIcon } from '@/components/PortfolioIcon';
+import { SocialButton } from '@/components/SocialButton';
 import styles from '@/app/page.module.css';
 import { SocialLink } from '@prisma/client';
 
@@ -9,10 +9,10 @@ const ContactForm = dynamic(() => import('@/components/ContactForm'), {
 });
 
 interface ContactSectionProps {
-  socials: SocialLink[];
+  socials?: SocialLink[];
 }
 
-export function ContactSection({ socials }: ContactSectionProps) {
+export function ContactSection({ socials = [] }: ContactSectionProps) {
   return (
     <StaggerItem id="contact" className={`${styles.bentoItem} ${styles.span4}`} style={{ display: 'flex', flexDirection: 'row', gap: '48px', flexWrap: 'wrap' }}>
       <div style={{ flex: '1 1 300px' }}>
@@ -24,13 +24,14 @@ export function ContactSection({ socials }: ContactSectionProps) {
         </p>
         <div className={styles.socialLinks} style={{ display: 'flex', gap: '16px', justifyContent: 'flex-start', flexWrap: 'wrap' }}>
           {socials.map((social) => (
-            <a
+            <SocialButton
               key={social.id}
-              href={social.url}
-              target="_blank"
-              rel="noopener noreferrer"
+              platform={social.platform}
+              url={social.url}
+              icon={social.icon}
+              actionType={social.actionType}
               className={styles.socialLink}
-              title={social.platform}
+              size={20}
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
@@ -43,9 +44,7 @@ export function ContactSection({ socials }: ContactSectionProps) {
                 color: 'var(--text-primary)',
                 transition: 'all 0.2s ease',
               }}
-            >
-              <PortfolioIcon platform={social.platform} url={social.url} icon={social.icon} size={20} />
-            </a>
+            />
           ))}
         </div>
       </div>

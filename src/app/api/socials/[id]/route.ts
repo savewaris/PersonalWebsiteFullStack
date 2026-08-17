@@ -10,6 +10,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
     platform?: string;
     url?: string;
     icon?: string;
+    actionType?: string;
     order?: number;
   }>(request);
 
@@ -17,13 +18,24 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
     return apiError('Invalid request payload', 400);
   }
 
+  let formattedUrl: string | undefined = undefined;
+  if (data.url !== undefined) {
+    const isCopy = data.actionType === 'copy';
+    formattedUrl = isCopy
+      ? data.url.trim()
+      : (data.url.includes('@') && !data.url.startsWith('mailto:') && !data.url.startsWith('http'))
+      ? `mailto:${data.url.trim()}`
+      : ensureHttps(data.url) || data.url.trim();
+  }
+
   try {
     const social = await prisma.socialLink.update({
       where: { id },
       data: {
         ...(data.platform ? { platform: data.platform.trim() } : {}),
-        ...(data.url ? { url: ensureHttps(data.url) || data.url.trim() } : {}),
+        ...(formattedUrl !== undefined ? { url: formattedUrl } : {}),
         ...(data.icon !== undefined ? { icon: data.icon ? data.icon.trim() : null } : {}),
+        ...(data.actionType !== undefined ? { actionType: data.actionType === 'copy' ? 'copy' : 'redirect' } : {}),
         ...(data.order !== undefined ? { order: Number(data.order) } : {}),
       },
     });

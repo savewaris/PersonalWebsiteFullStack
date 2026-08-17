@@ -42,18 +42,18 @@ export async function getSocialLinks(): Promise<SocialLink[]> {
     try {
       await prisma.socialLink.createMany({
         data: [
-          { platform: 'GitHub', url: 'https://github.com/savewaris', order: 1 },
-          { platform: 'LinkedIn', url: 'https://www.linkedin.com/in/waris-khamkaweepart/', order: 2 },
-          { platform: 'Instagram', url: 'https://www.instagram.com/save.waris/', order: 3 },
+          { platform: 'GitHub', url: 'https://github.com/savewaris', actionType: 'redirect', order: 1 },
+          { platform: 'LinkedIn', url: 'https://www.linkedin.com/in/waris-khamkaweepart/', actionType: 'redirect', order: 2 },
+          { platform: 'Instagram', url: 'https://www.instagram.com/save.waris/', actionType: 'redirect', order: 3 },
         ],
       });
       return await prisma.socialLink.findMany({ orderBy: { order: 'asc' } });
     } catch (e) {
       // Fallback in-memory
       return [
-        { id: '1', platform: 'GitHub', url: 'https://github.com/savewaris', icon: null, order: 1, createdAt: new Date(), updatedAt: new Date() },
-        { id: '2', platform: 'LinkedIn', url: 'https://www.linkedin.com/in/waris-khamkaweepart/', icon: null, order: 2, createdAt: new Date(), updatedAt: new Date() },
-        { id: '3', platform: 'Instagram', url: 'https://www.instagram.com/save.waris/', icon: null, order: 3, createdAt: new Date(), updatedAt: new Date() },
+        { id: '1', platform: 'GitHub', url: 'https://github.com/savewaris', icon: null, actionType: 'redirect', order: 1, createdAt: new Date(), updatedAt: new Date() },
+        { id: '2', platform: 'LinkedIn', url: 'https://www.linkedin.com/in/waris-khamkaweepart/', icon: null, actionType: 'redirect', order: 2, createdAt: new Date(), updatedAt: new Date() },
+        { id: '3', platform: 'Instagram', url: 'https://www.instagram.com/save.waris/', icon: null, actionType: 'redirect', order: 3, createdAt: new Date(), updatedAt: new Date() },
       ];
     }
   }

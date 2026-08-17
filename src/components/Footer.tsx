@@ -1,5 +1,5 @@
 import { SocialLink } from '@prisma/client';
-import { PortfolioIcon } from '@/components/PortfolioIcon';
+import { SocialButton } from '@/components/SocialButton';
 import styles from './Footer.module.css';
 
 interface FooterProps {
@@ -14,32 +14,29 @@ export default function Footer({ socials = [] }: FooterProps) {
         <div className={styles.socials}>
           {socials.length > 0 ? (
             socials.map((s) => (
-              <a
+              <SocialButton
                 key={s.id}
-                href={s.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                title={s.platform}
-                style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
-              >
-                <PortfolioIcon platform={s.platform} url={s.url} icon={s.icon} size={14} />
-                <span>{s.platform}</span>
-              </a>
+                platform={s.platform}
+                url={s.url}
+                icon={s.icon}
+                actionType={s.actionType}
+                size={14}
+                showPlatformLabel={true}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  color: 'inherit',
+                  textDecoration: 'none',
+                  fontSize: '0.88rem',
+                }}
+              />
             ))
           ) : (
             <>
-              <a href="https://github.com/savewaris" target="_blank" rel="noopener noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-                <PortfolioIcon platform="GitHub" size={14} />
-                <span>GitHub</span>
-              </a>
-              <a href="https://www.linkedin.com/in/waris-khamkaweepart/" target="_blank" rel="noopener noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-                <PortfolioIcon platform="LinkedIn" size={14} />
-                <span>LinkedIn</span>
-              </a>
-              <a href="https://www.instagram.com/save.waris/" target="_blank" rel="noopener noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-                <PortfolioIcon platform="Instagram" size={14} />
-                <span>Instagram</span>
-              </a>
+              <SocialButton platform="GitHub" url="https://github.com/savewaris" size={14} showPlatformLabel={true} />
+              <SocialButton platform="LinkedIn" url="https://www.linkedin.com/in/waris-khamkaweepart/" size={14} showPlatformLabel={true} />
+              <SocialButton platform="Instagram" url="https://www.instagram.com/save.waris/" size={14} showPlatformLabel={true} />
             </>
           )}
         </div>
