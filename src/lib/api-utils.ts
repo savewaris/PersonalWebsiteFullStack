@@ -2,6 +2,21 @@ import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { revalidatePath } from 'next/cache';
 
+export function ensureHttps(url?: string | null): string | null {
+  if (!url) return null;
+  const trimmed = url.trim();
+  if (!trimmed) return null;
+  if (
+    trimmed.startsWith('http://') ||
+    trimmed.startsWith('https://') ||
+    trimmed.startsWith('mailto:') ||
+    trimmed.startsWith('#')
+  ) {
+    return trimmed;
+  }
+  return `https://${trimmed}`;
+}
+
 export function apiSuccess<T>(data: T, status = 200, headers?: HeadersInit) {
   return NextResponse.json(data, { status, headers });
 }

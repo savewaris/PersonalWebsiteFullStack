@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma';
-import { apiSuccess, apiError, parseJsonBody, requireAuthSession, revalidatePortfolioData } from '@/lib/api-utils';
+import { apiSuccess, apiError, parseJsonBody, requireAuthSession, revalidatePortfolioData, ensureHttps } from '@/lib/api-utils';
 
 export async function GET() {
   try {
@@ -45,9 +45,9 @@ export async function POST(request: Request) {
         title: data.title.trim(),
         description: data.description.trim(),
         tags: tagsString,
-        demoUrl: data.demoUrl?.trim() || data.link?.trim() || null,
-        repoUrl: data.repoUrl?.trim() || data.github?.trim() || null,
-        imageUrl: data.imageUrl?.trim() || data.image?.trim() || null,
+        demoUrl: ensureHttps(data.demoUrl || data.link),
+        repoUrl: ensureHttps(data.repoUrl || data.github),
+        imageUrl: ensureHttps(data.imageUrl || data.image),
       },
     });
     revalidatePortfolioData();

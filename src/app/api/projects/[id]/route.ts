@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma';
-import { apiSuccess, apiError, parseJsonBody, requireAuthSession, revalidatePortfolioData } from '@/lib/api-utils';
+import { apiSuccess, apiError, parseJsonBody, requireAuthSession, revalidatePortfolioData, ensureHttps } from '@/lib/api-utils';
 
 export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const authError = await requireAuthSession();
@@ -42,9 +42,9 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
         ...(data.title ? { title: data.title.trim() } : {}),
         ...(data.description ? { description: data.description.trim() } : {}),
         ...(tagsString !== undefined ? { tags: tagsString } : {}),
-        ...(demo !== undefined ? { demoUrl: demo ? demo.trim() : null } : {}),
-        ...(repo !== undefined ? { repoUrl: repo ? repo.trim() : null } : {}),
-        ...(image !== undefined ? { imageUrl: image ? image.trim() : null } : {}),
+        ...(demo !== undefined ? { demoUrl: ensureHttps(demo) } : {}),
+        ...(repo !== undefined ? { repoUrl: ensureHttps(repo) } : {}),
+        ...(image !== undefined ? { imageUrl: ensureHttps(image) } : {}),
       },
     });
     revalidatePortfolioData();
