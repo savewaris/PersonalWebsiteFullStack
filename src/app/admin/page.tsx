@@ -84,7 +84,7 @@ export default async function AdminDashboard() {
   return (
     <div className={styles.dashboard}>
       <h1 className={styles.title}>Admin Overview</h1>
-      <p className={styles.subtitle}>Manage your portfolio content, resume generator, and incoming messages.</p>
+      <p className={styles.subtitle}>Manage your portfolio projects, skills, career history, and contact inquiries.</p>
 
       <div className={styles.statsGrid}>
         {cards.map((card) => (

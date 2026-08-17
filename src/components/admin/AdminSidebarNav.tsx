@@ -12,8 +12,6 @@ import {
   FaLightbulb,
   FaLanguage,
   FaEnvelope,
-  FaFileImport,
-  FaFileAlt,
   FaExternalLinkAlt,
   FaSignOutAlt,
 } from 'react-icons/fa';
@@ -29,8 +27,6 @@ const NAV_ITEMS = [
   { href: '/admin/interests', label: 'Interests', icon: FaLightbulb },
   { href: '/admin/languages', label: 'Languages', icon: FaLanguage },
   { href: '/admin/messages', label: 'Messages', icon: FaEnvelope },
-  { href: '/admin/import', label: 'Universal Import', icon: FaFileImport },
-  { href: '/admin/resume', label: 'Tailored Resume', icon: FaFileAlt },
 ];
 
 export function AdminSidebarNav() {
