@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma';
-import { apiSuccess, apiError, parseJsonBody, requireAuthSession } from '@/lib/api-utils';
+import { apiSuccess, apiError, parseJsonBody, requireAuthSession, revalidatePortfolioData } from '@/lib/api-utils';
 
 export async function GET() {
   try {
@@ -17,32 +17,33 @@ export async function POST(request: Request) {
   if (authError) return authError;
 
   const { data, error } = await parseJsonBody<{
-    institution?: string;
     degree?: string;
+    institution?: string;
     fieldOfStudy?: string;
-    faculty?: string | null;
+    faculty?: string;
+    score?: string;
     startDate?: string;
-    endDate?: string | null;
-    score?: string | null;
+    endDate?: string;
   }>(request);
 
-  if (error || !data?.institution || !data?.degree || !data?.fieldOfStudy || !data?.startDate) {
-    return apiError('Institution, degree, fieldOfStudy, and startDate are required', 400);
+  if (error || !data?.degree || !data?.institution || !data?.startDate) {
+    return apiError('Degree, institution, and startDate are required', 400);
   }
 
   try {
-    const education = await prisma.education.create({
+    const edu = await prisma.education.create({
       data: {
-        institution: data.institution.trim(),
         degree: data.degree.trim(),
-        fieldOfStudy: data.fieldOfStudy.trim(),
+        institution: data.institution.trim(),
+        fieldOfStudy: data.fieldOfStudy?.trim() || 'General',
         faculty: data.faculty?.trim() || null,
+        score: data.score?.trim() || null,
         startDate: new Date(data.startDate),
         endDate: data.endDate ? new Date(data.endDate) : null,
-        score: data.score?.trim() || null,
       },
     });
-    return apiSuccess(education, 201);
+    revalidatePortfolioData();
+    return apiSuccess(edu, 201);
   } catch (err: any) {
     return apiError('Failed to create education record', 500, err?.message);
   }

@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma';
-import { apiSuccess, apiError, parseJsonBody, requireAuthSession } from '@/lib/api-utils';
+import { apiSuccess, apiError, parseJsonBody, requireAuthSession, revalidatePortfolioData } from '@/lib/api-utils';
 
 export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const authError = await requireAuthSession();
@@ -19,6 +19,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
         ...(data.emoji !== undefined ? { emoji: data.emoji ? data.emoji.trim() : null } : {}),
       },
     });
+    revalidatePortfolioData();
     return apiSuccess(interest);
   } catch (err: any) {
     return apiError('Failed to update interest', 500, err?.message);
@@ -32,6 +33,7 @@ export async function DELETE(_request: Request, { params }: { params: Promise<{ 
   const { id } = await params;
   try {
     await prisma.interest.delete({ where: { id } });
+    revalidatePortfolioData();
     return apiSuccess({ message: 'Interest deleted successfully' });
   } catch (err: any) {
     return apiError('Failed to delete interest', 500, err?.message);

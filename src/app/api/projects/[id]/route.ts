@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma';
-import { apiSuccess, apiError, parseJsonBody, requireAuthSession } from '@/lib/api-utils';
+import { apiSuccess, apiError, parseJsonBody, requireAuthSession, revalidatePortfolioData } from '@/lib/api-utils';
 
 export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const authError = await requireAuthSession();
@@ -9,15 +9,31 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
   const { data, error } = await parseJsonBody<{
     title?: string;
     description?: string;
-    imageUrl?: string;
+    tags?: string[] | string;
     demoUrl?: string;
+    link?: string;
     repoUrl?: string;
-    tags?: string;
+    github?: string;
+    imageUrl?: string;
+    image?: string;
   }>(request);
 
   if (error || !data) {
     return apiError('Invalid request payload', 400);
   }
+
+  let tagsString: string | undefined = undefined;
+  if (data.tags !== undefined) {
+    if (Array.isArray(data.tags)) {
+      tagsString = data.tags.join(', ');
+    } else if (typeof data.tags === 'string') {
+      tagsString = data.tags;
+    }
+  }
+
+  const demo = data.demoUrl !== undefined ? data.demoUrl : data.link;
+  const repo = data.repoUrl !== undefined ? data.repoUrl : data.github;
+  const image = data.imageUrl !== undefined ? data.imageUrl : data.image;
 
   try {
     const project = await prisma.project.update({
@@ -25,12 +41,13 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
       data: {
         ...(data.title ? { title: data.title.trim() } : {}),
         ...(data.description ? { description: data.description.trim() } : {}),
-        ...(data.imageUrl !== undefined ? { imageUrl: data.imageUrl ? data.imageUrl.trim() : null } : {}),
-        ...(data.demoUrl !== undefined ? { demoUrl: data.demoUrl ? data.demoUrl.trim() : null } : {}),
-        ...(data.repoUrl !== undefined ? { repoUrl: data.repoUrl ? data.repoUrl.trim() : null } : {}),
-        ...(data.tags !== undefined ? { tags: data.tags.trim() } : {}),
+        ...(tagsString !== undefined ? { tags: tagsString } : {}),
+        ...(demo !== undefined ? { demoUrl: demo ? demo.trim() : null } : {}),
+        ...(repo !== undefined ? { repoUrl: repo ? repo.trim() : null } : {}),
+        ...(image !== undefined ? { imageUrl: image ? image.trim() : null } : {}),
       },
     });
+    revalidatePortfolioData();
     return apiSuccess(project);
   } catch (err: any) {
     return apiError('Failed to update project', 500, err?.message);
@@ -44,6 +61,7 @@ export async function DELETE(_request: Request, { params }: { params: Promise<{ 
   const { id } = await params;
   try {
     await prisma.project.delete({ where: { id } });
+    revalidatePortfolioData();
     return apiSuccess({ message: 'Project deleted successfully' });
   } catch (err: any) {
     return apiError('Failed to delete project', 500, err?.message);

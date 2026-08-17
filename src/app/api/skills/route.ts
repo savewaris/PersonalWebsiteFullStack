@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma';
-import { apiSuccess, apiError, parseJsonBody, requireAuthSession } from '@/lib/api-utils';
+import { apiSuccess, apiError, parseJsonBody, requireAuthSession, revalidatePortfolioData } from '@/lib/api-utils';
 
 export async function GET() {
   try {
@@ -36,6 +36,7 @@ export async function POST(request: Request) {
         icon: data.icon?.trim() || null,
       },
     });
+    revalidatePortfolioData();
     return apiSuccess(skill, 201);
   } catch (err: any) {
     return apiError('Failed to create skill', 500, err?.message);

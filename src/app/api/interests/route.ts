@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma';
-import { apiSuccess, apiError, parseJsonBody, requireAuthSession } from '@/lib/api-utils';
+import { apiSuccess, apiError, parseJsonBody, requireAuthSession, revalidatePortfolioData } from '@/lib/api-utils';
 
 export async function GET() {
   try {
@@ -26,6 +26,7 @@ export async function POST(request: Request) {
         emoji: data.emoji?.trim() || null,
       },
     });
+    revalidatePortfolioData();
     return apiSuccess(interest, 201);
   } catch (err: any) {
     return apiError('Failed to create interest', 500, err?.message);

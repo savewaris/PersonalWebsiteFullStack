@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
+import { revalidatePath } from 'next/cache';
 
 export function apiSuccess<T>(data: T, status = 200, headers?: HeadersInit) {
   return NextResponse.json(data, { status, headers });
@@ -13,6 +14,15 @@ export function apiError(message: string, status = 500, details?: unknown) {
     },
     { status }
   );
+}
+
+export function revalidatePortfolioData() {
+  try {
+    revalidatePath('/', 'page');
+    revalidatePath('/admin', 'layout');
+  } catch (err) {
+    console.error('Revalidation error:', err);
+  }
 }
 
 export async function isAuthSessionValid(): Promise<boolean> {

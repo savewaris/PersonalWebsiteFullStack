@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma';
-import { apiSuccess, apiError, parseJsonBody, requireAuthSession } from '@/lib/api-utils';
+import { apiSuccess, apiError, parseJsonBody, requireAuthSession, revalidatePortfolioData } from '@/lib/api-utils';
 
 export async function GET() {
   try {
@@ -19,14 +19,24 @@ export async function POST(request: Request) {
   const { data, error } = await parseJsonBody<{
     title?: string;
     description?: string;
-    imageUrl?: string;
+    tags?: string[] | string;
     demoUrl?: string;
+    link?: string;
     repoUrl?: string;
-    tags?: string;
+    github?: string;
+    imageUrl?: string;
+    image?: string;
   }>(request);
 
-  if (error || !data?.title || !data?.description) {
+  if (error || !data?.title || !data.description) {
     return apiError('Title and description are required', 400);
+  }
+
+  let tagsString = '';
+  if (Array.isArray(data.tags)) {
+    tagsString = data.tags.join(', ');
+  } else if (typeof data.tags === 'string') {
+    tagsString = data.tags;
   }
 
   try {
@@ -34,12 +44,13 @@ export async function POST(request: Request) {
       data: {
         title: data.title.trim(),
         description: data.description.trim(),
-        imageUrl: data.imageUrl?.trim() || null,
-        demoUrl: data.demoUrl?.trim() || null,
-        repoUrl: data.repoUrl?.trim() || null,
-        tags: data.tags?.trim() || '',
+        tags: tagsString,
+        demoUrl: data.demoUrl?.trim() || data.link?.trim() || null,
+        repoUrl: data.repoUrl?.trim() || data.github?.trim() || null,
+        imageUrl: data.imageUrl?.trim() || data.image?.trim() || null,
       },
     });
+    revalidatePortfolioData();
     return apiSuccess(project, 201);
   } catch (err: any) {
     return apiError('Failed to create project', 500, err?.message);

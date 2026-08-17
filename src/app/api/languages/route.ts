@@ -1,9 +1,9 @@
 import { prisma } from '@/lib/prisma';
-import { apiSuccess, apiError, parseJsonBody, requireAuthSession } from '@/lib/api-utils';
+import { apiSuccess, apiError, parseJsonBody, requireAuthSession, revalidatePortfolioData } from '@/lib/api-utils';
 
 export async function GET() {
   try {
-    const languages = await prisma.language.findMany({ orderBy: { proficiency: 'asc' } });
+    const languages = await prisma.language.findMany({ orderBy: { createdAt: 'asc' } });
     return apiSuccess(languages);
   } catch (error: any) {
     return apiError('Failed to fetch languages', 500, error?.message);
@@ -20,13 +20,14 @@ export async function POST(request: Request) {
   }
 
   try {
-    const language = await prisma.language.create({
+    const lang = await prisma.language.create({
       data: {
         name: data.name.trim(),
         proficiency: data.proficiency.trim(),
       },
     });
-    return apiSuccess(language, 201);
+    revalidatePortfolioData();
+    return apiSuccess(lang, 201);
   } catch (err: any) {
     return apiError('Failed to create language', 500, err?.message);
   }

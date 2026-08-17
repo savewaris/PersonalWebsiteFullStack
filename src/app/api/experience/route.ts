@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma';
-import { apiSuccess, apiError, parseJsonBody, requireAuthSession } from '@/lib/api-utils';
+import { apiSuccess, apiError, parseJsonBody, requireAuthSession, revalidatePortfolioData } from '@/lib/api-utils';
 
 export async function GET() {
   try {
@@ -19,28 +19,27 @@ export async function POST(request: Request) {
   const { data, error } = await parseJsonBody<{
     role?: string;
     company?: string;
-    location?: string;
-    startDate?: string;
-    endDate?: string | null;
     description?: string;
+    startDate?: string;
+    endDate?: string;
   }>(request);
 
-  if (error || !data?.role || !data?.company || !data?.startDate || !data?.description) {
-    return apiError('Role, company, startDate, and description are required', 400);
+  if (error || !data?.role || !data?.company || !data?.description || !data?.startDate) {
+    return apiError('Role, company, description, and startDate are required', 400);
   }
 
   try {
-    const experience = await prisma.experience.create({
+    const exp = await prisma.experience.create({
       data: {
         role: data.role.trim(),
         company: data.company.trim(),
-        location: data.location?.trim() || null,
+        description: data.description.trim(),
         startDate: new Date(data.startDate),
         endDate: data.endDate ? new Date(data.endDate) : null,
-        description: data.description.trim(),
       },
     });
-    return apiSuccess(experience, 201);
+    revalidatePortfolioData();
+    return apiSuccess(exp, 201);
   } catch (err: any) {
     return apiError('Failed to create experience', 500, err?.message);
   }

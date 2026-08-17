@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma';
-import { apiSuccess, apiError, parseJsonBody, requireAuthSession } from '@/lib/api-utils';
+import { apiSuccess, apiError, parseJsonBody, requireAuthSession, revalidatePortfolioData } from '@/lib/api-utils';
 
 export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const authError = await requireAuthSession();
@@ -29,6 +29,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
         ...(data.icon !== undefined ? { icon: data.icon ? data.icon.trim() : null } : {}),
       },
     });
+    revalidatePortfolioData();
     return apiSuccess(skill);
   } catch (err: any) {
     return apiError('Failed to update skill', 500, err?.message);
@@ -42,6 +43,7 @@ export async function DELETE(_request: Request, { params }: { params: Promise<{ 
   const { id } = await params;
   try {
     await prisma.skill.delete({ where: { id } });
+    revalidatePortfolioData();
     return apiSuccess({ message: 'Skill deleted successfully' });
   } catch (err: any) {
     return apiError('Failed to delete skill', 500, err?.message);

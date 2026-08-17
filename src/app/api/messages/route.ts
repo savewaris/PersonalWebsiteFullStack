@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma';
-import { apiSuccess, apiError, parseJsonBody, requireAuthSession } from '@/lib/api-utils';
+import { apiSuccess, apiError, parseJsonBody, requireAuthSession, revalidatePortfolioData } from '@/lib/api-utils';
 
 export async function GET() {
   const authError = await requireAuthSession();
@@ -40,6 +40,7 @@ export async function POST(request: Request) {
         message: data.message.trim(),
       },
     });
+    revalidatePortfolioData();
     return apiSuccess(newMessage, 201);
   } catch (err: any) {
     return apiError('Failed to send message', 500, err?.message);
