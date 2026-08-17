@@ -6,6 +6,7 @@ import {
   getHobbies,
   getInterests,
   getLanguages,
+  getSocialLinks,
   getStats,
 } from '@/lib/data';
 import Navbar from '@/components/Navbar';
@@ -24,7 +25,7 @@ import styles from './page.module.css';
 export const revalidate = 0;
 
 export default async function Home() {
-  const [skills, projects, experiences, education, hobbies, interests, languages, stats] = await Promise.all([
+  const [skills, projects, experiences, education, hobbies, interests, languages, socials, stats] = await Promise.all([
     getSkills(),
     getProjects(),
     getExperiences(),
@@ -32,6 +33,7 @@ export default async function Home() {
     getHobbies(),
     getInterests(),
     getLanguages(),
+    getSocialLinks(),
     getStats(),
   ]);
 
@@ -48,11 +50,11 @@ export default async function Home() {
             <ExperienceEducationSection experiences={experiences} education={education} />
             <ProjectsSection projects={projects} />
             <LanguagesInterestsSection languages={languages} hobbies={hobbies} interests={interests} />
-            <ContactSection />
+            <ContactSection socials={socials} />
           </StaggerContainer>
         </div>
       </main>
-      <Footer />
+      <Footer socials={socials} />
     </>
   );
 }

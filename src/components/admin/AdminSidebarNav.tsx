@@ -11,6 +11,7 @@ import {
   FaSmile,
   FaLightbulb,
   FaLanguage,
+  FaShareAlt,
   FaEnvelope,
   FaExternalLinkAlt,
   FaSignOutAlt,
@@ -26,6 +27,7 @@ const NAV_ITEMS = [
   { href: '/admin/hobbies', label: 'Hobbies', icon: FaSmile },
   { href: '/admin/interests', label: 'Interests', icon: FaLightbulb },
   { href: '/admin/languages', label: 'Languages', icon: FaLanguage },
+  { href: '/admin/socials', label: 'Socials & Contact', icon: FaShareAlt },
   { href: '/admin/messages', label: 'Messages', icon: FaEnvelope },
 ];
 

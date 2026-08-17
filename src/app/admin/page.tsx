@@ -14,11 +14,13 @@ export default async function AdminDashboard() {
     unreadMessagesCount,
     hobbiesCount,
     languagesCount,
+    socialsCount,
     recentSkills,
     recentProjects,
     recentExperience,
     recentEducation,
     recentMessages,
+    recentSocials,
   ] = await Promise.all([
     prisma.skill.count(),
     prisma.project.count(),
@@ -28,6 +30,7 @@ export default async function AdminDashboard() {
     prisma.message.count({ where: { read: false } }),
     prisma.hobby.count(),
     prisma.language.count(),
+    prisma.socialLink.count(),
     prisma.skill.findMany({
       select: { id: true, name: true, proficiency: true },
       orderBy: { proficiency: 'desc' },
@@ -51,6 +54,11 @@ export default async function AdminDashboard() {
     prisma.message.findMany({
       select: { id: true, name: true, message: true },
       orderBy: { createdAt: 'desc' },
+      take: 3,
+    }),
+    prisma.socialLink.findMany({
+      select: { id: true, platform: true, url: true },
+      orderBy: { order: 'asc' },
       take: 3,
     }),
   ]);
@@ -85,6 +93,13 @@ export default async function AdminDashboard() {
       emptyText: 'No education added yet',
     },
     {
+      title: 'Socials & Contact',
+      count: socialsCount,
+      href: '/admin/socials',
+      items: recentSocials.map((s) => s.platform),
+      emptyText: 'No social channels added',
+    },
+    {
       title: 'Messages',
       count: messagesCount,
       extraBadge: unreadMessagesCount > 0 ? `${unreadMessagesCount} unread` : undefined,
@@ -104,7 +119,7 @@ export default async function AdminDashboard() {
   return (
     <div className={styles.dashboard}>
       <h1 className={styles.title}>Admin Overview</h1>
-      <p className={styles.subtitle}>Manage your portfolio projects, skills, career history, and contact inquiries.</p>
+      <p className={styles.subtitle}>Manage your portfolio projects, skills, career history, social channels, and contact inquiries.</p>
 
       <div className={styles.statsGrid}>
         {cards.map((card) => (

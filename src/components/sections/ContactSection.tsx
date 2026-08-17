@@ -1,13 +1,18 @@
 import dynamic from 'next/dynamic';
-import { FaGithub, FaLinkedin, FaInstagram } from 'react-icons/fa';
 import { StaggerItem } from '@/components/MotionWrappers';
+import { SocialIcon } from '@/components/SocialIcon';
 import styles from '@/app/page.module.css';
+import { SocialLink } from '@prisma/client';
 
 const ContactForm = dynamic(() => import('@/components/ContactForm'), {
   loading: () => <div style={{ height: '200px', opacity: 0.5, animation: 'pulse 2s infinite' }}>Loading form...</div>,
 });
 
-export function ContactSection() {
+interface ContactSectionProps {
+  socials: SocialLink[];
+}
+
+export function ContactSection({ socials }: ContactSectionProps) {
   return (
     <StaggerItem id="contact" className={`${styles.bentoItem} ${styles.span4}`} style={{ display: 'flex', flexDirection: 'row', gap: '48px', flexWrap: 'wrap' }}>
       <div style={{ flex: '1 1 300px' }}>
@@ -15,18 +20,22 @@ export function ContactSection() {
           Get In Touch
         </h2>
         <p style={{ color: 'var(--text-secondary)', marginBottom: '32px', fontSize: '1.1rem' }}>
-          Interested in working together or have a question? Drop a message and I'll get back to you as soon as possible.
+          Interested in working together or have a question? Drop a message and I&apos;ll get back to you as soon as possible.
         </p>
-        <div className={styles.socialLinks} style={{ display: 'flex', gap: '16px', justifyContent: 'flex-start' }}>
-          <a href="https://github.com/savewaris" target="_blank" rel="noopener noreferrer" className={styles.socialLink} title="GitHub">
-            <FaGithub />
-          </a>
-          <a href="https://www.linkedin.com/in/waris-khamkaweepart/" target="_blank" rel="noopener noreferrer" className={styles.socialLink} title="LinkedIn">
-            <FaLinkedin />
-          </a>
-          <a href="https://www.instagram.com/save.waris/" target="_blank" rel="noopener noreferrer" className={styles.socialLink} title="Instagram">
-            <FaInstagram />
-          </a>
+        <div className={styles.socialLinks} style={{ display: 'flex', gap: '16px', justifyContent: 'flex-start', flexWrap: 'wrap' }}>
+          {socials.map((social) => (
+            <a
+              key={social.id}
+              href={social.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.socialLink}
+              title={social.platform}
+              style={{ fontSize: '1.25rem' }}
+            >
+              <SocialIcon platform={social.platform} url={social.url} icon={social.icon} />
+            </a>
+          ))}
         </div>
       </div>
       <div style={{ flex: '2 1 400px' }}>

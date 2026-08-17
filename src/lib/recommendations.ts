@@ -182,3 +182,17 @@ export const LANGUAGE_SUGGESTIONS = [
   { name: 'Burmese',          flag: '🇲🇲', defaultProficiency: 'Basic' },
   { name: 'Khmer',            flag: '🇰🇭', defaultProficiency: 'Basic' },
 ];
+
+export const SOCIAL_SUGGESTIONS = [
+  { platform: 'GitHub',        placeholderUrl: 'https://github.com/username', icon: '🐙' },
+  { platform: 'LinkedIn',      placeholderUrl: 'https://linkedin.com/in/username', icon: '💼' },
+  { platform: 'Instagram',     placeholderUrl: 'https://instagram.com/username', icon: '📸' },
+  { platform: 'X / Twitter',   placeholderUrl: 'https://x.com/username', icon: '🐦' },
+  { platform: 'Discord',       placeholderUrl: 'https://discord.gg/yourserver', icon: '💬' },
+  { platform: 'Email',         placeholderUrl: 'mailto:your.email@example.com', icon: '✉️' },
+  { platform: 'YouTube',       placeholderUrl: 'https://youtube.com/@channel', icon: '🎥' },
+  { platform: 'Telegram',      placeholderUrl: 'https://t.me/username', icon: '✈️' },
+  { platform: 'Medium / Blog', placeholderUrl: 'https://medium.com/@username', icon: '✍️' },
+  { platform: 'Spotify',       placeholderUrl: 'https://open.spotify.com/user/...', icon: '🎧' },
+  { platform: 'Portfolio / Web', placeholderUrl: 'https://yourwebsite.com', icon: '🌐' },
+];
