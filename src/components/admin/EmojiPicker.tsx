@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { FaExternalLinkAlt, FaBolt, FaIcons, FaSmile, FaGlobe } from 'react-icons/fa';
 import {
   HOBBY_EMOJI_PALETTE,
   INTEREST_EMOJI_PALETTE,
@@ -46,7 +47,103 @@ export function EmojiPicker({ onSelect, category = 'all' }: EmojiPickerProps) {
   const palette = getPalette();
 
   return (
-    <div style={{ marginTop: '8px', padding: '10px', background: 'var(--bg-elevated)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border)' }}>
+    <div style={{ marginTop: '8px', padding: '12px', background: 'var(--bg-elevated)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border)' }}>
+      {/* ── Official Clickable Resource Links Bar ── */}
+      <div style={{ marginBottom: '10px', paddingBottom: '8px', borderBottom: '1px solid var(--border)' }}>
+        <div style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+          Official Icon &amp; Emoji Catalogs (Click to browse &amp; copy):
+        </div>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+          <a
+            href="https://simpleicons.org/"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '4px',
+              padding: '3px 8px',
+              fontSize: '0.74rem',
+              borderRadius: '6px',
+              background: 'rgba(94, 106, 210, 0.12)',
+              border: '1px solid rgba(94, 106, 210, 0.25)',
+              color: 'var(--accent)',
+              textDecoration: 'none',
+              fontWeight: 500,
+            }}
+            title="Browse official brand and tech vector logos (Gmail, X, React, etc.)"
+          >
+            <FaBolt size={10} /> Simple Icons <FaExternalLinkAlt size={9} />
+          </a>
+
+          <a
+            href="https://react-icons.github.io/react-icons/"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '4px',
+              padding: '3px 8px',
+              fontSize: '0.74rem',
+              borderRadius: '6px',
+              background: 'rgba(255, 255, 255, 0.05)',
+              border: '1px solid var(--border)',
+              color: 'var(--text-primary)',
+              textDecoration: 'none',
+              fontWeight: 500,
+            }}
+            title="Browse all developer icon sets"
+          >
+            <FaIcons size={10} /> React Icons <FaExternalLinkAlt size={9} />
+          </a>
+
+          <a
+            href="https://emojipedia.org/"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '4px',
+              padding: '3px 8px',
+              fontSize: '0.74rem',
+              borderRadius: '6px',
+              background: 'rgba(255, 255, 255, 0.05)',
+              border: '1px solid var(--border)',
+              color: 'var(--text-primary)',
+              textDecoration: 'none',
+              fontWeight: 500,
+            }}
+            title="Search any emoji on Emojipedia"
+          >
+            <FaSmile size={10} /> Emojipedia <FaExternalLinkAlt size={9} />
+          </a>
+
+          <a
+            href="https://unicode.org/emoji/charts/full-emoji-list.html"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '4px',
+              padding: '3px 8px',
+              fontSize: '0.74rem',
+              borderRadius: '6px',
+              background: 'rgba(255, 255, 255, 0.05)',
+              border: '1px solid var(--border)',
+              color: 'var(--text-secondary)',
+              textDecoration: 'none',
+              fontWeight: 500,
+            }}
+            title="Unicode Consortium Official Emoji Chart"
+          >
+            <FaGlobe size={10} /> Unicode Chart <FaExternalLinkAlt size={9} />
+          </a>
+        </div>
+      </div>
+
       {/* Category Tabs */}
       <div style={{ display: 'flex', gap: '4px', marginBottom: '8px', flexWrap: 'wrap' }}>
         <button
@@ -127,7 +224,7 @@ export function EmojiPicker({ onSelect, category = 'all' }: EmojiPickerProps) {
       </div>
 
       {/* Emoji Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(28px, 1fr))', gap: '4px', maxHeight: '110px', overflowY: 'auto' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(28px, 1fr))', gap: '4px', maxHeight: '105px', overflowY: 'auto' }}>
         {palette.map((emoji, idx) => (
           <button
             key={idx}
