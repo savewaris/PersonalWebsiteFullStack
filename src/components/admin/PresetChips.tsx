@@ -13,14 +13,38 @@ interface PresetChipsProps<T> {
   searchType?: 'skills' | 'hobbies' | 'interests' | 'languages';
 }
 
-const DEFAULT_TREND_PILLS = [
-  { label: '🔥 Trending 2026', query: 'trending' },
-  { label: '🤖 AI & LLMs', query: 'artificial intelligence llm' },
-  { label: '🎨 Frontend', query: 'frontend framework ui' },
-  { label: '⚙️ Backend', query: 'backend server api' },
-  { label: '☁️ Cloud & DevOps', query: 'cloud devops kubernetes' },
-  { label: '🐘 Databases', query: 'database sql nosql' },
-];
+const DOMAIN_TREND_PILLS: Record<string, { label: string; query: string }[]> = {
+  skills: [
+    { label: '🔥 Trending 2026', query: 'trending web development' },
+    { label: '🤖 AI & LLMs', query: 'artificial intelligence llm' },
+    { label: '🎨 Frontend', query: 'frontend framework ui' },
+    { label: '⚙️ Backend', query: 'backend server api' },
+    { label: '☁️ Cloud & DevOps', query: 'cloud devops kubernetes' },
+    { label: '🐘 Databases', query: 'database sql nosql' },
+  ],
+  hobbies: [
+    { label: '📷 Photography', query: 'photography camera photo' },
+    { label: '🎮 Gaming & Esports', query: 'gaming video games' },
+    { label: '🏃 Fitness & Sports', query: 'fitness workout running sport' },
+    { label: '🎸 Music & Audio', query: 'music guitar synthesizer audio' },
+    { label: '🍳 Cooking & Coffee', query: 'cooking coffee culinary' },
+    { label: '✈️ Travel & Outdoors', query: 'travel hiking outdoor' },
+  ],
+  interests: [
+    { label: '🧠 Generative AI', query: 'generative ai machine learning' },
+    { label: '🏢 Startups & SaaS', query: 'saas startup entrepreneurship' },
+    { label: '📈 Quantitative Finance', query: 'quantitative finance algorithmic trading' },
+    { label: '🎨 UI/UX Design', query: 'ui ux design interaction' },
+    { label: '⚛️ Quantum Computing', query: 'quantum computing physics' },
+    { label: '🌐 Web3 & Systems', query: 'distributed systems cryptography' },
+  ],
+  languages: [
+    { label: '🌏 Asian Languages', query: 'Asian' },
+    { label: '🌍 European Languages', query: 'European' },
+    { label: '🌎 Americas', query: 'Americas' },
+    { label: '🗺️ Middle Eastern', query: 'Middle Eastern' },
+  ],
+};
 
 export function PresetChips<T>({
   title = 'Suggested Presets (Click to add)',
@@ -35,6 +59,8 @@ export function PresetChips<T>({
   const [webResults, setWebResults] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [searchError, setSearchError] = useState('');
+
+  const trendPills = DOMAIN_TREND_PILLS[searchType] || DOMAIN_TREND_PILLS.skills;
 
   const handleSearchWeb = async (queryText: string) => {
     if (!queryText.trim()) return;
@@ -86,7 +112,7 @@ export function PresetChips<T>({
               fontWeight: 500,
             }}
           >
-            <FaGlobe /> {showWebSearch ? 'Hide Web Trends' : '🌐 Discover Live Trends from Web'}
+            <FaGlobe /> {showWebSearch ? 'Hide Web Trends' : `🌐 Discover Live ${searchType.charAt(0).toUpperCase() + searchType.slice(1)}`}
           </button>
         )}
       </div>
@@ -98,7 +124,7 @@ export function PresetChips<T>({
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search live tech trends e.g. 'Next.js', 'AI Agents', 'Rust', 'Kubernetes'..."
+              placeholder={`Search live ${searchType}...`}
               style={{
                 flex: 1,
                 padding: '8px 12px',
@@ -115,13 +141,13 @@ export function PresetChips<T>({
               className={styles.primaryButton}
               style={{ padding: '8px 14px', fontSize: '0.85rem' }}
             >
-              {isLoading ? <FaSpinner className={styles.spinner} /> : <FaSearch />} Search Web
+              {isLoading ? <FaSpinner className={styles.spinner} /> : <FaSearch />} Search
             </button>
           </form>
 
-          {/* Quick trend pills */}
+          {/* Dynamic Domain Quick Pills */}
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-            {DEFAULT_TREND_PILLS.map((pill) => (
+            {trendPills.map((pill) => (
               <button
                 key={pill.label}
                 type="button"
@@ -152,7 +178,7 @@ export function PresetChips<T>({
           {webResults.length > 0 && (
             <div style={{ marginTop: '12px' }}>
               <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginBottom: '8px', fontWeight: 600 }}>
-                LIVE WEB RESULTS (Click to instant add):
+                LIVE RESULTS (Click to instant add):
               </div>
               <div className={styles.presetChips}>
                 {webResults.map((res, idx) => (
@@ -164,7 +190,7 @@ export function PresetChips<T>({
                     style={{ borderColor: 'var(--accent)', background: 'rgba(94, 106, 210, 0.08)' }}
                     title={res.description || res.name}
                   >
-                    + {res.icon} {res.name} ({res.category})
+                    + {res.flag || res.icon || res.emoji || '✨'} {res.name} {res.defaultProficiency ? `(${res.defaultProficiency})` : res.category ? `(${res.category})` : ''}
                   </button>
                 ))}
               </div>

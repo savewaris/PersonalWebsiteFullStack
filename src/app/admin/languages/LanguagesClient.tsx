@@ -52,8 +52,8 @@ export default function LanguagesClient({ initialLanguages }: { initialLanguages
   const existingNames = new Set(languages.map((l) => l.name.toLowerCase()));
   const availableSuggestions = LANGUAGE_SUGGESTIONS.filter((l) => !existingNames.has(l.name.toLowerCase()));
 
-  const handleSelectPreset = async (preset: (typeof LANGUAGE_SUGGESTIONS)[0]) => {
-    await saveItem({ name: preset.name, proficiency: preset.defaultProficiency });
+  const handleSelectPreset = async (preset: { name: string; defaultProficiency?: string; proficiency?: string; flag?: string }) => {
+    await saveItem({ name: preset.name, proficiency: preset.defaultProficiency || preset.proficiency || 'Professional Working' });
   };
 
   return (
@@ -69,8 +69,10 @@ export default function LanguagesClient({ initialLanguages }: { initialLanguages
       <PresetChips
         title="Suggested Languages (Click to instant add)"
         items={availableSuggestions}
-        getLabel={(s) => `${s.flag} ${s.name} (${s.defaultProficiency})`}
+        getLabel={(s) => `${s.flag || ''} ${s.name} (${s.defaultProficiency || 'Working'})`}
         onSelect={handleSelectPreset}
+        allowWebSearch={true}
+        searchType="languages"
       />
 
       {error && <div className={styles.errorBanner}>{error}</div>}

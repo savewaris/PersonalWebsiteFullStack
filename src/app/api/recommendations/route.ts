@@ -41,6 +41,35 @@ const CATEGORY_MAP: Record<string, { category: string; icon: string }> = {
   tensorflow: { category: 'AI / ML', icon: '🟧' },
 };
 
+const WORLD_LANGUAGES = [
+  { name: 'English', flag: '🇬🇧', region: 'European', defaultProficiency: 'Fluent' },
+  { name: 'Thai', flag: '🇹🇭', region: 'Asian', defaultProficiency: 'Native' },
+  { name: 'Mandarin Chinese', flag: '🇨🇳', region: 'Asian', defaultProficiency: 'Intermediate' },
+  { name: 'Japanese', flag: '🇯🇵', region: 'Asian', defaultProficiency: 'Intermediate' },
+  { name: 'Korean', flag: '🇰🇷', region: 'Asian', defaultProficiency: 'Basic' },
+  { name: 'Spanish', flag: '🇪🇸', region: 'Americas / European', defaultProficiency: 'Intermediate' },
+  { name: 'French', flag: '🇫🇷', region: 'European', defaultProficiency: 'Intermediate' },
+  { name: 'German', flag: '🇩🇪', region: 'European', defaultProficiency: 'Intermediate' },
+  { name: 'Portuguese', flag: '🇧🇷', region: 'Americas / European', defaultProficiency: 'Basic' },
+  { name: 'Italian', flag: '🇮🇹', region: 'European', defaultProficiency: 'Basic' },
+  { name: 'Russian', flag: '🇷🇺', region: 'European', defaultProficiency: 'Basic' },
+  { name: 'Arabic', flag: '🇸🇦', region: 'Middle Eastern', defaultProficiency: 'Basic' },
+  { name: 'Hindi', flag: '🇮🇳', region: 'Asian', defaultProficiency: 'Basic' },
+  { name: 'Vietnamese', flag: '🇻🇳', region: 'Asian', defaultProficiency: 'Basic' },
+  { name: 'Indonesian', flag: '🇮🇩', region: 'Asian', defaultProficiency: 'Intermediate' },
+  { name: 'Malay', flag: '🇲🇾', region: 'Asian', defaultProficiency: 'Basic' },
+  { name: 'Tagalog / Filipino', flag: '🇵🇭', region: 'Asian', defaultProficiency: 'Basic' },
+  { name: 'Dutch', flag: '🇳🇱', region: 'European', defaultProficiency: 'Basic' },
+  { name: 'Swedish', flag: '🇸🇪', region: 'European', defaultProficiency: 'Basic' },
+  { name: 'Norwegian', flag: '🇳🇴', region: 'European', defaultProficiency: 'Basic' },
+  { name: 'Danish', flag: '🇩🇰', region: 'European', defaultProficiency: 'Basic' },
+  { name: 'Finnish', flag: '🇫🇮', region: 'European', defaultProficiency: 'Basic' },
+  { name: 'Polish', flag: '🇵🇱', region: 'European', defaultProficiency: 'Basic' },
+  { name: 'Turkish', flag: '🇹🇷', region: 'Middle Eastern', defaultProficiency: 'Basic' },
+  { name: 'Greek', flag: '🇬🇷', region: 'European', defaultProficiency: 'Basic' },
+  { name: 'Hebrew', flag: '🇮🇱', region: 'Middle Eastern', defaultProficiency: 'Basic' },
+];
+
 function inferCategoryAndIcon(name: string, query?: string): { category: string; icon: string } {
   const lower = name.toLowerCase().replace(/[^a-z0-9]/g, '');
 
@@ -57,6 +86,10 @@ function inferCategoryAndIcon(name: string, query?: string): { category: string;
     if (qLower.includes('back') || qLower.includes('api') || qLower.includes('server')) return { category: 'Backend', icon: '⚙️' };
     if (qLower.includes('cloud') || qLower.includes('devops') || qLower.includes('infra')) return { category: 'Cloud / DevOps', icon: '☁️' };
     if (qLower.includes('db') || qLower.includes('data') || qLower.includes('sql')) return { category: 'Database', icon: '🗄️' };
+    if (qLower.includes('photo') || qLower.includes('camera')) return { category: 'Creative', icon: '📷' };
+    if (qLower.includes('game') || qLower.includes('gaming')) return { category: 'Gaming', icon: '🎮' };
+    if (qLower.includes('music') || qLower.includes('audio')) return { category: 'Music', icon: '🎧' };
+    if (qLower.includes('sport') || qLower.includes('fitness') || qLower.includes('run')) return { category: 'Sports', icon: '🏃' };
   }
 
   return { category: 'General', icon: '⚡' };
@@ -67,12 +100,40 @@ export async function GET(request: Request) {
   if (authError) return authError;
 
   const { searchParams } = new URL(request.url);
-  const query = searchParams.get('query')?.trim() || 'trending web development';
   const type = searchParams.get('type') || 'skills';
+  const query = searchParams.get('query')?.trim() || '';
+
+  // 1. Language Recommendations
+  if (type === 'languages') {
+    let filtered = WORLD_LANGUAGES;
+    if (query) {
+      const q = query.toLowerCase();
+      filtered = WORLD_LANGUAGES.filter(
+        (l) => l.name.toLowerCase().includes(q) || l.region.toLowerCase().includes(q)
+      );
+    }
+    const results = filtered.map((l) => ({
+      name: l.name,
+      flag: l.flag,
+      defaultProficiency: l.defaultProficiency,
+      category: l.region,
+      icon: l.flag,
+    }));
+    return apiSuccess({ query, type, results });
+  }
+
+  // 2. Skills, Hobbies, and Interests live web search
+  const defaultQuery =
+    type === 'hobbies'
+      ? 'hobbies sports gaming creative'
+      : type === 'interests'
+      ? 'technology science startups ai'
+      : 'trending web development';
+
+  const searchQuery = query || defaultQuery;
 
   try {
-    // Query GitHub Topics API for live developer technologies
-    const targetQuery = encodeURIComponent(query.replace(/\s+/g, '+'));
+    const targetQuery = encodeURIComponent(searchQuery.replace(/\s+/g, '+'));
     const response = await fetch(
       `https://api.github.com/search/topics?q=${targetQuery}&per_page=20`,
       {
@@ -80,14 +141,13 @@ export async function GET(request: Request) {
           Accept: 'application/vnd.github.mercy-preview+json',
           'User-Agent': 'Personal-Portfolio-Admin',
         },
-        next: { revalidate: 3600 }, // Cache live web results for 1 hour
+        next: { revalidate: 3600 },
       }
     );
 
     if (!response.ok) {
-      // Fallback search via repositories if topics is rate-limited
       const repoRes = await fetch(
-        `https://api.github.com/search/repositories?q=${targetQuery}+stars:>500&sort=stars&order=desc&per_page=15`,
+        `https://api.github.com/search/repositories?q=${targetQuery}+stars:>300&sort=stars&order=desc&per_page=15`,
         {
           headers: {
             Accept: 'application/vnd.github.v3+json',
@@ -103,17 +163,18 @@ export async function GET(request: Request) {
             .split(/[-_]/)
             .map((w: string) => w.charAt(0).toUpperCase() + w.slice(1))
             .join(' ');
-          const { category, icon } = inferCategoryAndIcon(repo.name, query);
+          const { category, icon } = inferCategoryAndIcon(repo.name, searchQuery);
           return {
             name,
             category,
             icon,
+            emoji: icon,
             proficiency: 80,
             description: repo.description,
           };
         });
 
-        return apiSuccess({ query, type, results });
+        return apiSuccess({ query: searchQuery, type, results });
       }
 
       return apiError('Unable to fetch live web trends at this moment', 502);
@@ -129,18 +190,19 @@ export async function GET(request: Request) {
           .split(/[-_]/)
           .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
           .join(' ');
-      const { category, icon } = inferCategoryAndIcon(t.name, query);
+      const { category, icon } = inferCategoryAndIcon(t.name, searchQuery);
 
       return {
         name: displayName,
         category,
         icon,
+        emoji: icon,
         proficiency: 85,
         description: t.short_description || t.description || undefined,
       };
     });
 
-    return apiSuccess({ query, type, results });
+    return apiSuccess({ query: searchQuery, type, results });
   } catch (err: any) {
     return apiError('Failed to fetch live web recommendations', 500, err?.message);
   }
