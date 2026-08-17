@@ -7,6 +7,7 @@ import { AdminPageHeader } from '@/components/admin/AdminPageHeader';
 import { AdminModal } from '@/components/admin/AdminModal';
 import { DeleteConfirmModal } from '@/components/admin/DeleteConfirmModal';
 import { PresetChips } from '@/components/admin/PresetChips';
+import { EmojiPicker } from '@/components/admin/EmojiPicker';
 import { HOBBY_SUGGESTIONS } from '@/lib/recommendations';
 import styles from '@/components/admin/admin.module.css';
 
@@ -131,9 +132,11 @@ export default function HobbiesClient({ initialHobbies }: { initialHobbies: Hobb
               type="text"
               value={formData.emoji || ''}
               onChange={(e) => setFormData({ ...formData, emoji: e.target.value })}
-              placeholder="e.g. 📷, 🎮, 🏃‍♂️"
+              placeholder="e.g. 📸, 🎮, 🏃"
             />
           </div>
+
+          <EmojiPicker category="hobbies" onSelect={(em) => setFormData({ ...formData, emoji: em })} />
 
           <div className={styles.modalFooter}>
             <button type="button" onClick={closeModal} className={styles.secondaryButton}>

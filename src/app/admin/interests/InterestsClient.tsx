@@ -7,6 +7,7 @@ import { AdminPageHeader } from '@/components/admin/AdminPageHeader';
 import { AdminModal } from '@/components/admin/AdminModal';
 import { DeleteConfirmModal } from '@/components/admin/DeleteConfirmModal';
 import { PresetChips } from '@/components/admin/PresetChips';
+import { EmojiPicker } from '@/components/admin/EmojiPicker';
 import { INTEREST_SUGGESTIONS } from '@/lib/recommendations';
 import styles from '@/components/admin/admin.module.css';
 
@@ -134,6 +135,8 @@ export default function InterestsClient({ initialInterests }: { initialInterests
               placeholder="e.g. 🤖, ⚡, 🌐"
             />
           </div>
+
+          <EmojiPicker category="interests" onSelect={(em) => setFormData({ ...formData, emoji: em })} />
 
           <div className={styles.modalFooter}>
             <button type="button" onClick={closeModal} className={styles.secondaryButton}>

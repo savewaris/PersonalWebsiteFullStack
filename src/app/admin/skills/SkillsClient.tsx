@@ -7,6 +7,8 @@ import { AdminPageHeader } from '@/components/admin/AdminPageHeader';
 import { AdminModal } from '@/components/admin/AdminModal';
 import { DeleteConfirmModal } from '@/components/admin/DeleteConfirmModal';
 import { PresetChips } from '@/components/admin/PresetChips';
+import { PortfolioIcon } from '@/components/PortfolioIcon';
+import { EmojiPicker } from '@/components/admin/EmojiPicker';
 import { SKILL_SUGGESTIONS } from '@/lib/recommendations';
 import styles from '@/components/admin/admin.module.css';
 
@@ -97,12 +99,25 @@ export default function SkillsClient({ initialSkills }: { initialSkills: Skill[]
           {skills.map((skill) => (
             <div key={skill.id} className={styles.card}>
               <div className={styles.cardHeader}>
-                <div>
-                  <h3 className={styles.cardTitle}>
-                    {skill.icon && <span style={{ marginRight: '8px' }}>{skill.icon}</span>}
-                    {skill.name}
-                  </h3>
-                  <div className={styles.cardSubtitle}>{skill.category}</div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <div
+                    style={{
+                      width: '36px',
+                      height: '36px',
+                      borderRadius: '8px',
+                      background: 'rgba(255, 255, 255, 0.05)',
+                      border: '1px solid var(--border)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <PortfolioIcon name={skill.name} icon={skill.icon} category={skill.category} size={18} />
+                  </div>
+                  <div>
+                    <h3 className={styles.cardTitle}>{skill.name}</h3>
+                    <div className={styles.cardSubtitle}>{skill.category}</div>
+                  </div>
                 </div>
                 <span className={styles.badgeCount}>{skill.proficiency}%</span>
               </div>
@@ -165,14 +180,16 @@ export default function SkillsClient({ initialSkills }: { initialSkills: Skill[]
           </div>
 
           <div className={styles.formGroup}>
-            <label>Icon / Emoji (Optional)</label>
+            <label>Icon / Emoji Override (Optional)</label>
             <input
               type="text"
               value={formData.icon || ''}
               onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
-              placeholder="e.g. ⚡, 🚀, or icon identifier"
+              placeholder="Leave blank to auto-detect official logo"
             />
           </div>
+
+          <EmojiPicker category="skills" onSelect={(em) => setFormData({ ...formData, icon: em })} />
 
           <div className={styles.modalFooter}>
             <button type="button" onClick={closeModal} className={styles.secondaryButton}>

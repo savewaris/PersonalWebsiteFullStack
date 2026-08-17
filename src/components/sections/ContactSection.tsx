@@ -1,6 +1,6 @@
 import dynamic from 'next/dynamic';
 import { StaggerItem } from '@/components/MotionWrappers';
-import { SocialIcon } from '@/components/SocialIcon';
+import { PortfolioIcon } from '@/components/PortfolioIcon';
 import styles from '@/app/page.module.css';
 import { SocialLink } from '@prisma/client';
 
@@ -31,9 +31,20 @@ export function ContactSection({ socials }: ContactSectionProps) {
               rel="noopener noreferrer"
               className={styles.socialLink}
               title={social.platform}
-              style={{ fontSize: '1.25rem' }}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: '46px',
+                height: '46px',
+                borderRadius: '12px',
+                background: 'rgba(255, 255, 255, 0.04)',
+                border: '1px solid var(--border)',
+                color: 'var(--text-primary)',
+                transition: 'all 0.2s ease',
+              }}
             >
-              <SocialIcon platform={social.platform} url={social.url} icon={social.icon} />
+              <PortfolioIcon platform={social.platform} url={social.url} icon={social.icon} size={20} />
             </a>
           ))}
         </div>

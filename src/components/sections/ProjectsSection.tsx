@@ -1,6 +1,7 @@
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import { StaggerItem } from '@/components/MotionWrappers';
+import { PortfolioIcon } from '@/components/PortfolioIcon';
 import { ensureHttps } from '@/lib/api-utils';
 import styles from '@/app/page.module.css';
 import { Project } from '@prisma/client';
@@ -38,13 +39,48 @@ export function ProjectsSection({ projects }: ProjectsSectionProps) {
                 </div>
                 <div className={styles.projectLinks} style={{ display: 'flex', gap: '12px' }}>
                   {liveDemoLink && (
-                    <a href={liveDemoLink} target="_blank" rel="noopener noreferrer" className={styles.projectLink} style={{ padding: '8px 16px', background: 'var(--text-primary)', color: 'var(--bg-primary)', borderRadius: '6px', fontSize: '0.85rem', fontWeight: 600 }}>
-                      Live Demo
+                    <a
+                      href={liveDemoLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={styles.projectLink}
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        padding: '8px 16px',
+                        background: 'var(--text-primary)',
+                        color: 'var(--bg-primary)',
+                        borderRadius: '6px',
+                        fontSize: '0.85rem',
+                        fontWeight: 600,
+                      }}
+                    >
+                      <PortfolioIcon platform="Web" size={14} />
+                      <span>Live Demo</span>
                     </a>
                   )}
                   {githubRepoLink && (
-                    <a href={githubRepoLink} target="_blank" rel="noopener noreferrer" className={styles.projectLink} style={{ padding: '8px 16px', background: 'transparent', border: '1px solid var(--border)', color: 'var(--text-primary)', borderRadius: '6px', fontSize: '0.85rem', fontWeight: 600 }}>
-                      GitHub
+                    <a
+                      href={githubRepoLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={styles.projectLink}
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        padding: '8px 16px',
+                        background: 'transparent',
+                        border: '1px solid var(--border)',
+                        color: 'var(--text-primary)',
+                        borderRadius: '6px',
+                        fontSize: '0.85rem',
+                        fontWeight: 600,
+                      }}
+                    >
+                      <PortfolioIcon platform="GitHub" size={14} />
+                      <span>GitHub</span>
                     </a>
                   )}
                 </div>

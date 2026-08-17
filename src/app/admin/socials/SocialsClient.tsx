@@ -7,7 +7,8 @@ import { AdminPageHeader } from '@/components/admin/AdminPageHeader';
 import { AdminModal } from '@/components/admin/AdminModal';
 import { DeleteConfirmModal } from '@/components/admin/DeleteConfirmModal';
 import { PresetChips } from '@/components/admin/PresetChips';
-import { SocialIcon } from '@/components/SocialIcon';
+import { PortfolioIcon } from '@/components/PortfolioIcon';
+import { EmojiPicker } from '@/components/admin/EmojiPicker';
 import { SOCIAL_SUGGESTIONS } from '@/lib/recommendations';
 import styles from '@/components/admin/admin.module.css';
 
@@ -63,7 +64,7 @@ export default function SocialsClient({ initialSocials }: { initialSocials: Soci
   const handleSelectPreset = (preset: (typeof SOCIAL_SUGGESTIONS)[0]) => {
     setFormData({
       platform: preset.platform,
-      url: preset.placeholderUrl.startsWith('mailto:') ? '' : preset.placeholderUrl,
+      url: preset.placeholderUrl.startsWith('mailto:') ? preset.placeholderUrl : preset.placeholderUrl,
       icon: '',
       order: socials.length + 1,
     });
@@ -112,7 +113,7 @@ export default function SocialsClient({ initialSocials }: { initialSocials: Soci
                       color: 'var(--text-primary)',
                     }}
                   >
-                    <SocialIcon platform={social.platform} url={social.url} icon={social.icon} />
+                    <PortfolioIcon platform={social.platform} url={social.url} icon={social.icon} size={20} />
                   </div>
                   <div>
                     <h3 className={styles.cardTitle}>{social.platform}</h3>
@@ -161,7 +162,7 @@ export default function SocialsClient({ initialSocials }: { initialSocials: Soci
               required
               value={formData.platform || ''}
               onChange={(e) => setFormData({ ...formData, platform: e.target.value })}
-              placeholder="e.g. GitHub, LinkedIn, X / Twitter, Discord, Email"
+              placeholder="e.g. Gmail, X / Twitter, GitHub, LinkedIn, Discord"
             />
           </div>
 
@@ -172,10 +173,10 @@ export default function SocialsClient({ initialSocials }: { initialSocials: Soci
               required
               value={formData.url || ''}
               onChange={(e) => setFormData({ ...formData, url: e.target.value })}
-              placeholder="e.g. https://github.com/username or mailto:you@domain.com"
+              placeholder="e.g. https://x.com/username or your.name@gmail.com"
             />
             <span style={{ fontSize: '0.78rem', color: 'var(--text-tertiary)', marginTop: '4px' }}>
-              Tip: If you omit https://, it will be automatically fulfilled for you.
+              Tip: Omitting https:// or mailto: will be automatically fulfilled for you.
             </span>
           </div>
 
@@ -200,6 +201,8 @@ export default function SocialsClient({ initialSocials }: { initialSocials: Soci
               />
             </div>
           </div>
+
+          <EmojiPicker category="socials" onSelect={(em) => setFormData({ ...formData, icon: em })} />
 
           <div className={styles.modalFooter}>
             <button type="button" onClick={closeModal} className={styles.secondaryButton}>

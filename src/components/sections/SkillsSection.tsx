@@ -1,4 +1,5 @@
 import { StaggerItem } from '@/components/MotionWrappers';
+import { PortfolioIcon } from '@/components/PortfolioIcon';
 import styles from '@/app/page.module.css';
 import { Skill } from '@prisma/client';
 
@@ -16,8 +17,10 @@ export function SkillsSection({ skills }: SkillsSectionProps) {
             <div key={skill.id} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem', color: 'var(--text-primary)' }}>
                 <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  {skill.icon} {skill.name}
+                  <PortfolioIcon name={skill.name} icon={skill.icon} category={skill.category} size={16} />
+                  <span>{skill.name}</span>
                 </span>
+                <span style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>{skill.proficiency}%</span>
               </div>
               <div className={styles.progressBar}>
                 <div className={styles.progressFill} style={{ width: `${skill.proficiency}%` }} />
