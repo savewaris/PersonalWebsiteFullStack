@@ -56,11 +56,6 @@ export default function Navbar() {
               Contact
             </Link>
           </li>
-          <li>
-            <Link href="/admin" className={styles.adminLink}>
-              Admin
-            </Link>
-          </li>
         </ul>
       </div>
     </nav>
