@@ -28,11 +28,31 @@ export default async function AdminDashboard() {
     prisma.message.count({ where: { read: false } }),
     prisma.hobby.count(),
     prisma.language.count(),
-    prisma.skill.findMany({ orderBy: { proficiency: 'desc' }, take: 4 }),
-    prisma.project.findMany({ orderBy: { createdAt: 'desc' }, take: 3 }),
-    prisma.experience.findMany({ orderBy: { startDate: 'desc' }, take: 3 }),
-    prisma.education.findMany({ orderBy: { startDate: 'desc' }, take: 3 }),
-    prisma.message.findMany({ orderBy: { createdAt: 'desc' }, take: 3 }),
+    prisma.skill.findMany({
+      select: { id: true, name: true, proficiency: true },
+      orderBy: { proficiency: 'desc' },
+      take: 4,
+    }),
+    prisma.project.findMany({
+      select: { id: true, title: true },
+      orderBy: { createdAt: 'desc' },
+      take: 3,
+    }),
+    prisma.experience.findMany({
+      select: { id: true, role: true, company: true },
+      orderBy: { startDate: 'desc' },
+      take: 3,
+    }),
+    prisma.education.findMany({
+      select: { id: true, degree: true, institution: true },
+      orderBy: { startDate: 'desc' },
+      take: 3,
+    }),
+    prisma.message.findMany({
+      select: { id: true, name: true, message: true },
+      orderBy: { createdAt: 'desc' },
+      take: 3,
+    }),
   ]);
 
   const cards = [
@@ -88,7 +108,7 @@ export default async function AdminDashboard() {
 
       <div className={styles.statsGrid}>
         {cards.map((card) => (
-          <Link key={card.title} href={card.href} className={styles.statCard}>
+          <Link key={card.title} href={card.href} prefetch={true} className={styles.statCard}>
             <div className={styles.cardHeader}>
               <h3>{card.title}</h3>
               <div style={{ display: 'flex', gap: '6px' }}>

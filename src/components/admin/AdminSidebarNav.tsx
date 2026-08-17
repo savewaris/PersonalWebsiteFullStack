@@ -52,6 +52,7 @@ export function AdminSidebarNav() {
           <Link
             key={item.href}
             href={item.href}
+            prefetch={true}
             className={`${styles.navLink} ${isActive ? styles.navLinkActive : ''}`}
           >
             <Icon className={styles.navIcon} />
@@ -62,7 +63,7 @@ export function AdminSidebarNav() {
 
       <div style={{ height: '1px', background: 'var(--border)', margin: '16px 0' }} />
 
-      <Link href="/" target="_blank" className={styles.navLink}>
+      <Link href="/" target="_blank" prefetch={false} className={styles.navLink}>
         <FaExternalLinkAlt className={styles.navIcon} />
         <span>View Site</span>
       </Link>
