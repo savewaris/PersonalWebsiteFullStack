@@ -8,6 +8,8 @@ import {
   getLanguages,
   getStats,
 } from '@/lib/data';
+import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
 import { StaggerContainer } from '@/components/MotionWrappers';
 import { HeroSection } from '@/components/sections/HeroSection';
 import { StatsSection } from '@/components/sections/StatsSection';
@@ -34,17 +36,23 @@ export default async function Home() {
   ]);
 
   return (
-    <div className={styles.page}>
-      <StaggerContainer className={styles.bentoContainer}>
-        <HeroSection />
-        <StatsSection stats={stats} />
-        <AboutSection />
-        <SkillsSection skills={skills} />
-        <ExperienceEducationSection experiences={experiences} education={education} />
-        <ProjectsSection projects={projects} />
-        <LanguagesInterestsSection languages={languages} hobbies={hobbies} interests={interests} />
-        <ContactSection />
-      </StaggerContainer>
-    </div>
+    <>
+      <Navbar />
+      <main style={{ minHeight: 'calc(100vh - 200px)', paddingTop: '64px' }}>
+        <div className={styles.page}>
+          <StaggerContainer className={styles.bentoContainer}>
+            <HeroSection />
+            <StatsSection stats={stats} />
+            <AboutSection />
+            <SkillsSection skills={skills} />
+            <ExperienceEducationSection experiences={experiences} education={education} />
+            <ProjectsSection projects={projects} />
+            <LanguagesInterestsSection languages={languages} hobbies={hobbies} interests={interests} />
+            <ContactSection />
+          </StaggerContainer>
+        </div>
+      </main>
+      <Footer />
+    </>
   );
 }
