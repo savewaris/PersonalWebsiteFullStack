@@ -1,153 +1,157 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { FaEdit, FaTrash, FaPlus } from 'react-icons/fa';
-import styles from './hobbies.module.css';
+import { FaEdit, FaTrash } from 'react-icons/fa';
+import { useAdminCrud } from '@/lib/useAdminCrud';
+import { AdminPageHeader } from '@/components/admin/AdminPageHeader';
+import { AdminModal } from '@/components/admin/AdminModal';
+import { DeleteConfirmModal } from '@/components/admin/DeleteConfirmModal';
+import { PresetChips } from '@/components/admin/PresetChips';
 import { HOBBY_SUGGESTIONS } from '@/lib/recommendations';
+import styles from '@/components/admin/admin.module.css';
 
-interface Hobby {
-    id: string;
-    name: string;
-    emoji: string | null;
+export interface Hobby {
+  id: string;
+  name: string;
+  emoji: string | null;
 }
 
 export default function HobbiesClient({ initialHobbies }: { initialHobbies: Hobby[] }) {
-    const [hobbies, setHobbies] = useState<Hobby[]>(initialHobbies);
-    const [isEditing, setIsEditing] = useState(false);
-    const [currentHobby, setCurrentHobby] = useState<Partial<Hobby>>({});
-    const router = useRouter();
+  const {
+    items: hobbies,
+    isModalOpen,
+    editingItem,
+    deletingItem,
+    setDeletingItem,
+    isSubmitting,
+    error,
+    openCreate,
+    openEdit,
+    closeModal,
+    saveItem,
+    deleteItem,
+  } = useAdminCrud<Hobby>(initialHobbies, '/api/hobbies');
 
-    const resetForm = () => {
-        setCurrentHobby({});
-        setIsEditing(false);
-    };
+  const [formData, setFormData] = useState<Partial<Hobby>>({ name: '', emoji: '' });
 
-    const handleDelete = async (id: string) => {
-        if (!confirm('Are you sure you want to delete this hobby?')) return;
-        const res = await fetch(`/api/hobbies/${id}`, { method: 'DELETE' });
-        if (res.ok) {
-            setHobbies(hobbies.filter(h => h.id !== id));
-            router.refresh();
-        }
-    };
+  const handleOpenCreate = () => {
+    setFormData({ name: '', emoji: '' });
+    openCreate();
+  };
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        const url = currentHobby.id ? `/api/hobbies/${currentHobby.id}` : '/api/hobbies';
-        const method = currentHobby.id ? 'PUT' : 'POST';
+  const handleOpenEdit = (hobby: Hobby) => {
+    setFormData(hobby);
+    openEdit(hobby);
+  };
 
-        const res = await fetch(url, {
-            method,
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(currentHobby),
-        });
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await saveItem(formData);
+  };
 
-        if (res.ok) {
-            const savedHobby = await res.json();
-            if (currentHobby.id) {
-                setHobbies(hobbies.map(h => h.id === savedHobby.id ? savedHobby : h));
-            } else {
-                setHobbies([savedHobby, ...hobbies]);
-            }
-            resetForm();
-            router.refresh();
-        }
-    };
+  const existingNames = new Set(hobbies.map((h) => h.name.toLowerCase()));
+  const availableSuggestions = HOBBY_SUGGESTIONS.filter((s) => !existingNames.has(s.name.toLowerCase()));
 
-    const existingNames = new Set(hobbies.map(h => h.name.toLowerCase()));
-    const filteredSuggestions = HOBBY_SUGGESTIONS.filter(s => !existingNames.has(s.name.toLowerCase()));
+  const handleSelectPreset = async (preset: (typeof HOBBY_SUGGESTIONS)[0]) => {
+    await saveItem({ name: preset.name, emoji: preset.emoji });
+  };
 
-    const applyChip = (suggestion: typeof HOBBY_SUGGESTIONS[0]) => {
-        setCurrentHobby({ name: suggestion.name, emoji: suggestion.emoji });
-        setIsEditing(true);
-    };
+  return (
+    <div>
+      <AdminPageHeader
+        title="Hobbies Management"
+        description="Manage your personal pastimes, activities, and interests outside of work."
+        count={hobbies.length}
+        actionLabel="Add Hobby"
+        onAction={handleOpenCreate}
+      />
 
-    // One-click save: directly POST without opening form
-    const quickAdd = async (suggestion: typeof HOBBY_SUGGESTIONS[0]) => {
-        const res = await fetch('/api/hobbies', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name: suggestion.name, emoji: suggestion.emoji }),
-        });
-        if (res.ok) {
-            const saved = await res.json();
-            setHobbies([saved, ...hobbies]);
-            router.refresh();
-        }
-    };
+      <PresetChips
+        title="Suggested Hobbies (Click to instant add)"
+        items={availableSuggestions}
+        getLabel={(s) => `${s.emoji || ''} ${s.name}`}
+        onSelect={handleSelectPreset}
+      />
 
-    return (
-        <div className={styles.container}>
-            <div className={styles.header}>
-                <h1 className={styles.title}>Hobbies Management</h1>
-                <button onClick={() => setIsEditing(true)} className={styles.addButton}>
-                    <FaPlus /> Add Hobby
+      {error && <div className={styles.errorBanner}>{error}</div>}
+
+      {hobbies.length === 0 ? (
+        <div className={styles.emptyState}>No hobbies added yet. Pick from the suggestions above or click &ldquo;+ Add Hobby&rdquo;.</div>
+      ) : (
+        <div className={styles.cardGrid}>
+          {hobbies.map((hobby) => (
+            <div key={hobby.id} className={styles.card}>
+              <div className={styles.cardHeader}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <span style={{ fontSize: '1.8rem' }}>{hobby.emoji || '✨'}</span>
+                  <h3 className={styles.cardTitle}>{hobby.name}</h3>
+                </div>
+              </div>
+
+              <div className={styles.cardActions}>
+                <button type="button" onClick={() => handleOpenEdit(hobby)} className={styles.actionBtn}>
+                  <FaEdit style={{ marginRight: '4px' }} /> Edit
                 </button>
+                <button
+                  type="button"
+                  onClick={() => setDeletingItem(hobby)}
+                  className={`${styles.actionBtn} ${styles.deleteBtn}`}
+                >
+                  <FaTrash style={{ marginRight: '4px' }} /> Delete
+                </button>
+              </div>
             </div>
-
-            {/* ── Recommendations ── */}
-            {filteredSuggestions.length > 0 && (
-                <div className={styles.recommendSection}>
-                    <span className={styles.recommendLabel}>✨ Suggestions — click to instantly add</span>
-                    <div className={styles.chips}>
-                        {filteredSuggestions.map((s, i) => (
-                            <button key={i} className={styles.chip} onClick={() => quickAdd(s)}>
-                                <span>{s.emoji}</span>
-                                <span>{s.name}</span>
-                            </button>
-                        ))}
-                    </div>
-                </div>
-            )}
-
-            {isEditing && (
-                <div className={styles.formContainer}>
-                    <h2>{currentHobby.id ? 'Edit Hobby' : 'Add New Hobby'}</h2>
-                    <form onSubmit={handleSubmit} className={styles.form}>
-                        <div className={styles.row}>
-                            <input
-                                type="text"
-                                placeholder="Hobby Name (e.g. Photography)"
-                                value={currentHobby.name || ''}
-                                onChange={e => setCurrentHobby({ ...currentHobby, name: e.target.value })}
-                                required
-                                className={styles.input}
-                            />
-                            <input
-                                type="text"
-                                placeholder="Emoji (e.g. 📷)"
-                                value={currentHobby.emoji || ''}
-                                onChange={e => setCurrentHobby({ ...currentHobby, emoji: e.target.value })}
-                                className={styles.input}
-                            />
-                        </div>
-                        <div className={styles.formActions}>
-                            <button type="button" onClick={resetForm} className={styles.cancelButton}>Cancel</button>
-                            <button type="submit" className={styles.saveButton}>Save</button>
-                        </div>
-                    </form>
-                </div>
-            )}
-
-            <div className={styles.grid}>
-                {hobbies.map(hobby => (
-                    <div key={hobby.id} className={styles.card}>
-                        <div className={styles.emoji}>{hobby.emoji}</div>
-                        <div className={styles.cardInfo}>
-                            <h3>{hobby.name}</h3>
-                        </div>
-                        <div className={styles.cardActions}>
-                            <button onClick={() => { setCurrentHobby(hobby); setIsEditing(true); }} className={styles.iconButton}>
-                                <FaEdit />
-                            </button>
-                            <button onClick={() => handleDelete(hobby.id)} className={styles.iconButtonDelete}>
-                                <FaTrash />
-                            </button>
-                        </div>
-                    </div>
-                ))}
-            </div>
+          ))}
         </div>
-    );
+      )}
+
+      {/* Add / Edit Modal */}
+      <AdminModal
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        title={editingItem ? 'Edit Hobby' : 'Add New Hobby'}
+      >
+        <form onSubmit={handleSubmit} className={styles.form}>
+          <div className={styles.formGroup}>
+            <label>Hobby Name</label>
+            <input
+              type="text"
+              required
+              value={formData.name || ''}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              placeholder="e.g. Street Photography, Gaming, Running"
+            />
+          </div>
+
+          <div className={styles.formGroup}>
+            <label>Emoji</label>
+            <input
+              type="text"
+              value={formData.emoji || ''}
+              onChange={(e) => setFormData({ ...formData, emoji: e.target.value })}
+              placeholder="e.g. 📷, 🎮, 🏃‍♂️"
+            />
+          </div>
+
+          <div className={styles.modalFooter}>
+            <button type="button" onClick={closeModal} className={styles.secondaryButton}>
+              Cancel
+            </button>
+            <button type="submit" disabled={isSubmitting} className={styles.primaryButton}>
+              {isSubmitting ? 'Saving...' : editingItem ? 'Update Hobby' : 'Create Hobby'}
+            </button>
+          </div>
+        </form>
+      </AdminModal>
+
+      {/* Delete Modal */}
+      <DeleteConfirmModal
+        isOpen={Boolean(deletingItem)}
+        itemName={deletingItem?.name}
+        isDeleting={isSubmitting}
+        onClose={() => setDeletingItem(null)}
+        onConfirm={() => deletingItem && deleteItem(deletingItem.id)}
+      />
+    </div>
+  );
 }

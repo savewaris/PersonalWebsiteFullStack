@@ -8,7 +8,7 @@ interface SkillsSectionProps {
 
 export function SkillsSection({ skills }: SkillsSectionProps) {
   return (
-    <StaggerItem className={`${styles.bentoItem} ${styles.span2}`}>
+    <StaggerItem id="skills" className={`${styles.bentoItem} ${styles.span2}`}>
       <h2 className={styles.bentoTitle}>Core Skills</h2>
       <div className={styles.bentoScrollArea} style={{ maxHeight: '300px' }}>
         <div className={styles.skillsGrid} style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px' }}>

@@ -1,174 +1,238 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { FaEdit, FaTrash, FaPlus } from 'react-icons/fa';
-import styles from './education.module.css';
+import { FaEdit, FaTrash } from 'react-icons/fa';
+import { useAdminCrud } from '@/lib/useAdminCrud';
+import { AdminPageHeader } from '@/components/admin/AdminPageHeader';
+import { AdminModal } from '@/components/admin/AdminModal';
+import { DeleteConfirmModal } from '@/components/admin/DeleteConfirmModal';
+import styles from '@/components/admin/admin.module.css';
 
-interface Education {
-    id: string;
-    institution: string;
-    degree: string;
-    fieldOfStudy: string;
-    faculty: string | null;
-    startDate: string;
-    endDate: string | null;
-    score: string | null;
+export interface Education {
+  id: string;
+  institution: string;
+  degree: string;
+  fieldOfStudy: string;
+  faculty: string | null;
+  startDate: string;
+  endDate: string | null;
+  score: string | null;
 }
 
 export default function EducationClient({ initialEducation }: { initialEducation: Education[] }) {
-    const [education, setEducation] = useState<Education[]>(initialEducation);
-    const [isEditing, setIsEditing] = useState(false);
-    const [currentEdu, setCurrentEdu] = useState<Partial<Education>>({});
-    const router = useRouter();
+  const {
+    items: educationList,
+    isModalOpen,
+    editingItem,
+    deletingItem,
+    setDeletingItem,
+    isSubmitting,
+    error,
+    openCreate,
+    openEdit,
+    closeModal,
+    saveItem,
+    deleteItem,
+  } = useAdminCrud<Education>(initialEducation, '/api/education');
 
-    const resetForm = () => {
-        setCurrentEdu({});
-        setIsEditing(false);
-    };
+  const [formData, setFormData] = useState<Partial<Education>>({
+    institution: '',
+    degree: '',
+    fieldOfStudy: '',
+    faculty: '',
+    startDate: '',
+    endDate: '',
+    score: '',
+  });
 
-    const handleDelete = async (id: string) => {
-        if (!confirm('Are you sure you want to delete this education entry?')) return;
+  const handleOpenCreate = () => {
+    setFormData({
+      institution: '',
+      degree: '',
+      fieldOfStudy: '',
+      faculty: '',
+      startDate: '',
+      endDate: '',
+      score: '',
+    });
+    openCreate();
+  };
 
-        const res = await fetch(`/api/education/${id}`, { method: 'DELETE' });
-        if (res.ok) {
-            setEducation(education.filter(e => e.id !== id));
-            router.refresh();
-        }
-    };
+  const handleOpenEdit = (edu: Education) => {
+    setFormData({
+      ...edu,
+      startDate: edu.startDate ? new Date(edu.startDate).toISOString().split('T')[0] : '',
+      endDate: edu.endDate ? new Date(edu.endDate).toISOString().split('T')[0] : '',
+    });
+    openEdit(edu);
+  };
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        const url = currentEdu.id ? `/api/education/${currentEdu.id}` : '/api/education';
-        const method = currentEdu.id ? 'PUT' : 'POST';
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await saveItem({
+      ...formData,
+      startDate: formData.startDate ? new Date(formData.startDate).toISOString() : undefined,
+      endDate: formData.endDate ? new Date(formData.endDate).toISOString() : null,
+    });
+  };
 
-        const res = await fetch(url, {
-            method,
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(currentEdu),
-        });
+  return (
+    <div>
+      <AdminPageHeader
+        title="Education Management"
+        description="Manage your degrees, university qualifications, faculty, and academic background."
+        count={educationList.length}
+        actionLabel="Add Education"
+        onAction={handleOpenCreate}
+      />
 
-        if (res.ok) {
-            const savedEdu = await res.json();
-            if (currentEdu.id) {
-                setEducation(education.map(e => e.id === savedEdu.id ? savedEdu : e));
-            } else {
-                setEducation([savedEdu, ...education]);
-            }
-            resetForm();
-            router.refresh();
-        }
-    };
+      {error && <div className={styles.errorBanner}>{error}</div>}
 
-    return (
-        <div className={styles.container}>
-            <div className={styles.header}>
-                <h1 className={styles.title}>Education Management</h1>
-                <button onClick={() => setIsEditing(true)} className={styles.addButton}>
-                    <FaPlus /> Add Education
-                </button>
-            </div>
-
-            {isEditing && (
-                <div className={styles.formContainer}>
-                    <h2>{currentEdu.id ? 'Edit Education' : 'Add New Education'}</h2>
-                    <form onSubmit={handleSubmit} className={styles.form}>
-                        <div className={styles.row}>
-                            <input
-                                type="text"
-                                placeholder="Institution (e.g. University of Example)"
-                                value={currentEdu.institution || ''}
-                                onChange={e => setCurrentEdu({ ...currentEdu, institution: e.target.value })}
-                                required
-                                className={styles.input}
-                            />
-                            <input
-                                type="text"
-                                placeholder="Degree (e.g. Bachelor)"
-                                value={currentEdu.degree || ''}
-                                onChange={e => setCurrentEdu({ ...currentEdu, degree: e.target.value })}
-                                required
-                                className={styles.input}
-                            />
-                        </div>
-                        <div className={styles.row}>
-                            <input
-                                type="text"
-                                placeholder="Field of Study (e.g. Computer Science)"
-                                value={currentEdu.fieldOfStudy || ''}
-                                onChange={e => setCurrentEdu({ ...currentEdu, fieldOfStudy: e.target.value })}
-                                required
-                                className={styles.input}
-                            />
-                            <input
-                                type="text"
-                                placeholder="Faculty (e.g. Faculty of Information and Communication Technology)"
-                                value={currentEdu.faculty || ''}
-                                onChange={e => setCurrentEdu({ ...currentEdu, faculty: e.target.value })}
-                                className={styles.input}
-                            />
-                        </div>
-                        <div className={styles.row}>
-                            <input
-                                type="text"
-                                placeholder="Score / GPA (Optional)"
-                                value={currentEdu.score || ''}
-                                onChange={e => setCurrentEdu({ ...currentEdu, score: e.target.value })}
-                                className={styles.input}
-                            />
-                        </div>
-                        <div className={styles.row}>
-                            <div className={styles.dateGroup}>
-                                <label>Start Date</label>
-                                <input
-                                    type="date"
-                                    value={currentEdu.startDate ? new Date(currentEdu.startDate).toISOString().split('T')[0] : ''}
-                                    onChange={e => setCurrentEdu({ ...currentEdu, startDate: e.target.value })}
-                                    required
-                                    className={styles.input}
-                                />
-                            </div>
-                            <div className={styles.dateGroup}>
-                                <label>End Date (Leave empty for Present)</label>
-                                <input
-                                    type="date"
-                                    value={currentEdu.endDate ? new Date(currentEdu.endDate).toISOString().split('T')[0] : ''}
-                                    onChange={e => setCurrentEdu({ ...currentEdu, endDate: e.target.value || null })}
-                                    className={styles.input}
-                                />
-                            </div>
-                        </div>
-                        <div className={styles.formActions}>
-                            <button type="button" onClick={resetForm} className={styles.cancelButton}>Cancel</button>
-                            <button type="submit" className={styles.saveButton}>Save</button>
-                        </div>
-                    </form>
-                </div>
-            )}
-
-            <div className={styles.grid}>
-                {education.map(edu => (
-                    <div key={edu.id} className={styles.card}>
-                        <div className={styles.cardInfo}>
-                            <h3>{edu.institution}</h3>
-                            <p className={styles.company}>{edu.degree} in {edu.fieldOfStudy}</p>
-                            {edu.faculty && <p className={styles.date} style={{ color: 'var(--accent)', fontStyle: 'italic' }}>🏛️ {edu.faculty}</p>}
-                            <p className={styles.date}>
-                                {new Date(edu.startDate).toLocaleDateString()} - {edu.endDate ? new Date(edu.endDate).toLocaleDateString() : 'Present'}
-                            </p>
-                            {edu.score && <p className={styles.date}>Score: {edu.score}</p>}
-                        </div>
-                        <div className={styles.cardActions}>
-                            <button onClick={() => { setCurrentEdu(edu); setIsEditing(true); }} className={styles.iconButton}>
-                                <FaEdit />
-                            </button>
-                            <button onClick={() => handleDelete(edu.id)} className={styles.iconButtonDelete}>
-                                <FaTrash />
-                            </button>
-                        </div>
+      {educationList.length === 0 ? (
+        <div className={styles.emptyState}>No education records found. Click &ldquo;+ Add Education&rdquo; to add your academic degrees.</div>
+      ) : (
+        <div className={styles.cardGrid}>
+          {educationList.map((edu) => (
+            <div key={edu.id} className={styles.card}>
+              <div className={styles.cardHeader}>
+                <div>
+                  <h3 className={styles.cardTitle}>{edu.degree} in {edu.fieldOfStudy}</h3>
+                  <div className={styles.cardSubtitle}>{edu.institution}</div>
+                  {edu.faculty && (
+                    <div style={{ fontSize: '0.85rem', color: 'var(--accent)', marginTop: '4px' }}>
+                      🏛️ {edu.faculty}
                     </div>
-                ))}
+                  )}
+                </div>
+                <span className={styles.badgeCount}>
+                  Class of {edu.endDate ? new Date(edu.endDate).getFullYear() : 'Present'}
+                </span>
+              </div>
+
+              {edu.score && (
+                <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                  GPA / Grade: <strong>{edu.score}</strong>
+                </div>
+              )}
+
+              <div className={styles.cardActions}>
+                <button type="button" onClick={() => handleOpenEdit(edu)} className={styles.actionBtn}>
+                  <FaEdit style={{ marginRight: '4px' }} /> Edit
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setDeletingItem(edu)}
+                  className={`${styles.actionBtn} ${styles.deleteBtn}`}
+                >
+                  <FaTrash style={{ marginRight: '4px' }} /> Delete
+                </button>
+              </div>
             </div>
+          ))}
         </div>
-    );
+      )}
+
+      {/* Add / Edit Modal */}
+      <AdminModal
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        title={editingItem ? 'Edit Education' : 'Add New Education'}
+      >
+        <form onSubmit={handleSubmit} className={styles.form}>
+          <div className={styles.formGroup}>
+            <label>Institution / University</label>
+            <input
+              type="text"
+              required
+              value={formData.institution || ''}
+              onChange={(e) => setFormData({ ...formData, institution: e.target.value })}
+              placeholder="e.g. Chulalongkorn University, Stanford University"
+            />
+          </div>
+
+          <div className={styles.formRow}>
+            <div className={styles.formGroup}>
+              <label>Degree</label>
+              <input
+                type="text"
+                required
+                value={formData.degree || ''}
+                onChange={(e) => setFormData({ ...formData, degree: e.target.value })}
+                placeholder="e.g. Bachelor of Science, Master"
+              />
+            </div>
+            <div className={styles.formGroup}>
+              <label>Field of Study</label>
+              <input
+                type="text"
+                required
+                value={formData.fieldOfStudy || ''}
+                onChange={(e) => setFormData({ ...formData, fieldOfStudy: e.target.value })}
+                placeholder="e.g. Computer Science, Information Systems"
+              />
+            </div>
+          </div>
+
+          <div className={styles.formRow}>
+            <div className={styles.formGroup}>
+              <label>Faculty (Optional)</label>
+              <input
+                type="text"
+                value={formData.faculty || ''}
+                onChange={(e) => setFormData({ ...formData, faculty: e.target.value })}
+                placeholder="e.g. Faculty of ICT / Engineering"
+              />
+            </div>
+            <div className={styles.formGroup}>
+              <label>GPA / Grade (Optional)</label>
+              <input
+                type="text"
+                value={formData.score || ''}
+                onChange={(e) => setFormData({ ...formData, score: e.target.value })}
+                placeholder="e.g. 3.85 / 4.00, First Class Honours"
+              />
+            </div>
+          </div>
+
+          <div className={styles.formRow}>
+            <div className={styles.formGroup}>
+              <label>Start Date</label>
+              <input
+                type="date"
+                required
+                value={formData.startDate || ''}
+                onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
+              />
+            </div>
+            <div className={styles.formGroup}>
+              <label>Graduation / End Date</label>
+              <input
+                type="date"
+                value={formData.endDate || ''}
+                onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
+              />
+            </div>
+          </div>
+
+          <div className={styles.modalFooter}>
+            <button type="button" onClick={closeModal} className={styles.secondaryButton}>
+              Cancel
+            </button>
+            <button type="submit" disabled={isSubmitting} className={styles.primaryButton}>
+              {isSubmitting ? 'Saving...' : editingItem ? 'Update Education' : 'Create Education'}
+            </button>
+          </div>
+        </form>
+      </AdminModal>
+
+      {/* Delete Modal */}
+      <DeleteConfirmModal
+        isOpen={Boolean(deletingItem)}
+        itemName={deletingItem ? `${deletingItem.degree} at ${deletingItem.institution}` : undefined}
+        isDeleting={isSubmitting}
+        onClose={() => setDeletingItem(null)}
+        onConfirm={() => deletingItem && deleteItem(deletingItem.id)}
+      />
+    </div>
+  );
 }

@@ -1,175 +1,196 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { FaEdit, FaTrash, FaPlus } from 'react-icons/fa';
-import styles from './skills.module.css';
+import { FaEdit, FaTrash } from 'react-icons/fa';
+import { useAdminCrud } from '@/lib/useAdminCrud';
+import { AdminPageHeader } from '@/components/admin/AdminPageHeader';
+import { AdminModal } from '@/components/admin/AdminModal';
+import { DeleteConfirmModal } from '@/components/admin/DeleteConfirmModal';
+import { PresetChips } from '@/components/admin/PresetChips';
 import { SKILL_SUGGESTIONS } from '@/lib/recommendations';
+import styles from '@/components/admin/admin.module.css';
 
-interface Skill {
-    id: string;
-    name: string;
-    proficiency: number;
-    category: string;
-    icon: string | null;
+export interface Skill {
+  id: string;
+  name: string;
+  proficiency: number;
+  category: string;
+  icon: string | null;
 }
 
 export default function SkillsClient({ initialSkills }: { initialSkills: Skill[] }) {
-    const [skills, setSkills] = useState<Skill[]>(initialSkills);
-    const [isEditing, setIsEditing] = useState(false);
-    const [currentSkill, setCurrentSkill] = useState<Partial<Skill>>({});
-    const [categoryFilter, setCategoryFilter] = useState<string>('All');
-    const router = useRouter();
+  const {
+    items: skills,
+    isModalOpen,
+    editingItem,
+    deletingItem,
+    setDeletingItem,
+    isSubmitting,
+    error,
+    openCreate,
+    openEdit,
+    closeModal,
+    saveItem,
+    deleteItem,
+  } = useAdminCrud<Skill>(initialSkills, '/api/skills');
 
-    const resetForm = () => {
-        setCurrentSkill({});
-        setIsEditing(false);
-    };
+  const [formData, setFormData] = useState<Partial<Skill>>({
+    name: '',
+    proficiency: 80,
+    category: 'Frontend',
+    icon: '',
+  });
 
-    const handleDelete = async (id: string) => {
-        if (!confirm('Are you sure you want to delete this skill?')) return;
-        const res = await fetch(`/api/skills/${id}`, { method: 'DELETE' });
-        if (res.ok) {
-            setSkills(skills.filter(s => s.id !== id));
-            router.refresh();
-        }
-    };
+  const handleOpenCreate = () => {
+    setFormData({ name: '', proficiency: 80, category: 'Frontend', icon: '' });
+    openCreate();
+  };
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        const url = currentSkill.id ? `/api/skills/${currentSkill.id}` : '/api/skills';
-        const method = currentSkill.id ? 'PUT' : 'POST';
+  const handleOpenEdit = (skill: Skill) => {
+    setFormData(skill);
+    openEdit(skill);
+  };
 
-        const res = await fetch(url, {
-            method,
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(currentSkill),
-        });
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await saveItem(formData);
+  };
 
-        if (res.ok) {
-            const savedSkill = await res.json();
-            if (currentSkill.id) {
-                setSkills(skills.map(s => s.id === savedSkill.id ? savedSkill : s));
-            } else {
-                setSkills([savedSkill, ...skills]);
-            }
-            resetForm();
-            router.refresh();
-        }
-    };
+  const existingNames = new Set(skills.map((s) => s.name.toLowerCase()));
+  const availableSuggestions = SKILL_SUGGESTIONS.filter((s) => !existingNames.has(s.name.toLowerCase()));
 
-    // Filter out already-added suggestions
-    const existingNames = new Set(skills.map(s => s.name.toLowerCase()));
-    const categories = ['All', ...Array.from(new Set(SKILL_SUGGESTIONS.map(s => s.category)))];
-    const filteredSuggestions = SKILL_SUGGESTIONS.filter(s =>
-        !existingNames.has(s.name.toLowerCase()) &&
-        (categoryFilter === 'All' || s.category === categoryFilter)
-    );
+  const handleSelectPreset = (preset: (typeof SKILL_SUGGESTIONS)[0]) => {
+    setFormData({
+      name: preset.name,
+      proficiency: preset.proficiency,
+      category: preset.category,
+      icon: '',
+    });
+    openCreate();
+  };
 
-    const applyChip = (suggestion: typeof SKILL_SUGGESTIONS[0]) => {
-        setCurrentSkill({ name: suggestion.name, proficiency: suggestion.proficiency, category: suggestion.category });
-        setIsEditing(true);
-    };
+  return (
+    <div>
+      <AdminPageHeader
+        title="Skills Management"
+        description="Manage the technical stack, tools, and proficiencies displayed on your portfolio."
+        count={skills.length}
+        actionLabel="Add Skill"
+        onAction={handleOpenCreate}
+      />
 
-    return (
-        <div className={styles.container}>
-            <div className={styles.header}>
-                <h1 className={styles.title}>Skills Management</h1>
-                <button onClick={() => setIsEditing(true)} className={styles.addButton}>
-                    <FaPlus /> Add Skill
+      <PresetChips
+        title="Suggested Skills (Click to auto-fill)"
+        items={availableSuggestions}
+        getLabel={(s) => `${s.name} (${s.category})`}
+        onSelect={handleSelectPreset}
+      />
+
+      {error && <div className={styles.errorBanner}>{error}</div>}
+
+      {skills.length === 0 ? (
+        <div className={styles.emptyState}>No skills added yet. Add your first skill or pick from suggestions above.</div>
+      ) : (
+        <div className={styles.cardGrid}>
+          {skills.map((skill) => (
+            <div key={skill.id} className={styles.card}>
+              <div className={styles.cardHeader}>
+                <div>
+                  <h3 className={styles.cardTitle}>
+                    {skill.icon && <span style={{ marginRight: '8px' }}>{skill.icon}</span>}
+                    {skill.name}
+                  </h3>
+                  <div className={styles.cardSubtitle}>{skill.category}</div>
+                </div>
+                <span className={styles.badgeCount}>{skill.proficiency}%</span>
+              </div>
+              <div className={styles.cardActions}>
+                <button type="button" onClick={() => handleOpenEdit(skill)} className={styles.actionBtn}>
+                  <FaEdit style={{ marginRight: '4px' }} /> Edit
                 </button>
+                <button
+                  type="button"
+                  onClick={() => setDeletingItem(skill)}
+                  className={`${styles.actionBtn} ${styles.deleteBtn}`}
+                >
+                  <FaTrash style={{ marginRight: '4px' }} /> Delete
+                </button>
+              </div>
             </div>
-
-            {/* ── Recommendations ── */}
-            {!isEditing && filteredSuggestions.length > 0 && (
-                <div className={styles.recommendSection}>
-                    <div className={styles.recommendHeader}>
-                        <span className={styles.recommendLabel}>✨ Suggestions — click to add</span>
-                        <div className={styles.filterTabs}>
-                            {categories.map(cat => (
-                                <button
-                                    key={cat}
-                                    className={`${styles.filterTab} ${categoryFilter === cat ? styles.filterTabActive : ''}`}
-                                    onClick={() => setCategoryFilter(cat)}
-                                >
-                                    {cat}
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-                    <div className={styles.chips}>
-                        {filteredSuggestions.map((s, i) => (
-                            <button key={i} className={styles.chip} onClick={() => applyChip(s)}>
-                                {s.name}
-                            </button>
-                        ))}
-                    </div>
-                </div>
-            )}
-
-            {isEditing && (
-                <div className={styles.formContainer}>
-                    <h2>{currentSkill.id ? 'Edit Skill' : 'Add New Skill'}</h2>
-                    <form onSubmit={handleSubmit} className={styles.form}>
-                        <input
-                            type="text"
-                            placeholder="Skill Name"
-                            value={currentSkill.name || ''}
-                            onChange={e => setCurrentSkill({ ...currentSkill, name: e.target.value })}
-                            required
-                            className={styles.input}
-                        />
-                        <input
-                            type="number"
-                            placeholder="Proficiency (0-100)"
-                            value={currentSkill.proficiency || ''}
-                            onChange={e => setCurrentSkill({ ...currentSkill, proficiency: Number(e.target.value) })}
-                            required
-                            max="100"
-                            min="0"
-                            className={styles.input}
-                        />
-                        <input
-                            type="text"
-                            placeholder="Category (e.g. Frontend)"
-                            value={currentSkill.category || ''}
-                            onChange={e => setCurrentSkill({ ...currentSkill, category: e.target.value })}
-                            required
-                            className={styles.input}
-                        />
-                        <input
-                            type="text"
-                            placeholder="Icon (Optional)"
-                            value={currentSkill.icon || ''}
-                            onChange={e => setCurrentSkill({ ...currentSkill, icon: e.target.value })}
-                            className={styles.input}
-                        />
-                        <div className={styles.formActions}>
-                            <button type="button" onClick={resetForm} className={styles.cancelButton}>Cancel</button>
-                            <button type="submit" className={styles.saveButton}>Save</button>
-                        </div>
-                    </form>
-                </div>
-            )}
-
-            <div className={styles.grid}>
-                {skills.map(skill => (
-                    <div key={skill.id} className={styles.card}>
-                        <div className={styles.cardInfo}>
-                            <h3>{skill.name}</h3>
-                            <p>{skill.category} • {skill.proficiency}%</p>
-                        </div>
-                        <div className={styles.cardActions}>
-                            <button onClick={() => { setCurrentSkill(skill); setIsEditing(true); }} className={styles.iconButton}>
-                                <FaEdit />
-                            </button>
-                            <button onClick={() => handleDelete(skill.id)} className={styles.iconButtonDelete}>
-                                <FaTrash />
-                            </button>
-                        </div>
-                    </div>
-                ))}
-            </div>
+          ))}
         </div>
-    );
+      )}
+
+      {/* Add / Edit Modal */}
+      <AdminModal
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        title={editingItem ? 'Edit Skill' : 'Add New Skill'}
+      >
+        <form onSubmit={handleSubmit} className={styles.form}>
+          <div className={styles.formGroup}>
+            <label>Skill Name</label>
+            <input
+              type="text"
+              required
+              value={formData.name || ''}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              placeholder="e.g. Next.js, TypeScript, PostgreSQL"
+            />
+          </div>
+
+          <div className={styles.formRow}>
+            <div className={styles.formGroup}>
+              <label>Category</label>
+              <input
+                type="text"
+                required
+                value={formData.category || ''}
+                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                placeholder="e.g. Frontend, Backend, Tools"
+              />
+            </div>
+            <div className={styles.formGroup}>
+              <label>Proficiency ({formData.proficiency || 0}%)</label>
+              <input
+                type="range"
+                min="0"
+                max="100"
+                value={formData.proficiency || 80}
+                onChange={(e) => setFormData({ ...formData, proficiency: Number(e.target.value) })}
+              />
+            </div>
+          </div>
+
+          <div className={styles.formGroup}>
+            <label>Icon / Emoji (Optional)</label>
+            <input
+              type="text"
+              value={formData.icon || ''}
+              onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
+              placeholder="e.g. ⚡, 🚀, or icon identifier"
+            />
+          </div>
+
+          <div className={styles.modalFooter}>
+            <button type="button" onClick={closeModal} className={styles.secondaryButton}>
+              Cancel
+            </button>
+            <button type="submit" disabled={isSubmitting} className={styles.primaryButton}>
+              {isSubmitting ? 'Saving...' : editingItem ? 'Update Skill' : 'Create Skill'}
+            </button>
+          </div>
+        </form>
+      </AdminModal>
+
+      {/* Delete Modal */}
+      <DeleteConfirmModal
+        isOpen={Boolean(deletingItem)}
+        itemName={deletingItem?.name}
+        isDeleting={isSubmitting}
+        onClose={() => setDeletingItem(null)}
+        onConfirm={() => deletingItem && deleteItem(deletingItem.id)}
+      />
+    </div>
+  );
 }

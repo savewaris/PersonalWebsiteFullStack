@@ -1,122 +1,115 @@
-import styles from './page.module.css';
-import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
+import { prisma } from '@/lib/prisma';
+import styles from './page.module.css';
 
-export const revalidate = 0; // Ensure fresh data on admin dashboard
+export const revalidate = 0;
 
 export default async function AdminDashboard() {
-    const [
-        skills,
-        projects,
-        experience,
-        messages,
-        education,
-        hobbies,
-        languages
-    ] = await Promise.all([
-        prisma.skill.findMany({ orderBy: { createdAt: 'desc' }, take: 5 }),
-        prisma.project.findMany({ orderBy: { createdAt: 'desc' }, take: 5 }),
-        prisma.experience.findMany({ orderBy: { startDate: 'desc' }, take: 5 }),
-        prisma.message.findMany({ orderBy: { createdAt: 'desc' }, take: 5 }),
-        prisma.education.findMany({ orderBy: { startDate: 'desc' }, take: 5 }),
-        prisma.hobby.findMany({ orderBy: { createdAt: 'desc' }, take: 5 }),
-        prisma.language.findMany({ orderBy: { createdAt: 'desc' }, take: 5 })
-    ]);
+  const [
+    skillsCount,
+    projectsCount,
+    experienceCount,
+    educationCount,
+    messagesCount,
+    unreadMessagesCount,
+    hobbiesCount,
+    languagesCount,
+    recentSkills,
+    recentProjects,
+    recentExperience,
+    recentEducation,
+    recentMessages,
+  ] = await Promise.all([
+    prisma.skill.count(),
+    prisma.project.count(),
+    prisma.experience.count(),
+    prisma.education.count(),
+    prisma.message.count(),
+    prisma.message.count({ where: { read: false } }),
+    prisma.hobby.count(),
+    prisma.language.count(),
+    prisma.skill.findMany({ orderBy: { proficiency: 'desc' }, take: 4 }),
+    prisma.project.findMany({ orderBy: { createdAt: 'desc' }, take: 3 }),
+    prisma.experience.findMany({ orderBy: { startDate: 'desc' }, take: 3 }),
+    prisma.education.findMany({ orderBy: { startDate: 'desc' }, take: 3 }),
+    prisma.message.findMany({ orderBy: { createdAt: 'desc' }, take: 3 }),
+  ]);
 
-    return (
-        <div className={styles.dashboard}>
-            <h1 className={styles.title}>Welcome Back</h1>
-            <p className={styles.subtitle}>Here is a quick overview of your portfolio content.</p>
+  const cards = [
+    {
+      title: 'Skills',
+      count: skillsCount,
+      href: '/admin/skills',
+      items: recentSkills.map((s) => `${s.name} (${s.proficiency}%)`),
+      emptyText: 'No skills added yet',
+    },
+    {
+      title: 'Projects',
+      count: projectsCount,
+      href: '/admin/projects',
+      items: recentProjects.map((p) => p.title),
+      emptyText: 'No projects added yet',
+    },
+    {
+      title: 'Experience',
+      count: experienceCount,
+      href: '/admin/experience',
+      items: recentExperience.map((e) => `${e.role} at ${e.company}`),
+      emptyText: 'No experience added yet',
+    },
+    {
+      title: 'Education',
+      count: educationCount,
+      href: '/admin/education',
+      items: recentEducation.map((e) => `${e.degree} (${e.institution})`),
+      emptyText: 'No education added yet',
+    },
+    {
+      title: 'Messages',
+      count: messagesCount,
+      extraBadge: unreadMessagesCount > 0 ? `${unreadMessagesCount} unread` : undefined,
+      href: '/admin/messages',
+      items: recentMessages.map((m) => `${m.name}: ${m.message.slice(0, 30)}...`),
+      emptyText: 'No messages yet',
+    },
+    {
+      title: 'Hobbies & Interests',
+      count: hobbiesCount + languagesCount,
+      href: '/admin/hobbies',
+      items: [`${hobbiesCount} Hobbies`, `${languagesCount} Languages`],
+      emptyText: 'No personal entries',
+    },
+  ];
 
-            <div className={styles.statsGrid}>
-                {/* Skills */}
-                <Link href="/admin/skills" className={styles.statCard}>
-                    <div className={styles.cardHeader}>
-                        <h3>Skills</h3>
-                        <span className={styles.countBadge}>{skills.length}</span>
-                    </div>
-                    <ul className={styles.previewList}>
-                        {skills.map(s => <li key={s.id}>{s.name} ({s.proficiency}%)</li>)}
-                        {skills.length === 0 && <li>No skills added</li>}
-                    </ul>
-                </Link>
+  return (
+    <div className={styles.dashboard}>
+      <h1 className={styles.title}>Admin Overview</h1>
+      <p className={styles.subtitle}>Manage your portfolio content, resume generator, and incoming messages.</p>
 
-                {/* Projects */}
-                <Link href="/admin/projects" className={styles.statCard}>
-                    <div className={styles.cardHeader}>
-                        <h3>Projects</h3>
-                        <span className={styles.countBadge}>{projects.length}</span>
-                    </div>
-                    <ul className={styles.previewList}>
-                        {projects.map(p => <li key={p.id}>{p.title}</li>)}
-                        {projects.length === 0 && <li>No projects added</li>}
-                    </ul>
-                </Link>
-
-                {/* Experience */}
-                <Link href="/admin/experience" className={styles.statCard}>
-                    <div className={styles.cardHeader}>
-                        <h3>Experience</h3>
-                        <span className={styles.countBadge}>{experience.length}</span>
-                    </div>
-                    <ul className={styles.previewList}>
-                        {experience.map(e => <li key={e.id}>{e.role} at {e.company}</li>)}
-                        {experience.length === 0 && <li>No experience added</li>}
-                    </ul>
-                </Link>
-
-                {/* Education */}
-                <Link href="/admin/education" className={styles.statCard}>
-                    <div className={styles.cardHeader}>
-                        <h3>Education</h3>
-                        <span className={styles.countBadge}>{education.length}</span>
-                    </div>
-                    <ul className={styles.previewList}>
-                        {education.map(e => <li key={e.id}>{e.degree}</li>)}
-                        {education.length === 0 && <li>No education added</li>}
-                    </ul>
-                </Link>
-
-                {/* Messages */}
-                <Link href="/admin/messages" className={styles.statCard}>
-                    <div className={styles.cardHeader}>
-                        <h3>Messages</h3>
-                        <span className={styles.countBadge}>{messages.length}</span>
-                    </div>
-                    <ul className={styles.previewList}>
-                        {messages.map(m => (
-                            <li key={m.id} style={{ fontWeight: m.read ? 'normal' : 'bold' }}>
-                                {m.name}: {m.message.substring(0, 20)}...
-                            </li>
-                        ))}
-                        {messages.length === 0 && <li>No messages</li>}
-                    </ul>
-                </Link>
-
-                {/* Hobbies */}
-                <Link href="/admin/hobbies" className={styles.statCard}>
-                    <div className={styles.cardHeader}>
-                        <h3>Hobbies</h3>
-                        <span className={styles.countBadge}>{hobbies.length}</span>
-                    </div>
-                    <ul className={styles.previewList}>
-                        {hobbies.map(h => <li key={h.id}>{h.emoji} {h.name}</li>)}
-                        {hobbies.length === 0 && <li>No hobbies added</li>}
-                    </ul>
-                </Link>
-                
-                {/* Languages */}
-                <Link href="/admin/languages" className={styles.statCard}>
-                    <div className={styles.cardHeader}>
-                        <h3>Languages</h3>
-                        <span className={styles.countBadge}>{languages.length}</span>
-                    </div>
-                    <ul className={styles.previewList}>
-                        {languages.map(l => <li key={l.id}>{l.name} - {l.proficiency}</li>)}
-                        {languages.length === 0 && <li>No languages added</li>}
-                    </ul>
-                </Link>
+      <div className={styles.statsGrid}>
+        {cards.map((card) => (
+          <Link key={card.title} href={card.href} className={styles.statCard}>
+            <div className={styles.cardHeader}>
+              <h3>{card.title}</h3>
+              <div style={{ display: 'flex', gap: '6px' }}>
+                {card.extraBadge && (
+                  <span className={styles.countBadge} style={{ background: 'rgba(239, 68, 68, 0.2)', color: '#f87171' }}>
+                    {card.extraBadge}
+                  </span>
+                )}
+                <span className={styles.countBadge}>{card.count}</span>
+              </div>
             </div>
-        </div>
-    );
+            <ul className={styles.previewList}>
+              {card.items.length > 0 ? (
+                card.items.map((item, idx) => <li key={idx}>{item}</li>)
+              ) : (
+                <li>{card.emptyText}</li>
+              )}
+            </ul>
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
 }

@@ -1,35 +1,53 @@
-import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { apiSuccess, apiError, parseJsonBody, requireAuthSession } from '@/lib/api-utils';
 
 export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
-    try {
-        const { id } = await params;
-        const body = await request.json();
-        const { institution, degree, fieldOfStudy, faculty, startDate, endDate, score } = body;
-        const data = await prisma.education.update({
-            where: { id },
-            data: {
-                institution,
-                degree,
-                fieldOfStudy,
-                faculty: faculty || null,
-                startDate: new Date(startDate),
-                endDate: endDate ? new Date(endDate) : null,
-                score,
-            },
-        });
-        return NextResponse.json(data);
-    } catch (error) {
-        return NextResponse.json({ error: 'Error updating education' }, { status: 500 });
-    }
+  const authError = await requireAuthSession();
+  if (authError) return authError;
+
+  const { id } = await params;
+  const { data, error } = await parseJsonBody<{
+    institution?: string;
+    degree?: string;
+    fieldOfStudy?: string;
+    faculty?: string | null;
+    startDate?: string;
+    endDate?: string | null;
+    score?: string | null;
+  }>(request);
+
+  if (error || !data) {
+    return apiError('Invalid request payload', 400);
+  }
+
+  try {
+    const education = await prisma.education.update({
+      where: { id },
+      data: {
+        ...(data.institution ? { institution: data.institution.trim() } : {}),
+        ...(data.degree ? { degree: data.degree.trim() } : {}),
+        ...(data.fieldOfStudy ? { fieldOfStudy: data.fieldOfStudy.trim() } : {}),
+        ...(data.faculty !== undefined ? { faculty: data.faculty ? data.faculty.trim() : null } : {}),
+        ...(data.startDate ? { startDate: new Date(data.startDate) } : {}),
+        ...(data.endDate !== undefined ? { endDate: data.endDate ? new Date(data.endDate) : null } : {}),
+        ...(data.score !== undefined ? { score: data.score ? data.score.trim() : null } : {}),
+      },
+    });
+    return apiSuccess(education);
+  } catch (err: any) {
+    return apiError('Failed to update education record', 500, err?.message);
+  }
 }
 
-export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
-    try {
-        const { id } = await params;
-        await prisma.education.delete({ where: { id } });
-        return NextResponse.json({ success: true });
-    } catch (error) {
-        return NextResponse.json({ error: 'Error deleting education' }, { status: 500 });
-    }
+export async function DELETE(_request: Request, { params }: { params: Promise<{ id: string }> }) {
+  const authError = await requireAuthSession();
+  if (authError) return authError;
+
+  const { id } = await params;
+  try {
+    await prisma.education.delete({ where: { id } });
+    return apiSuccess({ message: 'Education record deleted successfully' });
+  } catch (err: any) {
+    return apiError('Failed to delete education record', 500, err?.message);
+  }
 }

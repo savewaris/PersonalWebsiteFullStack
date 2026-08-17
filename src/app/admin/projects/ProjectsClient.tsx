@@ -1,146 +1,229 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { FaEdit, FaTrash, FaPlus } from 'react-icons/fa';
-import styles from './projects.module.css';
+import { FaEdit, FaTrash, FaExternalLinkAlt, FaGithub } from 'react-icons/fa';
+import { useAdminCrud } from '@/lib/useAdminCrud';
+import { AdminPageHeader } from '@/components/admin/AdminPageHeader';
+import { AdminModal } from '@/components/admin/AdminModal';
+import { DeleteConfirmModal } from '@/components/admin/DeleteConfirmModal';
+import styles from '@/components/admin/admin.module.css';
 
-interface Project {
-    id: string;
-    title: string;
-    description: string;
-    imageUrl: string | null;
-    demoUrl: string | null;
-    repoUrl: string | null;
-    tags: string;
+export interface Project {
+  id: string;
+  title: string;
+  description: string;
+  imageUrl: string | null;
+  demoUrl: string | null;
+  repoUrl: string | null;
+  tags: string;
 }
 
 export default function ProjectsClient({ initialProjects }: { initialProjects: Project[] }) {
-    const [projects, setProjects] = useState<Project[]>(initialProjects);
-    const [isEditing, setIsEditing] = useState(false);
-    const [currentProject, setCurrentProject] = useState<Partial<Project>>({});
-    const router = useRouter();
+  const {
+    items: projects,
+    isModalOpen,
+    editingItem,
+    deletingItem,
+    setDeletingItem,
+    isSubmitting,
+    error,
+    openCreate,
+    openEdit,
+    closeModal,
+    saveItem,
+    deleteItem,
+  } = useAdminCrud<Project>(initialProjects, '/api/projects');
 
-    const resetForm = () => {
-        setCurrentProject({});
-        setIsEditing(false);
-    };
+  const [formData, setFormData] = useState<Partial<Project>>({
+    title: '',
+    description: '',
+    imageUrl: '',
+    demoUrl: '',
+    repoUrl: '',
+    tags: '',
+  });
 
-    const handleDelete = async (id: string) => {
-        if (!confirm('Are you sure you want to delete this project?')) return;
+  const handleOpenCreate = () => {
+    setFormData({ title: '', description: '', imageUrl: '', demoUrl: '', repoUrl: '', tags: '' });
+    openCreate();
+  };
 
-        const res = await fetch(`/api/projects/${id}`, { method: 'DELETE' });
-        if (res.ok) {
-            setProjects(projects.filter(p => p.id !== id));
-            router.refresh();
-        }
-    };
+  const handleOpenEdit = (project: Project) => {
+    setFormData(project);
+    openEdit(project);
+  };
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        const url = currentProject.id ? `/api/projects/${currentProject.id}` : '/api/projects';
-        const method = currentProject.id ? 'PUT' : 'POST';
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await saveItem(formData);
+  };
 
-        const res = await fetch(url, {
-            method,
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(currentProject),
-        });
+  return (
+    <div>
+      <AdminPageHeader
+        title="Projects Management"
+        description="Manage the portfolio projects showcasing your work, live demos, and open-source repositories."
+        count={projects.length}
+        actionLabel="Add Project"
+        onAction={handleOpenCreate}
+      />
 
-        if (res.ok) {
-            const savedProject = await res.json();
-            if (currentProject.id) {
-                setProjects(projects.map(p => p.id === savedProject.id ? savedProject : p));
-            } else {
-                setProjects([savedProject, ...projects]);
-            }
-            resetForm();
-            router.refresh();
-        }
-    };
+      {error && <div className={styles.errorBanner}>{error}</div>}
 
-    return (
-        <div className={styles.container}>
-            <div className={styles.header}>
-                <h1 className={styles.title}>Projects Management</h1>
-                <button onClick={() => setIsEditing(true)} className={styles.addButton}>
-                    <FaPlus /> Add Project
-                </button>
-            </div>
-
-            {isEditing && (
-                <div className={styles.formContainer}>
-                    <h2>{currentProject.id ? 'Edit Project' : 'Add New Project'}</h2>
-                    <form onSubmit={handleSubmit} className={styles.form}>
-                        <input
-                            type="text"
-                            placeholder="Project Title"
-                            value={currentProject.title || ''}
-                            onChange={e => setCurrentProject({ ...currentProject, title: e.target.value })}
-                            required
-                            className={styles.input}
-                        />
-                        <textarea
-                            placeholder="Description (Markdown Supported: **bold**, *italic*, [link](url))"
-                            value={currentProject.description || ''}
-                            onChange={e => setCurrentProject({ ...currentProject, description: e.target.value })}
-                            required
-                            className={styles.textarea}
-                        />
-                        <input
-                            type="text"
-                            placeholder="Image URL"
-                            value={currentProject.imageUrl || ''}
-                            onChange={e => setCurrentProject({ ...currentProject, imageUrl: e.target.value })}
-                            className={styles.input}
-                        />
-                        <input
-                            type="text"
-                            placeholder="Demo URL"
-                            value={currentProject.demoUrl || ''}
-                            onChange={e => setCurrentProject({ ...currentProject, demoUrl: e.target.value })}
-                            className={styles.input}
-                        />
-                        <input
-                            type="text"
-                            placeholder="Repo URL"
-                            value={currentProject.repoUrl || ''}
-                            onChange={e => setCurrentProject({ ...currentProject, repoUrl: e.target.value })}
-                            className={styles.input}
-                        />
-                        <input
-                            type="text"
-                            placeholder="Tags (comma separated)"
-                            value={currentProject.tags || ''}
-                            onChange={e => setCurrentProject({ ...currentProject, tags: e.target.value })}
-                            className={styles.input}
-                        />
-                        <div className={styles.formActions}>
-                            <button type="button" onClick={resetForm} className={styles.cancelButton}>Cancel</button>
-                            <button type="submit" className={styles.saveButton}>Save</button>
-                        </div>
-                    </form>
-                </div>
-            )}
-
-            <div className={styles.grid}>
-                {projects.map(project => (
-                    <div key={project.id} className={styles.card}>
-                        <div className={styles.cardInfo}>
-                            <h3>{project.title}</h3>
-                            <p className={styles.truncate}>{project.description}</p>
-                        </div>
-                        <div className={styles.cardActions}>
-                            <button onClick={() => { setCurrentProject(project); setIsEditing(true); }} className={styles.iconButton}>
-                                <FaEdit />
-                            </button>
-                            <button onClick={() => handleDelete(project.id)} className={styles.iconButtonDelete}>
-                                <FaTrash />
-                            </button>
-                        </div>
+      {projects.length === 0 ? (
+        <div className={styles.emptyState}>No projects added yet. Click &ldquo;+ Add Project&rdquo; to showcase your work.</div>
+      ) : (
+        <div className={styles.cardGrid}>
+          {projects.map((project) => (
+            <div key={project.id} className={styles.card}>
+              <div className={styles.cardHeader}>
+                <div>
+                  <h3 className={styles.cardTitle}>{project.title}</h3>
+                  {project.tags && (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginTop: '6px' }}>
+                      {project.tags.split(',').map((tag, i) => (
+                        <span key={i} className={styles.badgeCount} style={{ fontSize: '0.75rem' }}>
+                          {tag.trim()}
+                        </span>
+                      ))}
                     </div>
-                ))}
+                  )}
+                </div>
+              </div>
+
+              <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', lineHeight: 1.5, maxHeight: '80px', overflow: 'hidden' }}>
+                {project.description}
+              </p>
+
+              <div style={{ display: 'flex', gap: '12px', fontSize: '0.85rem' }}>
+                {project.demoUrl && (
+                  <a
+                    href={project.demoUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    style={{ color: 'var(--accent)', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+                  >
+                    <FaExternalLinkAlt /> Live Demo
+                  </a>
+                )}
+                {project.repoUrl && (
+                  <a
+                    href={project.repoUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    style={{ color: 'var(--text-secondary)', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+                  >
+                    <FaGithub /> Repository
+                  </a>
+                )}
+              </div>
+
+              <div className={styles.cardActions}>
+                <button type="button" onClick={() => handleOpenEdit(project)} className={styles.actionBtn}>
+                  <FaEdit style={{ marginRight: '4px' }} /> Edit
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setDeletingItem(project)}
+                  className={`${styles.actionBtn} ${styles.deleteBtn}`}
+                >
+                  <FaTrash style={{ marginRight: '4px' }} /> Delete
+                </button>
+              </div>
             </div>
+          ))}
         </div>
-    );
+      )}
+
+      {/* Add / Edit Modal */}
+      <AdminModal
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        title={editingItem ? 'Edit Project' : 'Add New Project'}
+      >
+        <form onSubmit={handleSubmit} className={styles.form}>
+          <div className={styles.formGroup}>
+            <label>Project Title</label>
+            <input
+              type="text"
+              required
+              value={formData.title || ''}
+              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+              placeholder="e.g. AI Portfolio Platform"
+            />
+          </div>
+
+          <div className={styles.formGroup}>
+            <label>Description (Markdown supported)</label>
+            <textarea
+              required
+              rows={4}
+              value={formData.description || ''}
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              placeholder="Detailed description of features, tech stack, and impact..."
+            />
+          </div>
+
+          <div className={styles.formGroup}>
+            <label>Image URL</label>
+            <input
+              type="url"
+              value={formData.imageUrl || ''}
+              onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
+              placeholder="https://example.com/project-screenshot.png"
+            />
+          </div>
+
+          <div className={styles.formRow}>
+            <div className={styles.formGroup}>
+              <label>Demo URL</label>
+              <input
+                type="url"
+                value={formData.demoUrl || ''}
+                onChange={(e) => setFormData({ ...formData, demoUrl: e.target.value })}
+                placeholder="https://myproject.com"
+              />
+            </div>
+            <div className={styles.formGroup}>
+              <label>GitHub / Repo URL</label>
+              <input
+                type="url"
+                value={formData.repoUrl || ''}
+                onChange={(e) => setFormData({ ...formData, repoUrl: e.target.value })}
+                placeholder="https://github.com/username/project"
+              />
+            </div>
+          </div>
+
+          <div className={styles.formGroup}>
+            <label>Tags (Comma separated)</label>
+            <input
+              type="text"
+              value={formData.tags || ''}
+              onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
+              placeholder="React, Next.js, PostgreSQL, TypeScript"
+            />
+          </div>
+
+          <div className={styles.modalFooter}>
+            <button type="button" onClick={closeModal} className={styles.secondaryButton}>
+              Cancel
+            </button>
+            <button type="submit" disabled={isSubmitting} className={styles.primaryButton}>
+              {isSubmitting ? 'Saving...' : editingItem ? 'Update Project' : 'Create Project'}
+            </button>
+          </div>
+        </form>
+      </AdminModal>
+
+      {/* Delete Confirmation */}
+      <DeleteConfirmModal
+        isOpen={Boolean(deletingItem)}
+        itemName={deletingItem?.title}
+        isDeleting={isSubmitting}
+        onClose={() => setDeletingItem(null)}
+        onConfirm={() => deletingItem && deleteItem(deletingItem.id)}
+      />
+    </div>
+  );
 }

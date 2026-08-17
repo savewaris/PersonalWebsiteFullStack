@@ -9,7 +9,7 @@ interface ExperienceEducationSectionProps {
 
 export function ExperienceEducationSection({ experiences, education }: ExperienceEducationSectionProps) {
   return (
-    <StaggerItem className={`${styles.bentoItem} ${styles.span2} ${styles.rowSpan2}`}>
+    <StaggerItem id="experience" className={`${styles.bentoItem} ${styles.span2} ${styles.rowSpan2}`}>
       <h2 className={styles.bentoTitle}>Experience & Education</h2>
       <div className={styles.bentoScrollArea} style={{ maxHeight: '100%' }}>
         <div className={styles.experienceList} style={{ gap: '32px' }}>

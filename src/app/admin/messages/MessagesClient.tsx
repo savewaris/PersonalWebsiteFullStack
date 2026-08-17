@@ -1,79 +1,145 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { FaTrash, FaCheckCircle, FaCircle } from 'react-icons/fa';
-import styles from './messages.module.css';
+import { FaTrash, FaCheckCircle, FaRegCircle } from 'react-icons/fa';
+import { AdminPageHeader } from '@/components/admin/AdminPageHeader';
+import { DeleteConfirmModal } from '@/components/admin/DeleteConfirmModal';
+import styles from '@/components/admin/admin.module.css';
 
-interface Message {
-    id: string;
-    name: string;
-    email: string;
-    message: string;
-    read: boolean;
-    createdAt: string;
+export interface Message {
+  id: string;
+  name: string;
+  email: string;
+  message: string;
+  read: boolean;
+  createdAt: string;
 }
 
 export default function MessagesClient({ initialMessages }: { initialMessages: Message[] }) {
-    const [messages, setMessages] = useState<Message[]>(initialMessages);
-    const router = useRouter();
+  const [messages, setMessages] = useState<Message[]>(initialMessages);
+  const [deletingMessage, setDeletingMessage] = useState<Message | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-    const handleToggleRead = async (id: string, currentReadStatus: boolean) => {
-        const res = await fetch(`/api/messages/${id}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ read: !currentReadStatus }),
-        });
+  const unreadCount = messages.filter((m) => !m.read).length;
 
-        if (res.ok) {
-            setMessages(messages.map(m => m.id === id ? { ...m, read: !currentReadStatus } : m));
-            router.refresh();
-        }
-    };
+  const handleToggleRead = async (id: string, currentReadStatus: boolean) => {
+    try {
+      const res = await fetch(`/api/messages/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ read: !currentReadStatus }),
+      });
+      if (res.ok) {
+        setMessages((prev) =>
+          prev.map((m) => (m.id === id ? { ...m, read: !currentReadStatus } : m))
+        );
+      }
+    } catch (err: any) {
+      setError('Failed to update message status');
+    }
+  };
 
-    const handleDelete = async (id: string) => {
-        if (!confirm('Are you sure you want to delete this message?')) return;
+  const handleDelete = async (id: string) => {
+    setIsProcessing(true);
+    try {
+      const res = await fetch(`/api/messages/${id}`, { method: 'DELETE' });
+      if (res.ok) {
+        setMessages((prev) => prev.filter((m) => m.id !== id));
+        setDeletingMessage(null);
+      }
+    } catch (err: any) {
+      setError('Failed to delete message');
+    } finally {
+      setIsProcessing(false);
+    }
+  };
 
-        const res = await fetch(`/api/messages/${id}`, { method: 'DELETE' });
-        if (res.ok) {
-            setMessages(messages.filter(m => m.id !== id));
-            router.refresh();
-        }
-    };
+  return (
+    <div>
+      <AdminPageHeader
+        title="Messages Inbox"
+        description="View and manage contact inquiries sent by visitors to your portfolio."
+        count={messages.length}
+      />
 
-    return (
-        <div className={styles.container}>
-            <h1 className={styles.title}>Messages ({messages.filter(m => !m.read).length} Unread)</h1>
-            <div className={styles.list}>
-                {messages.length === 0 ? (
-                    <p className={styles.emptyState}>No messages yet.</p>
-                ) : (
-                    messages.map(msg => (
-                        <div key={msg.id} className={`${styles.card} ${!msg.read ? styles.unread : ''}`}>
-                            <div className={styles.header}>
-                                <div>
-                                    <h3 className={styles.name}>{msg.name}</h3>
-                                    <a href={`mailto:${msg.email}`} className={styles.email}>{msg.email}</a>
-                                </div>
-                                <div className={styles.date}>
-                                    {new Date(msg.createdAt).toLocaleString()}
-                                </div>
-                            </div>
-                            <p className={styles.messageBody}>{msg.message}</p>
-                            <div className={styles.actions}>
-                                <button onClick={() => handleToggleRead(msg.id, msg.read)} className={styles.iconButton} title={msg.read ? "Mark Unread" : "Mark Read"}>
-                                    {msg.read ? <FaCheckCircle style={{ color: 'var(--text-secondary)' }} /> : <FaCircle style={{ color: 'var(--accent)' }} />}
-                                    <span style={{ marginLeft: '8px', fontSize: '0.85rem' }}>{msg.read ? 'Read' : 'Unread'}</span>
-                                </button>
-                                <button onClick={() => handleDelete(msg.id)} className={styles.iconButtonDelete} title="Delete">
-                                    <FaTrash />
-                                    <span style={{ marginLeft: '8px', fontSize: '0.85rem' }}>Delete</span>
-                                </button>
-                            </div>
-                        </div>
-                    ))
-                )}
+      {error && <div className={styles.errorBanner}>{error}</div>}
+
+      <div style={{ marginBottom: '24px', color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
+        <strong>{unreadCount}</strong> unread message{unreadCount === 1 ? '' : 's'}
+      </div>
+
+      {messages.length === 0 ? (
+        <div className={styles.emptyState}>No messages in your inbox yet.</div>
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          {messages.map((msg) => (
+            <div
+              key={msg.id}
+              className={styles.card}
+              style={{
+                borderLeft: msg.read ? '1px solid var(--border)' : '4px solid var(--accent)',
+                backgroundColor: msg.read ? 'var(--bg-elevated)' : 'rgba(255, 255, 255, 0.04)',
+              }}
+            >
+              <div className={styles.cardHeader}>
+                <div>
+                  <h3 className={styles.cardTitle}>{msg.name}</h3>
+                  <a
+                    href={`mailto:${msg.email}`}
+                    style={{ color: 'var(--accent)', fontSize: '0.9rem', textDecoration: 'none' }}
+                  >
+                    {msg.email}
+                  </a>
+                </div>
+                <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                  {new Date(msg.createdAt).toLocaleDateString()} at{' '}
+                  {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                </span>
+              </div>
+
+              <p style={{ color: 'var(--text-primary)', fontSize: '0.95rem', lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>
+                {msg.message}
+              </p>
+
+              <div className={styles.cardActions}>
+                <button
+                  type="button"
+                  onClick={() => handleToggleRead(msg.id, msg.read)}
+                  className={styles.actionBtn}
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                >
+                  {msg.read ? (
+                    <>
+                      <FaCheckCircle style={{ color: 'var(--text-secondary)' }} /> Mark Unread
+                    </>
+                  ) : (
+                    <>
+                      <FaRegCircle style={{ color: 'var(--accent)' }} /> Mark as Read
+                    </>
+                  )}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setDeletingMessage(msg)}
+                  className={`${styles.actionBtn} ${styles.deleteBtn}`}
+                >
+                  <FaTrash style={{ marginRight: '4px' }} /> Delete
+                </button>
+              </div>
             </div>
+          ))}
         </div>
-    );
+      )}
+
+      {/* Delete Confirmation */}
+      <DeleteConfirmModal
+        isOpen={Boolean(deletingMessage)}
+        itemName={deletingMessage ? `message from ${deletingMessage.name}` : undefined}
+        isDeleting={isProcessing}
+        onClose={() => setDeletingMessage(null)}
+        onConfirm={() => deletingMessage && handleDelete(deletingMessage.id)}
+      />
+    </div>
+  );
 }

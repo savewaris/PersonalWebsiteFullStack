@@ -1,33 +1,43 @@
-import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { apiSuccess, apiError, parseJsonBody, requireAuthSession } from '@/lib/api-utils';
 
 export async function GET() {
-    try {
-        const skills = await prisma.skill.findMany({
-            orderBy: { createdAt: 'desc' },
-        });
-        return NextResponse.json(skills);
-    } catch (error) {
-        return NextResponse.json({ error: 'Failed to fetch skills' }, { status: 500 });
-    }
+  try {
+    const skills = await prisma.skill.findMany({
+      orderBy: { proficiency: 'desc' },
+    });
+    return apiSuccess(skills);
+  } catch (error: any) {
+    return apiError('Failed to fetch skills', 500, error?.message);
+  }
 }
 
 export async function POST(request: Request) {
-    try {
-        const body = await request.json();
-        const { name, proficiency, category, icon } = body;
+  const authError = await requireAuthSession();
+  if (authError) return authError;
 
-        const skill = await prisma.skill.create({
-            data: {
-                name,
-                proficiency: Number(proficiency),
-                category,
-                icon,
-            },
-        });
-        return NextResponse.json(skill, { status: 201 });
-    } catch (error) {
-        console.error(error);
-        return NextResponse.json({ error: 'Failed to create skill' }, { status: 500 });
-    }
+  const { data, error } = await parseJsonBody<{
+    name?: string;
+    proficiency?: number | string;
+    category?: string;
+    icon?: string;
+  }>(request);
+
+  if (error || !data?.name || data.proficiency === undefined || !data.category) {
+    return apiError('Name, proficiency, and category are required', 400);
+  }
+
+  try {
+    const skill = await prisma.skill.create({
+      data: {
+        name: data.name.trim(),
+        proficiency: Math.min(100, Math.max(0, Number(data.proficiency))),
+        category: data.category.trim(),
+        icon: data.icon?.trim() || null,
+      },
+    });
+    return apiSuccess(skill, 201);
+  } catch (err: any) {
+    return apiError('Failed to create skill', 500, err?.message);
+  }
 }

@@ -1,27 +1,39 @@
-import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { apiSuccess, apiError, parseJsonBody, requireAuthSession } from '@/lib/api-utils';
 
 export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
-    try {
-        const { id } = await params;
-        const body = await request.json();
-        const { name, emoji } = body;
-        const data = await prisma.hobby.update({
-            where: { id },
-            data: { name, emoji },
-        });
-        return NextResponse.json(data);
-    } catch (error) {
-        return NextResponse.json({ error: 'Error updating hobby' }, { status: 500 });
-    }
+  const authError = await requireAuthSession();
+  if (authError) return authError;
+
+  const { id } = await params;
+  const { data, error } = await parseJsonBody<{ name?: string; emoji?: string }>(request);
+  if (error || !data) {
+    return apiError('Invalid request payload', 400);
+  }
+
+  try {
+    const hobby = await prisma.hobby.update({
+      where: { id },
+      data: {
+        ...(data.name ? { name: data.name.trim() } : {}),
+        ...(data.emoji !== undefined ? { emoji: data.emoji ? data.emoji.trim() : null } : {}),
+      },
+    });
+    return apiSuccess(hobby);
+  } catch (err: any) {
+    return apiError('Failed to update hobby', 500, err?.message);
+  }
 }
 
-export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
-    try {
-        const { id } = await params;
-        await prisma.hobby.delete({ where: { id } });
-        return NextResponse.json({ success: true });
-    } catch (error) {
-        return NextResponse.json({ error: 'Error deleting hobby' }, { status: 500 });
-    }
+export async function DELETE(_request: Request, { params }: { params: Promise<{ id: string }> }) {
+  const authError = await requireAuthSession();
+  if (authError) return authError;
+
+  const { id } = await params;
+  try {
+    await prisma.hobby.delete({ where: { id } });
+    return apiSuccess({ message: 'Hobby deleted successfully' });
+  } catch (err: any) {
+    return apiError('Failed to delete hobby', 500, err?.message);
+  }
 }

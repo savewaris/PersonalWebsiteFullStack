@@ -1,35 +1,47 @@
-import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { apiSuccess, apiError, parseJsonBody, requireAuthSession } from '@/lib/api-utils';
 
 export async function GET() {
-    try {
-        const experiences = await prisma.experience.findMany({
-            orderBy: { startDate: 'desc' },
-        });
-        return NextResponse.json(experiences);
-    } catch (error) {
-        return NextResponse.json({ error: 'Failed to fetch experiences' }, { status: 500 });
-    }
+  try {
+    const experiences = await prisma.experience.findMany({
+      orderBy: { startDate: 'desc' },
+    });
+    return apiSuccess(experiences);
+  } catch (error: any) {
+    return apiError('Failed to fetch experiences', 500, error?.message);
+  }
 }
 
 export async function POST(request: Request) {
-    try {
-        const body = await request.json();
-        const { role, company, location, startDate, endDate, description } = body;
+  const authError = await requireAuthSession();
+  if (authError) return authError;
 
-        const experience = await prisma.experience.create({
-            data: {
-                role,
-                company,
-                location,
-                startDate: new Date(startDate),
-                endDate: endDate ? new Date(endDate) : null,
-                description,
-            },
-        });
-        return NextResponse.json(experience, { status: 201 });
-    } catch (error) {
-        console.error(error);
-        return NextResponse.json({ error: 'Failed to create experience' }, { status: 500 });
-    }
+  const { data, error } = await parseJsonBody<{
+    role?: string;
+    company?: string;
+    location?: string;
+    startDate?: string;
+    endDate?: string | null;
+    description?: string;
+  }>(request);
+
+  if (error || !data?.role || !data?.company || !data?.startDate || !data?.description) {
+    return apiError('Role, company, startDate, and description are required', 400);
+  }
+
+  try {
+    const experience = await prisma.experience.create({
+      data: {
+        role: data.role.trim(),
+        company: data.company.trim(),
+        location: data.location?.trim() || null,
+        startDate: new Date(data.startDate),
+        endDate: data.endDate ? new Date(data.endDate) : null,
+        description: data.description.trim(),
+      },
+    });
+    return apiSuccess(experience, 201);
+  } catch (err: any) {
+    return apiError('Failed to create experience', 500, err?.message);
+  }
 }
