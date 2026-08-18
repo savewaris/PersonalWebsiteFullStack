@@ -1,21 +1,9 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { revalidatePath } from 'next/cache';
+import { ensureHttps } from './url-utils';
 
-export function ensureHttps(url?: string | null): string | null {
-  if (!url) return null;
-  const trimmed = url.trim();
-  if (!trimmed) return null;
-  if (
-    trimmed.startsWith('http://') ||
-    trimmed.startsWith('https://') ||
-    trimmed.startsWith('mailto:') ||
-    trimmed.startsWith('#')
-  ) {
-    return trimmed;
-  }
-  return `https://${trimmed}`;
-}
+export { ensureHttps };
 
 export function apiSuccess<T>(data: T, status = 200, headers?: HeadersInit) {
   return NextResponse.json(data, { status, headers });
@@ -58,7 +46,8 @@ export async function parseJsonBody<T>(req: Request): Promise<{ data: T | null; 
   try {
     const data = (await req.json()) as T;
     return { data, error: null };
-  } catch (err: any) {
-    return { data: null, error: err?.message || 'Invalid JSON body' };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Invalid JSON body';
+    return { data: null, error: message };
   }
 }

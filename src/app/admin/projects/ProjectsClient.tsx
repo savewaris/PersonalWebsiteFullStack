@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { FaEdit, FaTrash, FaExternalLinkAlt, FaGithub } from 'react-icons/fa';
+import { FaEdit, FaTrash, FaExternalLinkAlt, FaGithub, FaVideo, FaImages } from 'react-icons/fa';
 import { useAdminCrud } from '@/lib/useAdminCrud';
 import { AdminPageHeader } from '@/components/admin/AdminPageHeader';
 import { AdminModal } from '@/components/admin/AdminModal';
@@ -13,6 +13,8 @@ export interface Project {
   title: string;
   description: string;
   imageUrl: string | null;
+  videoPreviewUrl: string | null;
+  galleryImages: string | null;
   demoUrl: string | null;
   repoUrl: string | null;
   tags: string;
@@ -38,13 +40,24 @@ export default function ProjectsClient({ initialProjects }: { initialProjects: P
     title: '',
     description: '',
     imageUrl: '',
+    videoPreviewUrl: '',
+    galleryImages: '',
     demoUrl: '',
     repoUrl: '',
     tags: '',
   });
 
   const handleOpenCreate = () => {
-    setFormData({ title: '', description: '', imageUrl: '', demoUrl: '', repoUrl: '', tags: '' });
+    setFormData({
+      title: '',
+      description: '',
+      imageUrl: '',
+      videoPreviewUrl: '',
+      galleryImages: '',
+      demoUrl: '',
+      repoUrl: '',
+      tags: '',
+    });
     openCreate();
   };
 
@@ -62,7 +75,7 @@ export default function ProjectsClient({ initialProjects }: { initialProjects: P
     <div>
       <AdminPageHeader
         title="Projects Management"
-        description="Manage the portfolio projects showcasing your work, live demos, and open-source repositories."
+        description="Manage the portfolio projects showcasing your work, rich media videos, screenshot galleries, and open-source repositories."
         count={projects.length}
         actionLabel="Add Project"
         onAction={handleOpenCreate}
@@ -74,64 +87,113 @@ export default function ProjectsClient({ initialProjects }: { initialProjects: P
         <div className={styles.emptyState}>No projects added yet. Click &ldquo;+ Add Project&rdquo; to showcase your work.</div>
       ) : (
         <div className={styles.cardGrid}>
-          {projects.map((project) => (
-            <div key={project.id} className={styles.card}>
-              <div className={styles.cardHeader}>
-                <div>
-                  <h3 className={styles.cardTitle}>{project.title}</h3>
-                  {project.tags && (
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginTop: '6px' }}>
-                      {project.tags.split(',').map((tag, i) => (
-                        <span key={i} className={styles.badgeCount} style={{ fontSize: '0.75rem' }}>
-                          {tag.trim()}
+          {projects.map((project) => {
+            const galleryCount = project.galleryImages
+              ? project.galleryImages.split(',').filter((s) => s.trim().length > 0).length
+              : 0;
+
+            return (
+              <div key={project.id} className={styles.card}>
+                <div className={styles.cardHeader}>
+                  <div>
+                    <h3 className={styles.cardTitle}>{project.title}</h3>
+                    
+                    {/* Media Badges */}
+                    <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginTop: '6px' }}>
+                      {project.videoPreviewUrl && (
+                        <span
+                          style={{
+                            fontSize: '0.72rem',
+                            padding: '2px 8px',
+                            borderRadius: '4px',
+                            background: 'rgba(59, 130, 246, 0.15)',
+                            color: '#60a5fa',
+                            border: '1px solid rgba(59, 130, 246, 0.3)',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                          }}
+                        >
+                          <FaVideo size={10} /> Video
                         </span>
-                      ))}
+                      )}
+                      {galleryCount > 0 && (
+                        <span
+                          style={{
+                            fontSize: '0.72rem',
+                            padding: '2px 8px',
+                            borderRadius: '4px',
+                            background: 'rgba(168, 85, 247, 0.15)',
+                            color: '#c084fc',
+                            border: '1px solid rgba(168, 85, 247, 0.3)',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                          }}
+                        >
+                          <FaImages size={10} /> {galleryCount} Screenshot{galleryCount > 1 ? 's' : ''}
+                        </span>
+                      )}
+                      {project.tags &&
+                        project.tags.split(',').map((tag, i) => (
+                          <span key={i} className={styles.badgeCount} style={{ fontSize: '0.72rem' }}>
+                            {tag.trim()}
+                          </span>
+                        ))}
                     </div>
+                  </div>
+                </div>
+
+                <p
+                  style={{
+                    color: 'var(--text-secondary)',
+                    fontSize: '0.9rem',
+                    lineHeight: 1.5,
+                    maxHeight: '80px',
+                    overflow: 'hidden',
+                  }}
+                >
+                  {project.description}
+                </p>
+
+                <div style={{ display: 'flex', gap: '12px', fontSize: '0.85rem', flexWrap: 'wrap' }}>
+                  {project.demoUrl && (
+                    <a
+                      href={project.demoUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ color: 'var(--accent)', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+                    >
+                      <FaExternalLinkAlt /> Live Demo
+                    </a>
+                  )}
+                  {project.repoUrl && (
+                    <a
+                      href={project.repoUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ color: 'var(--text-secondary)', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+                    >
+                      <FaGithub /> Repository
+                    </a>
                   )}
                 </div>
-              </div>
 
-              <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', lineHeight: 1.5, maxHeight: '80px', overflow: 'hidden' }}>
-                {project.description}
-              </p>
-
-              <div style={{ display: 'flex', gap: '12px', fontSize: '0.85rem' }}>
-                {project.demoUrl && (
-                  <a
-                    href={project.demoUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    style={{ color: 'var(--accent)', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+                <div className={styles.cardActions}>
+                  <button type="button" onClick={() => handleOpenEdit(project)} className={styles.actionBtn}>
+                    <FaEdit style={{ marginRight: '4px' }} /> Edit
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setDeletingItem(project)}
+                    className={`${styles.actionBtn} ${styles.deleteBtn}`}
                   >
-                    <FaExternalLinkAlt /> Live Demo
-                  </a>
-                )}
-                {project.repoUrl && (
-                  <a
-                    href={project.repoUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    style={{ color: 'var(--text-secondary)', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
-                  >
-                    <FaGithub /> Repository
-                  </a>
-                )}
+                    <FaTrash style={{ marginRight: '4px' }} /> Delete
+                  </button>
+                </div>
               </div>
-
-              <div className={styles.cardActions}>
-                <button type="button" onClick={() => handleOpenEdit(project)} className={styles.actionBtn}>
-                  <FaEdit style={{ marginRight: '4px' }} /> Edit
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setDeletingItem(project)}
-                  className={`${styles.actionBtn} ${styles.deleteBtn}`}
-                >
-                  <FaTrash style={{ marginRight: '4px' }} /> Delete
-                </button>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
@@ -164,13 +226,34 @@ export default function ProjectsClient({ initialProjects }: { initialProjects: P
             />
           </div>
 
+          <div className={styles.formRow}>
+            <div className={styles.formGroup}>
+              <label>Poster Image URL</label>
+              <input
+                type="url"
+                value={formData.imageUrl || ''}
+                onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
+                placeholder="https://example.com/cover.png"
+              />
+            </div>
+            <div className={styles.formGroup}>
+              <label>Video Preview URL (MP4 / WebM)</label>
+              <input
+                type="url"
+                value={formData.videoPreviewUrl || ''}
+                onChange={(e) => setFormData({ ...formData, videoPreviewUrl: e.target.value })}
+                placeholder="https://example.com/demo.mp4"
+              />
+            </div>
+          </div>
+
           <div className={styles.formGroup}>
-            <label>Image URL</label>
-            <input
-              type="url"
-              value={formData.imageUrl || ''}
-              onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
-              placeholder="https://example.com/project-screenshot.png"
+            <label>Screenshot Gallery (Comma-separated URLs)</label>
+            <textarea
+              rows={2}
+              value={formData.galleryImages || ''}
+              onChange={(e) => setFormData({ ...formData, galleryImages: e.target.value })}
+              placeholder="https://example.com/shot1.png, https://example.com/shot2.png"
             />
           </div>
 

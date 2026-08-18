@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "version": "1.0",
+  "project": "PersonalWebsite",
+  "currentMilestone": "v1.2 — Content Architecture & Taxonomy",
+  "activeTask": null,
+  "queue": [
+    {
+      "id": "ISSUE-3",
+      "title": "Separate Experience and Education into Dedicated Side-by-Side Sections with Employment Badges",
+      "priority": "High",
+      "milestone": "v1.4",
+      "assignedAgents": [
+        "db-engineer",
+        "ui-designer"
+      ],
+      "status": "TODO"
+    },
+    {
+      "id": "ISSUE-4",
+      "title": "Add Certifications & Credentials Section",
+      "priority": "Medium",
+      "milestone": "v1.5",
+      "assignedAgents": [
+        "db-engineer",
+        "ui-designer",
+        "doc-writer"
+      ],
+      "status": "TODO"
+    }
+  ],
+  "completedTasks": [
+    {
+      "id": "ADR-0001",
+      "title": "Project-Scoped AI Agent Architecture & Swarm Protocol",
+      "completedAt": "2026-08-18T16:12:00.000Z"
+    },
+    {
+      "id": "ADR-0002",
+      "title": "Real-Time Incremental Step Logging & Session Handover Architecture",
+      "completedAt": "2026-08-18T16:53:00.000Z"
+    },
+    {
+      "id": "ISSUE-1",
+      "title": "Refactor Interests Section into Structured Categories",
+      "completedAt": "2026-08-18T10:22:35.827Z"
+    },
+    {
+      "id": "ISSUE-2",
+      "title": "Upgrade Project Cards to Support Rich Media (Video, Carousel & Links)",
+      "completedAt": "2026-08-18T10:42:37.211Z"
+    }
+  ],
+  "lastDoctorCheck": {
+    "passed": true,
+    "totalChecks": 26,
+    "timestamp": "2026-08-18T16:53:49.000Z"
+  }
+}

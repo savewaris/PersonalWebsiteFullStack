@@ -9,7 +9,6 @@ import {
   SOCIAL_EMOJI_PALETTE,
   COMMON_EMOJI_PALETTE,
 } from '@/lib/emojis';
-import styles from './admin.module.css';
 
 interface EmojiPickerProps {
   onSelect: (emoji: string) => void;

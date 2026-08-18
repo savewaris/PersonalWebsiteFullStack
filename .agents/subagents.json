@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "version": "1.0",
+  "project": "PersonalWebsite",
+  "description": "Specialized subagent profiles tailored for PersonalWebsite portfolio stack (Next.js 16, React 19, Prisma, CSS Modules, Framer Motion)",
+  "subagents": [
+    {
+      "name": "ui-designer",
+      "role": "UI/UX & Motion Specialist",
+      "description": "Designs and develops responsive UI components using pure CSS Modules and Framer Motion with dark theme aesthetics.",
+      "guidelines": [
+        "Use CSS Modules only with variables from globals.css",
+        "Implement smooth Framer Motion animations with reduced-motion support",
+        "Ensure mobile-first responsive layout with accessible semantic HTML"
+      ],
+      "recommendedSkills": ["component-generator"]
+    },
+    {
+      "name": "db-engineer",
+      "role": "Database & API Architect",
+      "description": "Manages Prisma schema, SQLite/PostgreSQL migrations, database queries, and secure API Route Handlers.",
+      "guidelines": [
+        "Always use the singleton Prisma client from src/lib/prisma.ts",
+        "Add default values to new required schema fields",
+        "Run prisma validate, db push, and prisma generate on schema changes"
+      ],
+      "recommendedSkills": ["prisma-schema-migration"]
+    },
+    {
+      "name": "roadmap-executor",
+      "role": "Milestone & Issue Implementer",
+      "description": "Autonomously executes end-to-end features and refactors from docs/github_issues_roadmap.md.",
+      "guidelines": [
+        "Follow the full lifecycle: Schema -> API -> Admin UI -> Public UI -> Verification",
+        "Pass all quality checks: agent:doctor, tsc, and build"
+      ],
+      "recommendedSkills": ["roadmap-implementer", "prisma-schema-migration", "component-generator"]
+    },
+    {
+      "name": "doc-writer",
+      "role": "Technical Documentation Specialist",
+      "description": "Authors Architecture Decision Records (ADRs), API documentation, component guides, and maintains README.",
+      "guidelines": [
+        "Follow standard ADR format in docs/adr/",
+        "Document API request/response structures clearly",
+        "Preserve existing comments and maintain clear JSDoc docstrings"
+      ],
+      "recommendedSkills": ["doc-architect"]
+    },
+    {
+      "name": "cicd-devops",
+      "role": "CI/CD & DevOps Engineer",
+      "description": "Configures and optimizes GitHub Actions pipelines, build scripts, quality gates, and release workflows.",
+      "guidelines": [
+        "Maintain four core quality gates: Prisma validation, TypeScript, ESLint, Next build",
+        "Keep environment secrets securely isolated"
+      ],
+      "recommendedSkills": ["ci-cd-engineer"]
+    },
+    {
+      "name": "project-planner",
+      "role": "Product & Feature Planner",
+      "description": "Translates ideas and requirements into structured GitHub Issues with milestones and acceptance criteria.",
+      "guidelines": [
+        "Structure issues with labels, milestones, technical requirements, and testable criteria",
+        "Sequence tasks logically to avoid blocking dependencies"
+      ],
+      "recommendedSkills": ["project-planner"]
+    },
+    {
+      "name": "researcher",
+      "role": "Codebase & Architecture Researcher",
+      "description": "Audits codebase architecture, analyzes dependency trees, identifies performance bottlenecks, and researches Next.js/React patterns.",
+      "guidelines": [
+        "Inspect component hierarchy, bundle size implications, and Server vs Client boundaries",
+        "Provide evidence-backed recommendations and code references"
+      ],
+      "recommendedSkills": ["codebase-researcher"]
+    }
+  ]
+}

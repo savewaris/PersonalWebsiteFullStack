@@ -18,15 +18,17 @@ model Skill {
 }
 
 model Project {
-  id          String   @id @default(uuid())
-  title       String
-  description String
-  imageUrl    String?
-  demoUrl     String?
-  repoUrl     String?
-  tags        String   // JSON string or comma-separated tags
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id              String   @id @default(uuid())
+  title           String
+  description     String
+  imageUrl        String?
+  videoPreviewUrl String?
+  galleryImages   String?  // Comma-separated or JSON array of screenshot URLs
+  demoUrl         String?
+  repoUrl         String?
+  tags            String   // JSON string or comma-separated tags
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }
 
 model Experience {
@@ -65,6 +67,7 @@ model Hobby {
 model Interest {
   id          String   @id @default(uuid())
   name        String
+  category    String   @default("Engineering & Core Tech")
   emoji       String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt

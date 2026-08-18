@@ -1,0 +1,37 @@
+# PersonalWebsite — Real-Time Agent Action Ledger
+
+> Live chronological log of micro-actions performed by active agents. Every agent must append a line immediately upon completing or starting any concrete micro-action.
+
+- 🟢 **[DONE]** `2026-08-18 16:53:00` | `lead-agent` | **SETUP**: Integrated Real-Time Step Logger and Session Checkpointing into `agent-state.mjs`.
+- 🟢 **[DONE]** `2026-08-18 16:53:15` | `lead-agent` | **SETUP**: Created `.agents/state/SESSION_LOG.md` and `.agents/state/LIVE_STEP_LOG.md`.
+- 🟡 **[IN_PROGRESS]** `2026-08-18 10:11:28` | `agent` | **GENERAL**: Decomposing monolithic src/lib/data.ts into domain data modules
+- 🟢 **[DONE]       ** `2026-08-18 10:12:08` | `agent` | **GENERAL**: Decomposed src/lib/data.ts into 9 isolated domain modules in src/lib/data/
+- 🟡 **[IN_PROGRESS]** `2026-08-18 10:12:19` | `agent` | **GENERAL**: Decoupling composite sections into standalone domain components
+- 🟢 **[DONE]       ** `2026-08-18 10:12:46` | `agent` | **GENERAL**: Decoupled Languages, Hobbies, Interests, Experience, and Education into dedicated atomic components
+- 🔒 **[LOCKED]     ** `2026-08-18 10:13:06` | `agent` | **GENERAL**: Acquired lock on prisma/schema.prisma (Testing cross-CLI lock)
+- 🔓 **[UNLOCKED]   ** `2026-08-18 10:13:13` | `agent` | **GENERAL**: Released locks on prisma/schema.prisma
+- 🟡 **[IN_PROGRESS]** `2026-08-18 10:15:08` | `agent` | **GENERAL**: Add VitePress scripts to package.json and update docs configuration
+- 🟢 **[DONE]       ** `2026-08-18 10:15:22` | `agent` | **GENERAL**: Add VitePress scripts to package.json and update docs configuration
+- 🟡 **[IN_PROGRESS]** `2026-08-18 10:15:27` | `agent` | **GENERAL**: Create docs/data-dictionary.md for Prisma models
+- 🟢 **[DONE]       ** `2026-08-18 10:15:43` | `agent` | **GENERAL**: Create docs/data-dictionary.md for Prisma models
+- 🟡 **[IN_PROGRESS]** `2026-08-18 10:15:46` | `agent` | **GENERAL**: Create docs/skills.md for Progressive Skills Catalog
+- 🟢 **[DONE]       ** `2026-08-18 10:15:56` | `agent` | **GENERAL**: Create docs/skills.md for Progressive Skills Catalog
+- 🟡 **[IN_PROGRESS]** `2026-08-18 10:15:58` | `agent` | **GENERAL**: Update root README.md with full architecture, commands, and docs portal guide
+- 🟢 **[DONE]       ** `2026-08-18 10:16:04` | `agent` | **GENERAL**: Update root README.md with full architecture, commands, and docs portal guide
+- 🟡 **[IN_PROGRESS]** `2026-08-18 10:20:11` | `db-engineer+ui-designer` | **ISSUE-1**: Locked & Started task ISSUE-1: Refactor Interests Section into Structured Categories
+- 🔒 **[LOCKED]     ** `2026-08-18 10:20:15` | `db-engineer+ui-designer` | **ISSUE-1**: Acquired lock on prisma/schema.prisma, src/lib/data/interests.ts, src/app/api/interests/route.ts, src/app/api/interests/[id]/route.ts, src/app/admin/interests/InterestsClient.tsx, src/components/sections/InterestsSection.tsx (Refactor Interests into Categories)
+- 🟢 **[DONE]       ** `2026-08-18 10:20:48` | `db-engineer+ui-designer` | **ISSUE-1**: Updated Interest model with category field and synced PostgreSQL database via prisma db push
+- 🟡 **[IN_PROGRESS]** `2026-08-18 10:21:33` | `db-engineer+ui-designer` | **ISSUE-1**: Install vitepress-plugin-mermaid and configure withMermaid in docs config
+- 🟢 **[DONE]       ** `2026-08-18 10:22:02` | `db-engineer+ui-designer` | **ISSUE-1**: Refactored InterestsSection into Grouped Category Bento Cards and updated Admin CMS with category selectors and filter tabs
+- 🟢 **[DONE]       ** `2026-08-18 10:22:26` | `db-engineer+ui-designer` | **ISSUE-1**: Install vitepress-plugin-mermaid and configure withMermaid in docs config
+- 🟢 **[DONE]       ** `2026-08-18 10:22:35` | `agent` | **GENERAL**: Task ISSUE-1 (Refactor Interests Section into Structured Categories) marked as COMPLETED and unlocked
+- 🟡 **[IN_PROGRESS]** `2026-08-18 10:39:17` | `db-engineer+ui-designer` | **ISSUE-2**: Locked & Started task ISSUE-2: Upgrade Project Cards to Support Rich Media (Video, Carousel & Links)
+- 🔒 **[LOCKED]     ** `2026-08-18 10:39:20` | `db-engineer+ui-designer` | **ISSUE-2**: Acquired lock on prisma/schema.prisma, src/lib/data/projects.ts, src/app/api/projects/route.ts, src/app/api/projects/[id]/route.ts, src/app/admin/projects/ProjectsClient.tsx, src/components/sections/ProjectsSection.tsx, src/components/ProjectMediaPreview.tsx, src/components/ProjectLightbox.tsx (Rich Media Project Cards)
+- 🟢 **[DONE]       ** `2026-08-18 10:40:02` | `db-engineer+ui-designer` | **ISSUE-2**: Updated Project model with videoPreviewUrl and galleryImages fields, synced DB, and regenerated Prisma Client
+- 🟢 **[DONE]       ** `2026-08-18 10:40:57` | `db-engineer+ui-designer` | **ISSUE-2**: Created ProjectMediaPreview, ProjectLightbox, updated ProjectsSection and Admin CMS with video and gallery capabilities
+- 🟢 **[DONE]       ** `2026-08-18 10:42:37` | `agent` | **GENERAL**: Task ISSUE-2 (Upgrade Project Cards to Support Rich Media (Video, Carousel & Links)) marked as COMPLETED and unlocked
+- 🟡 **[IN_PROGRESS]** `2026-08-18 10:51:00` | `agent` | **GENERAL**: Add Issue #5 to docs/github_issues_roadmap.md
+- 🟢 **[DONE]       ** `2026-08-18 10:51:08` | `agent` | **GENERAL**: Add Issue #5 to docs/github_issues_roadmap.md
+- 🟡 **[IN_PROGRESS]** `2026-08-18 10:51:12` | `agent` | **GENERAL**: Create backend upload API route (src/app/api/upload/route.ts)
+- 🟢 **[DONE]       ** `2026-08-18 10:51:30` | `agent` | **GENERAL**: Create backend upload API route (src/app/api/upload/route.ts)
+- 🟡 **[IN_PROGRESS]** `2026-08-18 10:51:33` | `agent` | **GENERAL**: Create MediaDropzone CSS Module and UI components

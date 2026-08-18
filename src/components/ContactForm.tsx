@@ -34,7 +34,7 @@ export default function ContactForm() {
             {status === 'success' ? (
                 <div className={styles.successMessage}>
                     <h3>Message Sent!</h3>
-                    <p>Thanks for reaching out. I'll get back to you soon.</p>
+                    <p>Thanks for reaching out. I&apos;ll get back to you soon.</p>
                     <button onClick={() => setStatus('idle')} className={styles.resetButton}>Send Another Message</button>
                 </div>
             ) : (

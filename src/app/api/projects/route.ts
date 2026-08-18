@@ -7,8 +7,9 @@ export async function GET() {
       orderBy: { createdAt: 'desc' },
     });
     return apiSuccess(projects);
-  } catch (error: any) {
-    return apiError('Failed to fetch projects', 500, error?.message);
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    return apiError('Failed to fetch projects', 500, message);
   }
 }
 
@@ -26,6 +27,8 @@ export async function POST(request: Request) {
     github?: string;
     imageUrl?: string;
     image?: string;
+    videoPreviewUrl?: string;
+    galleryImages?: string[] | string;
   }>(request);
 
   if (error || !data?.title || !data.description) {
@@ -39,6 +42,13 @@ export async function POST(request: Request) {
     tagsString = data.tags;
   }
 
+  let galleryString: string | null = null;
+  if (Array.isArray(data.galleryImages)) {
+    galleryString = data.galleryImages.filter(Boolean).join(', ');
+  } else if (typeof data.galleryImages === 'string') {
+    galleryString = data.galleryImages.trim() || null;
+  }
+
   try {
     const project = await prisma.project.create({
       data: {
@@ -48,11 +58,14 @@ export async function POST(request: Request) {
         demoUrl: ensureHttps(data.demoUrl || data.link),
         repoUrl: ensureHttps(data.repoUrl || data.github),
         imageUrl: ensureHttps(data.imageUrl || data.image),
+        videoPreviewUrl: ensureHttps(data.videoPreviewUrl),
+        galleryImages: galleryString,
       },
     });
     revalidatePortfolioData();
     return apiSuccess(project, 201);
-  } catch (err: any) {
-    return apiError('Failed to create project', 500, err?.message);
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Unknown error';
+    return apiError('Failed to create project', 500, message);
   }
 }

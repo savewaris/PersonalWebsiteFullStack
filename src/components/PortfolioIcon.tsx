@@ -25,7 +25,6 @@ import {
   SiTailwindcss,
   SiHtml5,
   SiCss3,
-  SiSass,
   SiRedux,
   SiFigma,
   SiNodedotjs,
@@ -66,7 +65,6 @@ import {
   FaCalendarAlt,
   FaEnvelope,
   FaGlobe,
-  FaExternalLinkAlt,
   FaCloud,
 } from 'react-icons/fa';
 

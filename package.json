@@ -7,6 +7,13 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "lint:fix": "eslint --fix",
+    "agent:doctor": "node scripts/agent-doctor.mjs",
+    "agent:state": "node scripts/agent-state.mjs",
+    "agent:issues": "node scripts/create-github-issues.mjs",
+    "docs:dev": "vitepress dev docs --port 3001",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs --port 3001",
     "postinstall": "prisma generate"
   },
   "dependencies": {
@@ -24,7 +31,10 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
+    "mermaid": "^11.16.1",
     "prisma": "^6.0.0",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitepress": "^1.6.4",
+    "vitepress-plugin-mermaid": "^2.0.17"
   }
 }

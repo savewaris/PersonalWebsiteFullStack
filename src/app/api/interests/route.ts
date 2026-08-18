@@ -3,10 +3,16 @@ import { apiSuccess, apiError, parseJsonBody, requireAuthSession, revalidatePort
 
 export async function GET() {
   try {
-    const interests = await prisma.interest.findMany({ orderBy: { createdAt: 'asc' } });
+    const interests = await prisma.interest.findMany({
+      orderBy: [
+        { category: 'asc' },
+        { createdAt: 'asc' },
+      ],
+    });
     return apiSuccess(interests);
-  } catch (error: any) {
-    return apiError('Failed to fetch interests', 500, error?.message);
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    return apiError('Failed to fetch interests', 500, message);
   }
 }
 
@@ -14,7 +20,7 @@ export async function POST(request: Request) {
   const authError = await requireAuthSession();
   if (authError) return authError;
 
-  const { data, error } = await parseJsonBody<{ name?: string; emoji?: string }>(request);
+  const { data, error } = await parseJsonBody<{ name?: string; emoji?: string; category?: string }>(request);
   if (error || !data?.name) {
     return apiError('Name is required', 400);
   }
@@ -23,12 +29,14 @@ export async function POST(request: Request) {
     const interest = await prisma.interest.create({
       data: {
         name: data.name.trim(),
+        category: data.category?.trim() || 'Engineering & Core Tech',
         emoji: data.emoji?.trim() || null,
       },
     });
     revalidatePortfolioData();
     return apiSuccess(interest, 201);
-  } catch (err: any) {
-    return apiError('Failed to create interest', 500, err?.message);
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Unknown error';
+    return apiError('Failed to create interest', 500, message);
   }
 }

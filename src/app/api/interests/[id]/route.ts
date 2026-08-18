@@ -6,7 +6,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
   if (authError) return authError;
 
   const { id } = await params;
-  const { data, error } = await parseJsonBody<{ name?: string; emoji?: string }>(request);
+  const { data, error } = await parseJsonBody<{ name?: string; emoji?: string; category?: string }>(request);
   if (error || !data) {
     return apiError('Invalid request payload', 400);
   }
@@ -16,13 +16,15 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
       where: { id },
       data: {
         ...(data.name ? { name: data.name.trim() } : {}),
+        ...(data.category ? { category: data.category.trim() } : {}),
         ...(data.emoji !== undefined ? { emoji: data.emoji ? data.emoji.trim() : null } : {}),
       },
     });
     revalidatePortfolioData();
     return apiSuccess(interest);
-  } catch (err: any) {
-    return apiError('Failed to update interest', 500, err?.message);
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Unknown error';
+    return apiError('Failed to update interest', 500, message);
   }
 }
 
@@ -35,7 +37,8 @@ export async function DELETE(_request: Request, { params }: { params: Promise<{ 
     await prisma.interest.delete({ where: { id } });
     revalidatePortfolioData();
     return apiSuccess({ message: 'Interest deleted successfully' });
-  } catch (err: any) {
-    return apiError('Failed to delete interest', 500, err?.message);
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Unknown error';
+    return apiError('Failed to delete interest', 500, message);
   }
 }

@@ -127,37 +127,40 @@ export const HOBBY_SUGGESTIONS = [
   { name: 'Piano',           emoji: '🎹' },
 ];
 
+export const INTEREST_CATEGORIES = [
+  'Engineering & Core Tech',
+  'Domain & Industry',
+  'Personal & Disciplines',
+] as const;
+
 export const INTEREST_SUGGESTIONS = [
-  { name: 'Artificial Intelligence', emoji: '🤖' },
-  { name: 'Web3 & Blockchain',       emoji: '⛓️' },
-  { name: 'Open Source',             emoji: '🌐' },
-  { name: 'Startups',                emoji: '🚀' },
-  { name: 'Cybersecurity',           emoji: '🔐' },
-  { name: 'Cloud Computing',         emoji: '☁️' },
-  { name: 'Data Science',            emoji: '📊' },
-  { name: 'Product Design',          emoji: '🎨' },
-  { name: 'Entrepreneurship',        emoji: '💡' },
-  { name: 'Fintech',                 emoji: '💰' },
-  { name: 'EdTech',                  emoji: '🎓' },
-  { name: 'Game Development',        emoji: '🕹️' },
-  { name: 'Space Technology',        emoji: '🌌' },
-  { name: 'Robotics',                emoji: '🦾' },
-  { name: 'Sustainability / GreenTech', emoji: '🌱' },
-  { name: 'Neuroscience',            emoji: '🧠' },
-  { name: 'Philosophy of Mind',      emoji: '🤔' },
-  { name: 'System Design',           emoji: '🏗️' },
-  { name: 'DevOps Culture',          emoji: '⚙️' },
-  { name: 'HealthTech',              emoji: '🏥' },
-  { name: 'AR / VR',                 emoji: '🥽' },
-  { name: 'Quantum Computing',       emoji: '⚛️' },
-  { name: 'IoT',                     emoji: '📡' },
-  { name: 'Digital Marketing',       emoji: '📣' },
-  { name: 'Psychology',              emoji: '🧩' },
-  { name: 'Economics',               emoji: '📈' },
-  { name: 'Design Thinking',         emoji: '💭' },
-  { name: 'Agile Methodologies',     emoji: '🔄' },
-  { name: 'Tech Entrepreneurship',   emoji: '🏢' },
-  { name: 'Creative Writing',        emoji: '📖' },
+  // ── Engineering & Core Tech ─────────────────────────────────
+  { name: 'AI Agents & LLMs',        emoji: '🤖', category: 'Engineering & Core Tech' },
+  { name: 'System Architecture',     emoji: '🏗️', category: 'Engineering & Core Tech' },
+  { name: 'Distributed Computing',   emoji: '⚡', category: 'Engineering & Core Tech' },
+  { name: 'Database Systems',        emoji: '🗄️', category: 'Engineering & Core Tech' },
+  { name: 'Cloud & Kubernetes',      emoji: '☁️', category: 'Engineering & Core Tech' },
+  { name: 'Web Performance',         emoji: '🚀', category: 'Engineering & Core Tech' },
+  { name: 'Cybersecurity',           emoji: '🔐', category: 'Engineering & Core Tech' },
+  { name: 'Quantum Computing',       emoji: '⚛️', category: 'Engineering & Core Tech' },
+  { name: 'Open Source Development', emoji: '🌐', category: 'Engineering & Core Tech' },
+
+  // ── Domain & Industry ───────────────────────────────────────
+  { name: 'FinTech & DeFi',          emoji: '💰', category: 'Domain & Industry' },
+  { name: 'HealthTech & BioTech',    emoji: '🏥', category: 'Domain & Industry' },
+  { name: 'Developer Tooling & DX',  emoji: '🛠️', category: 'Domain & Industry' },
+  { name: 'Enterprise SaaS',         emoji: '🏢', category: 'Domain & Industry' },
+  { name: 'EdTech & Learning',       emoji: '🎓', category: 'Domain & Industry' },
+  { name: 'GreenTech & Energy',      emoji: '🌱', category: 'Domain & Industry' },
+  { name: 'Space Technology',        emoji: '🌌', category: 'Domain & Industry' },
+
+  // ── Personal & Disciplines ──────────────────────────────────
+  { name: 'Weightlifting & Fitness', emoji: '🏋️', category: 'Personal & Disciplines' },
+  { name: 'Chess Strategy',          emoji: '♟️', category: 'Personal & Disciplines' },
+  { name: 'Astronomy & Astrophysics',emoji: '🔭', category: 'Personal & Disciplines' },
+  { name: 'Language Acquisition',    emoji: '🗣️', category: 'Personal & Disciplines' },
+  { name: 'Philosophy of Mind',      emoji: '🧠', category: 'Personal & Disciplines' },
+  { name: 'Product Design & UI/UX',  emoji: '🎨', category: 'Personal & Disciplines' },
 ];
 
 // defaultProficiency is used to pre-select the dropdown when the chip is clicked

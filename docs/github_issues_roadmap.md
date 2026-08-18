@@ -168,3 +168,58 @@ To establish technical authority and showcase verified specializations (e.g., AW
 - [ ] Public Bento grid displays verified certifications with direct external verification links.
 - [ ] Linked in public navigation and footer if applicable.
 - [ ] 0 TypeScript errors and production build passes.
+
+---
+---
+
+## Issue #5: [Feature] Drag-and-Drop Media Upload & Gallery Manager in Project Management
+
+**Labels:** `feature`, `frontend`, `backend`, `ui/ux`, `admin`  
+**Milestone:** `v1.3 — Rich Media & Showcase`  
+**Priority:** `High`
+
+### Description
+Managing project media currently requires manually pasting external URLs for images, video previews, and screenshot galleries. This issue introduces an integrated drag-and-drop media uploader in the Project Management admin panel. Administrators can drag images and videos directly onto dedicated drop zones with instant visual previews, upload progress feedback, and an interactive drag-to-reorder gallery manager, while retaining an external URL fallback option.
+
+---
+
+### Technical Requirements
+
+1. **Backend Media Upload API (`/api/upload`)**:
+   - Next.js 16 Route Handler supporting `multipart/form-data` uploads.
+   - Authentication gate using `requireAuthSession()` from `@/lib/api-utils`.
+   - MIME type validation and file extension sanitization:
+     - Images: `image/png`, `image/jpeg`, `image/webp`, `image/gif`, `image/svg+xml` (Max 10MB).
+     - Videos: `video/mp4`, `video/webm`, `video/quicktime` (Max 50MB).
+   - Safe disk writing to `public/uploads/projects/` directory with collision-resistant filenames.
+   - Returns structured JSON payload: `{ success: true, url: string, filename: string, size: number, mimeType: string }`.
+
+2. **Reusable Admin Media Dropzone Component (`src/components/admin/MediaDropzone.tsx`)**:
+   - Single-file and multi-file drag-and-drop modes.
+   - Distinct dropzone states: `idle`, `dragover` (highlighted border, glowing pulse), `uploading` (animated spinner + progress indicator), and `preview` (rich thumbnail or HTML5 video player).
+   - Dual-mode tab toggle: `[ 📁 Upload File ]` vs `[ 🔗 External URL ]`.
+   - Action controls on preview: **Replace**, **View Fullscreen**, and **Remove**.
+
+3. **Interactive Screenshot Gallery Reorder Manager (`src/components/admin/ProjectGalleryManager.tsx`)**:
+   - Drag-to-reorder thumbnail cards for `galleryImages`.
+   - Batch drag-and-drop upload for multiple screenshots at once.
+   - Immediate live array syncing with the parent project form state.
+
+4. **Project Management Admin Integration (`src/app/admin/projects/ProjectsClient.tsx`)**:
+   - Embed `MediaDropzone` for **Poster Cover Image** (`imageUrl`).
+   - Embed `MediaDropzone` for **Video Preview** (`videoPreviewUrl`) with live inline video playback.
+   - Embed `ProjectGalleryManager` for **Screenshot Gallery** (`galleryImages`).
+   - Retain full backward-compatibility with existing project data.
+
+---
+
+### Acceptance Criteria
+- [ ] Drag-and-drop file upload works for single cover images (PNG, JPG, WebP, GIF, SVG).
+- [ ] Drag-and-drop file upload works for video previews (MP4, WebM) with live playback controls.
+- [ ] Multi-file drag-and-drop and drag-to-reorder works for project screenshot galleries.
+- [ ] Dual-mode switcher allows switching between local file upload and external URL input.
+- [ ] Backend API `/api/upload` enforces admin session authentication, file type validation, and file size limits.
+- [ ] Uploaded files are safely stored in `public/uploads/projects/` and served properly.
+- [ ] Responsive across all desktop, tablet, and mobile breakpoints.
+- [ ] 0 TypeScript compilation errors (`npx tsc --noEmit`) and successful Next.js build (`npm run build`).
+

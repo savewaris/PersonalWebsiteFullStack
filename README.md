@@ -1,36 +1,111 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Personal Website & AI Engineering Hub 🚀
 
-## Getting Started
+A modern, high-performance personal developer portfolio and content management application built with **Next.js 16 (App Router)**, **React 19**, **Pure CSS Modules**, **Framer Motion 12**, and **Prisma ORM**.
 
-First, run the development server:
+---
+
+## ⚡ Key Highlights & Architecture
+
+- **Next.js 16 App Router**: Server Components by default with Turbopack acceleration.
+- **Pure CSS Modules & Custom Properties**: Zero Tailwind / Zero CSS-in-JS design system.
+- **Micro-Animations**: Framer Motion 12 hardware-accelerated transitions.
+- **CMS Admin Panel**: Authenticated CRUD dashboard under `/admin`.
+- **Developer Documentation Portal**: Built-in interactive **VitePress** documentation site under `docs/`.
+- **Autonomous AI Subagent System**: 7 specialized agent personas with real-time state tracking and progressive execution skills in `.agents/`.
+
+---
+
+## 🛠️ Technology Stack
+
+| Layer | Technology |
+| :--- | :--- |
+| **Framework** | Next.js 16.1.6 (App Router, Turbopack) |
+| **UI Library** | React 19.2.3 |
+| **Language** | TypeScript 5 (Strict Mode) |
+| **Database & ORM** | Prisma ORM 6.19 (SQLite local, PostgreSQL production) |
+| **Styling** | Pure CSS Modules + Global CSS Tokens (`src/app/globals.css`) |
+| **Animations** | Framer Motion 12.38 |
+| **Documentation** | VitePress 1.6 |
+
+---
+
+## 🚀 Quick Start & Commands
 
 ```bash
+# 1. Install Dependencies & Generate Prisma Client
+npm install
+
+# 2. Start Next.js Portfolio Development Server (Port 3000)
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+
+# 3. Start VitePress Developer Documentation Portal (Port 3001)
+npm run docs:dev
+
+# 4. Run Agent Doctor Health Check (Validates Rules, Skills, Schema, TS)
+npm run agent:doctor
+
+# 5. Check Live Agent Task State & Locks
+npm run agent:state
+
+# 6. Production Next.js Build
+npm run build
+
+# 7. Production Documentation Build
+npm run docs:build
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 📂 Directory Layout
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+PersonalWebsite/
+├── .agents/                   # AI Agent Ecosystem
+│   ├── rules/                 # 8 Stack engineering rules
+│   ├── skills/                # 8 Progressive on-demand execution skills
+│   ├── state/                 # Live state, task queue & locks
+│   └── subagents.json         # 7 Subagent profile definitions
+├── .github/workflows/         # CI/CD pipelines (GitHub Actions)
+├── docs/                      # VitePress Developer Documentation Portal
+│   ├── .vitepress/            # VitePress configuration & theme
+│   ├── adr/                   # Architecture Decision Records
+│   ├── data-dictionary.md     # Database model reference
+│   ├── features.md            # Portfolio & CMS feature breakdown
+│   ├── github_issues_roadmap.md # Milestones & GitHub issues
+│   ├── overview.md            # Architecture overview
+│   ├── skills.md              # Progressive skills catalog
+│   └── workflows.md           # Mermaid sequence & flow charts
+├── prisma/                    # Database schema & migrations
+│   ├── dev.db                 # SQLite local database
+│   └── schema.prisma          # Prisma schema definition
+├── public/                    # Static assets, images, icons
+├── scripts/                   # Utility CLI scripts (agent-doctor, agent-state)
+└── src/
+    ├── app/                   # Next.js App Router (pages, layouts, API routes)
+    │   ├── admin/             # Authenticated CMS dashboard
+    │   ├── api/               # Serverless Route Handlers
+    │   └── globals.css        # Global CSS variables & tokens
+    ├── components/            # Reusable UI & Section components
+    │   ├── admin/             # Admin management modules
+    │   ├── sections/          # Public portfolio Bento sections
+    │   └── MotionWrappers.tsx # Reusable Framer Motion animation containers
+    └── lib/                   # Shared Prisma singleton & domain data fetchers
+```
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## 📖 Developer Documentation Portal
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+To explore full architecture blueprints, data dictionaries, workflow diagrams, and subagent guides, run:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+npm run docs:dev
+```
 
-## Deploy on Vercel
+Then visit **`http://localhost:3001`** in your browser.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 🛡️ License
+
+Private repository © 2026. All rights reserved.

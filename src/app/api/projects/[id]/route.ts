@@ -16,6 +16,8 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
     github?: string;
     imageUrl?: string;
     image?: string;
+    videoPreviewUrl?: string;
+    galleryImages?: string[] | string;
   }>(request);
 
   if (error || !data) {
@@ -28,6 +30,17 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
       tagsString = data.tags.join(', ');
     } else if (typeof data.tags === 'string') {
       tagsString = data.tags;
+    }
+  }
+
+  let galleryString: string | null | undefined = undefined;
+  if (data.galleryImages !== undefined) {
+    if (Array.isArray(data.galleryImages)) {
+      galleryString = data.galleryImages.filter(Boolean).join(', ') || null;
+    } else if (typeof data.galleryImages === 'string') {
+      galleryString = data.galleryImages.trim() || null;
+    } else {
+      galleryString = null;
     }
   }
 
@@ -45,12 +58,15 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
         ...(demo !== undefined ? { demoUrl: ensureHttps(demo) } : {}),
         ...(repo !== undefined ? { repoUrl: ensureHttps(repo) } : {}),
         ...(image !== undefined ? { imageUrl: ensureHttps(image) } : {}),
+        ...(data.videoPreviewUrl !== undefined ? { videoPreviewUrl: ensureHttps(data.videoPreviewUrl) } : {}),
+        ...(galleryString !== undefined ? { galleryImages: galleryString } : {}),
       },
     });
     revalidatePortfolioData();
     return apiSuccess(project);
-  } catch (err: any) {
-    return apiError('Failed to update project', 500, err?.message);
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Unknown error';
+    return apiError('Failed to update project', 500, message);
   }
 }
 
@@ -63,7 +79,8 @@ export async function DELETE(_request: Request, { params }: { params: Promise<{ 
     await prisma.project.delete({ where: { id } });
     revalidatePortfolioData();
     return apiSuccess({ message: 'Project deleted successfully' });
-  } catch (err: any) {
-    return apiError('Failed to delete project', 500, err?.message);
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Unknown error';
+    return apiError('Failed to delete project', 500, message);
   }
 }
