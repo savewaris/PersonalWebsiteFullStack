@@ -6,17 +6,6 @@
   "activeTask": null,
   "queue": [
     {
-      "id": "ISSUE-3",
-      "title": "Separate Experience and Education into Dedicated Side-by-Side Sections with Employment Badges",
-      "priority": "High",
-      "milestone": "v1.4",
-      "assignedAgents": [
-        "db-engineer",
-        "ui-designer"
-      ],
-      "status": "TODO"
-    },
-    {
       "id": "ISSUE-4",
       "title": "Add Certifications & Credentials Section",
       "priority": "Medium",
@@ -49,6 +38,11 @@
       "id": "ISSUE-2",
       "title": "Upgrade Project Cards to Support Rich Media (Video, Carousel & Links)",
       "completedAt": "2026-08-18T10:42:37.211Z"
+    },
+    {
+      "id": "ISSUE-3",
+      "title": "Separate Experience and Education into Dedicated Side-by-Side Sections with Employment Badges",
+      "completedAt": "2026-08-28T04:51:07.323Z"
     }
   ],
   "lastDoctorCheck": {

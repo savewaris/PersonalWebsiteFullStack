@@ -19,6 +19,9 @@ export async function POST(request: Request) {
   const { data, error } = await parseJsonBody<{
     role?: string;
     company?: string;
+    location?: string;
+    employmentType?: string;
+    locationType?: string;
     description?: string;
     startDate?: string;
     endDate?: string;
@@ -33,6 +36,9 @@ export async function POST(request: Request) {
       data: {
         role: data.role.trim(),
         company: data.company.trim(),
+        location: data.location?.trim() || null,
+        employmentType: data.employmentType?.trim() || 'Full-time',
+        locationType: data.locationType?.trim() || 'On-site',
         description: data.description.trim(),
         startDate: new Date(data.startDate),
         endDate: data.endDate ? new Date(data.endDate) : null,

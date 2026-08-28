@@ -95,25 +95,41 @@ export default function EducationClient({ initialEducation }: { initialEducation
           {educationList.map((edu) => (
             <div key={edu.id} className={styles.card}>
               <div className={styles.cardHeader}>
-                <div>
+                <div className={styles.cardInfo}>
                   <h3 className={styles.cardTitle}>{edu.degree} in {edu.fieldOfStudy}</h3>
                   <div className={styles.cardSubtitle}>{edu.institution}</div>
-                  {edu.faculty && (
-                    <div style={{ fontSize: '0.85rem', color: 'var(--accent)', marginTop: '4px' }}>
-                      🏛️ {edu.faculty}
-                    </div>
-                  )}
+                  <div style={{ display: 'flex', gap: '8px', marginTop: '8px', flexWrap: 'wrap' }}>
+                    {edu.faculty && (
+                      <span style={{
+                        fontSize: '0.78rem',
+                        padding: '2px 8px',
+                        borderRadius: '6px',
+                        background: 'rgba(124, 58, 237, 0.12)',
+                        color: 'var(--accent)',
+                        border: '1px solid rgba(124, 58, 237, 0.25)',
+                      }}>
+                        🏛️ {edu.faculty}
+                      </span>
+                    )}
+                    {edu.score && (
+                      <span style={{
+                        fontSize: '0.78rem',
+                        padding: '2px 8px',
+                        borderRadius: '999px',
+                        background: 'rgba(245, 158, 11, 0.12)',
+                        color: '#fbbf24',
+                        border: '1px solid rgba(245, 158, 11, 0.25)',
+                        fontWeight: 600,
+                      }}>
+                        🏆 GPA: {edu.score}
+                      </span>
+                    )}
+                  </div>
                 </div>
                 <span className={styles.badgeCount}>
                   Class of {edu.endDate ? new Date(edu.endDate).getFullYear() : 'Present'}
                 </span>
               </div>
-
-              {edu.score && (
-                <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-                  GPA / Grade: <strong>{edu.score}</strong>
-                </div>
-              )}
 
               <div className={styles.cardActions}>
                 <button type="button" onClick={() => handleOpenEdit(edu)} className={styles.actionBtn}>

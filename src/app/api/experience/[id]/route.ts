@@ -9,9 +9,12 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
   const { data, error } = await parseJsonBody<{
     role?: string;
     company?: string;
+    location?: string | null;
+    employmentType?: string;
+    locationType?: string;
     description?: string;
     startDate?: string;
-    endDate?: string;
+    endDate?: string | null;
   }>(request);
 
   if (error || !data) {
@@ -24,6 +27,9 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
       data: {
         ...(data.role ? { role: data.role.trim() } : {}),
         ...(data.company ? { company: data.company.trim() } : {}),
+        ...(data.location !== undefined ? { location: data.location?.trim() || null } : {}),
+        ...(data.employmentType ? { employmentType: data.employmentType.trim() } : {}),
+        ...(data.locationType ? { locationType: data.locationType.trim() } : {}),
         ...(data.description ? { description: data.description.trim() } : {}),
         ...(data.startDate ? { startDate: new Date(data.startDate) } : {}),
         ...(data.endDate !== undefined ? { endDate: data.endDate ? new Date(data.endDate) : null } : {}),

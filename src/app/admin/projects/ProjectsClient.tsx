@@ -6,6 +6,8 @@ import { useAdminCrud } from '@/lib/useAdminCrud';
 import { AdminPageHeader } from '@/components/admin/AdminPageHeader';
 import { AdminModal } from '@/components/admin/AdminModal';
 import { DeleteConfirmModal } from '@/components/admin/DeleteConfirmModal';
+import { MediaDropzone } from '@/components/admin/MediaDropzone';
+import { ProjectGalleryManager } from '@/components/admin/ProjectGalleryManager';
 import styles from '@/components/admin/admin.module.css';
 
 export interface Project {
@@ -95,7 +97,7 @@ export default function ProjectsClient({ initialProjects }: { initialProjects: P
             return (
               <div key={project.id} className={styles.card}>
                 <div className={styles.cardHeader}>
-                  <div>
+                  <div className={styles.cardInfo}>
                     <h3 className={styles.cardTitle}>{project.title}</h3>
                     
                     {/* Media Badges */}
@@ -144,15 +146,7 @@ export default function ProjectsClient({ initialProjects }: { initialProjects: P
                   </div>
                 </div>
 
-                <p
-                  style={{
-                    color: 'var(--text-secondary)',
-                    fontSize: '0.9rem',
-                    lineHeight: 1.5,
-                    maxHeight: '80px',
-                    overflow: 'hidden',
-                  }}
-                >
+                <p className={styles.cardDescription}>
                   {project.description}
                 </p>
 
@@ -226,34 +220,30 @@ export default function ProjectsClient({ initialProjects }: { initialProjects: P
             />
           </div>
 
-          <div className={styles.formRow}>
-            <div className={styles.formGroup}>
-              <label>Poster Image URL</label>
-              <input
-                type="url"
-                value={formData.imageUrl || ''}
-                onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
-                placeholder="https://example.com/cover.png"
-              />
-            </div>
-            <div className={styles.formGroup}>
-              <label>Video Preview URL (MP4 / WebM)</label>
-              <input
-                type="url"
-                value={formData.videoPreviewUrl || ''}
-                onChange={(e) => setFormData({ ...formData, videoPreviewUrl: e.target.value })}
-                placeholder="https://example.com/demo.mp4"
-              />
-            </div>
+          <div className={styles.formGroup}>
+            <MediaDropzone
+              label="Cover / Poster Image"
+              value={formData.imageUrl}
+              onChange={(url) => setFormData({ ...formData, imageUrl: url })}
+              mediaType="image"
+              placeholder="https://example.com/cover.png"
+            />
           </div>
 
           <div className={styles.formGroup}>
-            <label>Screenshot Gallery (Comma-separated URLs)</label>
-            <textarea
-              rows={2}
-              value={formData.galleryImages || ''}
-              onChange={(e) => setFormData({ ...formData, galleryImages: e.target.value })}
-              placeholder="https://example.com/shot1.png, https://example.com/shot2.png"
+            <MediaDropzone
+              label="Video Preview (MP4 / WebM / MOV)"
+              value={formData.videoPreviewUrl}
+              onChange={(url) => setFormData({ ...formData, videoPreviewUrl: url })}
+              mediaType="video"
+              placeholder="https://example.com/demo.mp4"
+            />
+          </div>
+
+          <div className={styles.formGroup}>
+            <ProjectGalleryManager
+              value={formData.galleryImages}
+              onChange={(val) => setFormData({ ...formData, galleryImages: val })}
             />
           </div>
 

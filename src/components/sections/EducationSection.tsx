@@ -1,5 +1,5 @@
-import styles from '@/app/page.module.css';
 import type { Education } from '@prisma/client';
+import styles from './ExperienceEducation.module.css';
 
 interface EducationSectionProps {
   education: Education[];
@@ -8,32 +8,57 @@ interface EducationSectionProps {
 
 export function EducationSection({ education, className }: EducationSectionProps) {
   return (
-    <div className={className}>
-      <h2 className={styles.bentoTitle}>Education</h2>
-      <div className={styles.experienceList} style={{ gap: '24px' }}>
-        {education.map((edu) => (
-          <div
-            key={edu.id}
-            className={styles.experienceItem}
-            style={{ position: 'relative', paddingLeft: '20px', borderLeft: '2px solid var(--border)', marginBottom: '20px' }}
-          >
-            <h3 className={styles.expRole} style={{ fontSize: '1.05rem', marginBottom: '4px' }}>
-              {edu.degree}
-            </h3>
-            <div className={styles.expCompany} style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
-              {edu.institution}
-            </div>
-            {edu.faculty && (
-              <div style={{ fontSize: '0.82rem', color: 'var(--accent)', fontStyle: 'italic', marginTop: '2px', opacity: 0.85 }}>
-                🏛️ {edu.faculty}
-              </div>
-            )}
-            <div className={styles.expDate} style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '6px' }}>
-              Class of {edu.endDate ? new Date(edu.endDate).getFullYear() : 'Present'}
-            </div>
-          </div>
-        ))}
+    <div className={`${styles.column} ${className || ''}`}>
+      <div className={styles.columnHeader}>
+        <div className={styles.columnTitle}>
+          <span>🎓</span> Academic Journey
+        </div>
+        <span className={styles.columnCountBadge}>{education.length} Qualifications</span>
       </div>
+
+      {education.length === 0 ? (
+        <div className={styles.emptyState}>No education records recorded yet.</div>
+      ) : (
+        <div className={styles.timeline}>
+          {education.map((edu) => {
+            const startYear = new Date(edu.startDate).getFullYear();
+            const endYear = edu.endDate ? new Date(edu.endDate).getFullYear() : 'Present';
+
+            return (
+              <div key={edu.id} className={styles.timelineItem}>
+                <div className={styles.timelineNode} />
+                <div className={styles.timelineCard}>
+                  <div className={styles.itemHeader}>
+                    <h3 className={styles.itemRole}>
+                      {edu.degree}
+                      {edu.fieldOfStudy && edu.fieldOfStudy !== 'General' ? ` in ${edu.fieldOfStudy}` : ''}
+                    </h3>
+                    <div className={styles.itemCompany}>
+                      <span>{edu.institution}</span>
+                    </div>
+                    <div className={styles.itemDate}>
+                      {startYear} - {endYear}
+                    </div>
+                  </div>
+
+                  <div className={styles.badgeRow}>
+                    {edu.faculty && (
+                      <span className={styles.facultyBadge}>
+                        🏛️ {edu.faculty}
+                      </span>
+                    )}
+                    {edu.score && (
+                      <span className={styles.gpaBadge}>
+                        🏆 GPA: {edu.score}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

@@ -5,26 +5,26 @@ description: Protocol for multi-agent swarm delegation, intelligent sequencing, 
 
 # Multi-Agent Swarm & Peer Consensus Rules
 
-## 1. Multi-Action Delegation Trigger
+## 1. Autonomous Multi-Action Delegation Trigger
 
-When a user request or roadmap item contains **more than one action or domain** (e.g., modifying database schema + building UI components + writing documentation):
-1. **Analyze Task Breakdown**: Separate the requirements into distinct domain sub-tasks (Database, UI/UX, CI/CD, Documentation, Planning, Research).
-2. **Propose Subagent Swarm**: Automatically suggest the optimal specialized subagents in the implementation plan.
-3. **Obtain Approval**: Present the swarm proposal for user confirmation before launching.
+When a user request or roadmap item contains **more than one action, file, or domain** (e.g., modifying database schema + building UI components + writing documentation):
+1. **Immediate Autonomous Decomposition**: Break the request down into discrete domain subtasks and immediately spawn parallel subagents using `invoke_subagent` without waiting for redundant manual confirmation.
+2. **Assign Optimal Model Tiers**: Map each subagent to the most efficient model tier (`flash_lite`, `flash`, `pro`, `inherit`) based on task complexity.
 
 ---
 
-## 2. Domain-to-Subagent Matrix
+## 2. Domain-to-Subagent & Model Routing Matrix
 
-| Task Domain | Subagent | Primary Scope |
-| :--- | :--- | :--- |
-| **Database & API** | `db-engineer` | Prisma models, migrations, DB push, Next.js route handlers |
-| **UI & Styling** | `ui-designer` | CSS Modules, Framer Motion, responsive bento grids |
-| **Full Milestone** | `roadmap-executor` | End-to-end execution of roadmap issues |
-| **Documentation** | `doc-writer` | Architecture Decision Records (ADRs), API specs, README sync |
-| **DevOps & CI/CD** | `cicd-devops` | GitHub Actions workflows, build verification, environment setup |
-| **Feature Planning** | `project-planner` | Translating ideas into structured GitHub issues & milestones |
-| **Deep Research** | `researcher` | Dependency audits, performance benchmarks, architectural review |
+| Task Domain | Subagent | Recommended Model | Primary Scope |
+| :--- | :--- | :--- | :--- |
+| **Quick Lookups / Lint** | `qa-verifier` | `flash_lite` | Quick file grep, syntax check, bundle size checks |
+| **Deep Research** | `researcher` | `flash` | Dependency audits, performance benchmarks, architectural review |
+| **UI & Styling** | `ui-designer` | `flash` | CSS Modules, Framer Motion, responsive bento grids |
+| **Documentation** | `doc-writer` | `flash` | Architecture Decision Records (ADRs), API specs, README sync |
+| **DevOps & CI/CD** | `cicd-devops` | `flash` | GitHub Actions workflows, build verification, environment setup |
+| **Database & API** | `db-engineer` | `pro` | Prisma models, migrations, DB push, Next.js route handlers |
+| **Feature Planning** | `project-planner` | `pro` | Translating ideas into structured GitHub issues & milestones |
+| **Full Milestone** | `roadmap-executor` | `pro` / `inherit` | End-to-end execution of complex multi-tier roadmap issues |
 
 ---
 

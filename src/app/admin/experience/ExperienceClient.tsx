@@ -13,10 +13,15 @@ export interface Experience {
   role: string;
   company: string;
   location: string | null;
+  employmentType: string;
+  locationType: string;
   startDate: string;
   endDate: string | null;
   description: string;
 }
+
+const EMPLOYMENT_TYPES = ['Full-time', 'Part-time', 'Internship', 'Contract', 'Freelance'];
+const LOCATION_TYPES = ['On-site', 'Hybrid', 'Remote'];
 
 export default function ExperienceClient({ initialExperience }: { initialExperience: Experience[] }) {
   const {
@@ -38,19 +43,32 @@ export default function ExperienceClient({ initialExperience }: { initialExperie
     role: '',
     company: '',
     location: '',
+    employmentType: 'Full-time',
+    locationType: 'On-site',
     startDate: '',
     endDate: '',
     description: '',
   });
 
   const handleOpenCreate = () => {
-    setFormData({ role: '', company: '', location: '', startDate: '', endDate: '', description: '' });
+    setFormData({
+      role: '',
+      company: '',
+      location: '',
+      employmentType: 'Full-time',
+      locationType: 'On-site',
+      startDate: '',
+      endDate: '',
+      description: '',
+    });
     openCreate();
   };
 
   const handleOpenEdit = (exp: Experience) => {
     setFormData({
       ...exp,
+      employmentType: exp.employmentType || 'Full-time',
+      locationType: exp.locationType || 'On-site',
       startDate: exp.startDate ? new Date(exp.startDate).toISOString().split('T')[0] : '',
       endDate: exp.endDate ? new Date(exp.endDate).toISOString().split('T')[0] : '',
     });
@@ -85,10 +103,32 @@ export default function ExperienceClient({ initialExperience }: { initialExperie
           {experiences.map((exp) => (
             <div key={exp.id} className={styles.card}>
               <div className={styles.cardHeader}>
-                <div>
+                <div className={styles.cardInfo}>
                   <h3 className={styles.cardTitle}>{exp.role}</h3>
                   <div className={styles.cardSubtitle}>
                     {exp.company} {exp.location ? `• ${exp.location}` : ''}
+                  </div>
+                  <div style={{ display: 'flex', gap: '6px', marginTop: '6px', flexWrap: 'wrap' }}>
+                    <span style={{
+                      fontSize: '0.75rem',
+                      padding: '2px 8px',
+                      borderRadius: '999px',
+                      background: 'rgba(124, 58, 237, 0.15)',
+                      color: 'var(--accent)',
+                      border: '1px solid rgba(124, 58, 237, 0.3)',
+                    }}>
+                      💼 {exp.employmentType || 'Full-time'}
+                    </span>
+                    <span style={{
+                      fontSize: '0.75rem',
+                      padding: '2px 8px',
+                      borderRadius: '999px',
+                      background: 'rgba(59, 130, 246, 0.15)',
+                      color: '#60a5fa',
+                      border: '1px solid rgba(59, 130, 246, 0.3)',
+                    }}>
+                      🌐 {exp.locationType || 'On-site'}
+                    </span>
                   </div>
                 </div>
                 <span className={styles.badgeCount}>
@@ -96,7 +136,7 @@ export default function ExperienceClient({ initialExperience }: { initialExperie
                 </span>
               </div>
 
-              <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', lineHeight: 1.5, maxHeight: '80px', overflow: 'hidden' }}>
+              <p className={styles.cardDescription}>
                 {exp.description}
               </p>
 
@@ -147,13 +187,42 @@ export default function ExperienceClient({ initialExperience }: { initialExperie
             </div>
           </div>
 
+          <div className={styles.formRow}>
+            <div className={styles.formGroup}>
+              <label>Employment Type</label>
+              <select
+                value={formData.employmentType || 'Full-time'}
+                onChange={(e) => setFormData({ ...formData, employmentType: e.target.value })}
+              >
+                {EMPLOYMENT_TYPES.map((t) => (
+                  <option key={t} value={t}>
+                    {t}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className={styles.formGroup}>
+              <label>Location Mode</label>
+              <select
+                value={formData.locationType || 'On-site'}
+                onChange={(e) => setFormData({ ...formData, locationType: e.target.value })}
+              >
+                {LOCATION_TYPES.map((l) => (
+                  <option key={l} value={l}>
+                    {l}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
           <div className={styles.formGroup}>
-            <label>Location (Optional)</label>
+            <label>Location (City / Country / Remote)</label>
             <input
               type="text"
               value={formData.location || ''}
               onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-              placeholder="e.g. Bangkok, Thailand (Remote)"
+              placeholder="e.g. Bangkok, Thailand"
             />
           </div>
 
@@ -178,7 +247,7 @@ export default function ExperienceClient({ initialExperience }: { initialExperie
           </div>
 
           <div className={styles.formGroup}>
-            <label>Description & Achievements</label>
+            <label>Description &amp; Achievements</label>
             <textarea
               required
               rows={4}

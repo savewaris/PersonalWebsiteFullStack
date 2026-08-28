@@ -35,3 +35,16 @@
 - 🟡 **[IN_PROGRESS]** `2026-08-18 10:51:12` | `agent` | **GENERAL**: Create backend upload API route (src/app/api/upload/route.ts)
 - 🟢 **[DONE]       ** `2026-08-18 10:51:30` | `agent` | **GENERAL**: Create backend upload API route (src/app/api/upload/route.ts)
 - 🟡 **[IN_PROGRESS]** `2026-08-18 10:51:33` | `agent` | **GENERAL**: Create MediaDropzone CSS Module and UI components
+- 🟢 **[DONE]       ** `2026-08-18 10:51:57` | `agent` | **GENERAL**: Create MediaDropzone CSS Module and UI components
+- 🟢 **[DONE]       ** `2026-08-18 10:52:04` | `agent` | **GENERAL**: Committed and pushed all multi-agent files, modular clean code, Issue #1, and Issue #2 to GitHub origin main
+- 🟡 **[IN_PROGRESS]** `2026-08-18 10:52:04` | `agent` | **GENERAL**: Integrate MediaDropzone and ProjectGalleryManager into ProjectsClient.tsx
+- 🟢 **[DONE]       ** `2026-08-18 10:52:18` | `agent` | **GENERAL**: Integrate MediaDropzone and ProjectGalleryManager into ProjectsClient.tsx
+- 🟡 **[IN_PROGRESS]** `2026-08-28 04:49:13` | `db-engineer+ui-designer` | **ISSUE-3**: Locked & Started task ISSUE-3: Separate Experience and Education into Dedicated Side-by-Side Sections with Employment Badges
+- 🔒 **[LOCKED]     ** `2026-08-28 04:49:16` | `db-engineer+ui-designer` | **ISSUE-3**: Acquired lock on prisma/schema.prisma, src/lib/data/experience.ts, src/lib/data/education.ts, src/app/api/experience/route.ts, src/app/api/experience/[id]/route.ts, src/app/api/education/route.ts, src/app/api/education/[id]/route.ts, src/app/admin/experience/ExperienceClient.tsx, src/app/admin/education/EducationClient.tsx, src/components/sections/ExperienceSection.tsx, src/components/sections/EducationSection.tsx, src/components/sections/ExperienceEducationSection.tsx (Refactor Experience and Education to Dual-Column with Badges)
+- 🟡 **[IN_PROGRESS]** `2026-08-28 04:49:23` | `db-engineer+ui-designer` | **ISSUE-3**: Sync database schema with employmentType and locationType fields and regenerate Prisma Client
+- 🟢 **[DONE]       ** `2026-08-28 04:49:45` | `db-engineer+ui-designer` | **ISSUE-3**: Updated Experience model with employmentType and locationType fields and pushed to Neon PostgreSQL
+- 🟢 **[DONE]       ** `2026-08-28 04:50:44` | `db-engineer+ui-designer` | **ISSUE-3**: Created ExperienceEducation.module.css, refactored ExperienceSection and EducationSection into dual-column Bento with glowing timeline rails and badge chips, upgraded Admin CMS interfaces
+- 🟢 **[DONE]       ** `2026-08-28 04:51:07` | `agent` | **GENERAL**: Task ISSUE-3 (Separate Experience and Education into Dedicated Side-by-Side Sections with Employment Badges) marked as COMPLETED and unlocked
+- 🟢 **[DONE]       ** `2026-08-28 05:10:21` | `agent` | **GENERAL**: Fixed admin card year badge overflow and text clipping: constrained flex header info width, enabled 2-line title wrapping, and added CSS 3-line clamp for descriptions
+- 🟡 **[IN_PROGRESS]** `2026-08-28 05:14:12` | `agent` | **GENERAL**: Implement Playwright + Axe-Core automated UX/UI global standards verification system
+- 🟢 **[DONE]       ** `2026-08-28 05:14:14` | `agent` | **GENERAL**: Implement Playwright + Axe-Core automated UX/UI global standards verification system

@@ -32,15 +32,17 @@ model Project {
 }
 
 model Experience {
-  id          String   @id @default(uuid())
-  role        String
-  company     String
-  location    String?
-  startDate   DateTime
-  endDate     DateTime? // Null means "Present"
-  description String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id             String    @id @default(uuid())
+  role           String
+  company        String
+  location       String?
+  employmentType String    @default("Full-time") // "Full-time", "Part-time", "Internship", "Contract", "Freelance"
+  locationType   String    @default("On-site")   // "On-site", "Hybrid", "Remote"
+  startDate      DateTime
+  endDate        DateTime? // Null means "Present"
+  description    String
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 }
 
 model Education {

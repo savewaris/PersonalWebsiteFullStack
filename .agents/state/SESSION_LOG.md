@@ -52,3 +52,51 @@ This file is the official handover memory across developer sessions and AI agent
   - Completed Issue #2: Upgrade Project Cards to Support Rich Media. Added videoPreviewUrl and galleryImages to Prisma schema, built ProjectMediaPreview with silent hover-to-play video player, built accessible ProjectLightbox with keyboard navigation and thumbnail strip, upgraded Admin Projects CMS with media badges and video/gallery inputs.
 - **Queue Status**: 2 tasks remaining in queue.
 - **Recent Completed**: ADR-0002, ISSUE-1, ISSUE-2
+
+## Session Checkpoint: 2026-08-18
+- **Active Milestone**: `v1.2 — Content Architecture & Taxonomy`
+- **Active Task**: `None (Queue Ready)`
+- **Summary / Key Handoff Notes**:
+  - Pushed commit c6efe70 to GitHub origin/main. Includes multi-agent system, 3 ADRs, modular clean architecture data layer, Issue #1 (Interests categorization), and Issue #2 (Rich media project cards).
+- **Queue Status**: 2 tasks remaining in queue.
+- **Recent Completed**: ADR-0002, ISSUE-1, ISSUE-2
+
+## Session Checkpoint: 2026-08-18
+- **Active Milestone**: `v1.2 — Content Architecture & Taxonomy`
+- **Active Task**: `None (Queue Ready)`
+- **Summary / Key Handoff Notes**:
+  - Issue #5 specification added to roadmap; implemented /api/upload Route Handler with MIME validation and disk storage; built MediaDropzone & ProjectGalleryManager with drag-and-drop file upload, live preview, and gallery reordering; integrated into ProjectsClient; all 31 health checks and Next.js build passed.
+- **Queue Status**: 2 tasks remaining in queue.
+- **Recent Completed**: ADR-0002, ISSUE-1, ISSUE-2
+
+## Session Checkpoint: 2026-08-28
+- **Active Milestone**: `v1.2 — Content Architecture & Taxonomy`
+- **Active Task**: `None (Queue Ready)`
+- **Summary / Key Handoff Notes**:
+  - Completed Issue #3: Separate Experience and Education into Dedicated Side-by-Side Sections with Employment Badges. Pushed schema updates (employmentType, locationType) to Neon PostgreSQL, updated API handlers, created ExperienceEducation.module.css with glowing timeline rails and badge chips, upgraded Admin CMS interfaces with selectors, verified 0 TS errors and successful production build.
+- **Queue Status**: 1 tasks remaining in queue.
+- **Recent Completed**: ISSUE-1, ISSUE-2, ISSUE-3
+
+## Session Checkpoint: 2026-08-28
+- **Active Milestone**: `v1.2 — Content Architecture & Taxonomy`
+- **Active Task**: `None (Queue Ready)`
+- **Summary / Key Handoff Notes**:
+  - Configured autonomous subagent swarms and dynamic model tier matrix across Second Brain and project
+- **Queue Status**: 1 tasks remaining in queue.
+- **Recent Completed**: ISSUE-1, ISSUE-2, ISSUE-3
+
+## Session Checkpoint: 2026-08-28
+- **Active Milestone**: `v1.2 — Content Architecture & Taxonomy`
+- **Active Task**: `None (Queue Ready)`
+- **Summary / Key Handoff Notes**:
+  - Added full UI/UX design standards, UI/UX Quad Squad subagents, and 4 specialized skills to Second Brain and PersonalWebsite
+- **Queue Status**: 1 tasks remaining in queue.
+- **Recent Completed**: ISSUE-1, ISSUE-2, ISSUE-3
+
+## Session Checkpoint: 2026-08-28
+- **Active Milestone**: `v1.2 — Content Architecture & Taxonomy`
+- **Active Task**: `None (Queue Ready)`
+- **Summary / Key Handoff Notes**:
+  - Implemented automated UX/UI global standards verification system with Playwright, Axe-Core WCAG 2.2 AA, responsive viewport overflow checks, touch target validation, semantic typography rules, ADR 0004, ux-ui-verifier skill, and CI/CD quality gate.
+- **Queue Status**: 1 tasks remaining in queue.
+- **Recent Completed**: ISSUE-1, ISSUE-2, ISSUE-3

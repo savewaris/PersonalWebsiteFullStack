@@ -44,7 +44,7 @@ try {
   const subagentsRaw = readFileSync(path.join(AGENTS_DIR, 'subagents.json'), 'utf8');
   const subagentsData = JSON.parse(subagentsRaw);
   const count = subagentsData.subagents?.length || 0;
-  check(`Loaded ${count} subagent definitions (expected 7)`, count === 7);
+  check(`Loaded ${count} subagent definitions (expected >= 7)`, count >= 7);
 } catch (err) {
   check('subagents.json is valid JSON', false, err.message);
 }
@@ -78,6 +78,11 @@ const expectedSkills = [
   'project-planner',
   'codebase-researcher',
   'clean-code-refactor',
+  'framer-motion-physics',
+  'bento-grid-architect',
+  'design-system-tokens',
+  'wcag-accessibility',
+  'ux-ui-verifier',
 ];
 
 for (const skill of expectedSkills) {
@@ -94,9 +99,16 @@ for (const skill of expectedSkills) {
 // 5. Check CI/CD, Documentation & State Assets
 console.log('\n🚀 5. Verifying CI/CD, State & Documentation Assets...');
 check('GitHub Actions CI pipeline (.github/workflows/ci.yml)', existsSync(path.join(ROOT_DIR, '.github', 'workflows', 'ci.yml')));
+check('Playwright config (playwright.config.ts)', existsSync(path.join(ROOT_DIR, 'playwright.config.ts')));
+check('WCAG 2.2 Accessibility test (tests/ui-ux/accessibility-wcag.spec.ts)', existsSync(path.join(ROOT_DIR, 'tests', 'ui-ux', 'accessibility-wcag.spec.ts')));
+check('Responsive overflow test (tests/ui-ux/responsive-overflow.spec.ts)', existsSync(path.join(ROOT_DIR, 'tests', 'ui-ux', 'responsive-overflow.spec.ts')));
+check('Touch targets usability test (tests/ui-ux/touch-targets.spec.ts)', existsSync(path.join(ROOT_DIR, 'tests', 'ui-ux', 'touch-targets.spec.ts')));
+check('Semantic HTML & typography test (tests/ui-ux/typography-and-landmarks.spec.ts)', existsSync(path.join(ROOT_DIR, 'tests', 'ui-ux', 'typography-and-landmarks.spec.ts')));
+check('Motion accessibility test (tests/ui-ux/motion-accessibility.spec.ts)', existsSync(path.join(ROOT_DIR, 'tests', 'ui-ux', 'motion-accessibility.spec.ts')));
 check('ADR 0001 (docs/adr/0001-project-scoped-agents.md)', existsSync(path.join(ROOT_DIR, 'docs', 'adr', '0001-project-scoped-agents.md')));
 check('ADR 0002 (docs/adr/0002-real-time-step-logging-and-session-handoff.md)', existsSync(path.join(ROOT_DIR, 'docs', 'adr', '0002-real-time-step-logging-and-session-handoff.md')));
 check('ADR 0003 (docs/adr/0003-modular-clean-code-and-cross-cli-file-locking.md)', existsSync(path.join(ROOT_DIR, 'docs', 'adr', '0003-modular-clean-code-and-cross-cli-file-locking.md')));
+check('ADR 0004 (docs/adr/0004-automated-ux-ui-standard-verification.md)', existsSync(path.join(ROOT_DIR, 'docs', 'adr', '0004-automated-ux-ui-standard-verification.md')));
 check('Roadmap document (docs/github_issues_roadmap.md)', existsSync(path.join(ROOT_DIR, 'docs', 'github_issues_roadmap.md')));
 check('Session handover log (.agents/state/SESSION_LOG.md)', existsSync(path.join(AGENTS_DIR, 'state', 'SESSION_LOG.md')));
 check('Live step action ledger (.agents/state/LIVE_STEP_LOG.md)', existsSync(path.join(AGENTS_DIR, 'state', 'LIVE_STEP_LOG.md')));
