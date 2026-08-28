@@ -36,6 +36,7 @@ updates:
         update-types: ["version-update:semver-major"]
       - dependency-name: "prisma"
         update-types: ["version-update:semver-major"]
+      - dependency-name: "react-icons"
 
   # Maintain GitHub Actions dependencies
   - package-ecosystem: "github-actions"
