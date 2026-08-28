@@ -6,14 +6,13 @@
   "activeTask": null,
   "queue": [
     {
-      "id": "ISSUE-4",
-      "title": "Add Certifications & Credentials Section",
+      "id": "ISSUE-6",
+      "title": "Import LinkedIn Credentials & Certifications via CSV/JSON Export & Quick URL Parser",
       "priority": "Medium",
       "milestone": "v1.5",
       "assignedAgents": [
         "db-engineer",
-        "ui-designer",
-        "doc-writer"
+        "ui-designer"
       ],
       "status": "TODO"
     }
@@ -43,6 +42,11 @@
       "id": "ISSUE-3",
       "title": "Separate Experience and Education into Dedicated Side-by-Side Sections with Employment Badges",
       "completedAt": "2026-08-28T04:51:07.323Z"
+    },
+    {
+      "id": "ISSUE-4",
+      "title": "Add Certifications & Credentials Section",
+      "completedAt": "2026-08-28T11:04:55.644Z"
     }
   ],
   "lastDoctorCheck": {

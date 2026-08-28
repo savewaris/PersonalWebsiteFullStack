@@ -15,10 +15,12 @@ export default async function AdminDashboard() {
     hobbiesCount,
     languagesCount,
     socialsCount,
+    certificationsCount,
     recentSkills,
     recentProjects,
     recentExperience,
     recentEducation,
+    recentCertifications,
     recentMessages,
     recentSocials,
   ] = await Promise.all([
@@ -31,6 +33,7 @@ export default async function AdminDashboard() {
     prisma.hobby.count(),
     prisma.language.count(),
     prisma.socialLink.count(),
+    prisma.certification.count(),
     prisma.skill.findMany({
       select: { id: true, name: true, proficiency: true },
       orderBy: { proficiency: 'desc' },
@@ -49,6 +52,11 @@ export default async function AdminDashboard() {
     prisma.education.findMany({
       select: { id: true, degree: true, institution: true },
       orderBy: { startDate: 'desc' },
+      take: 3,
+    }),
+    prisma.certification.findMany({
+      select: { id: true, title: true, issuer: true },
+      orderBy: { issueDate: 'desc' },
       take: 3,
     }),
     prisma.message.findMany({
@@ -91,6 +99,13 @@ export default async function AdminDashboard() {
       href: '/admin/education',
       items: recentEducation.map((e) => `${e.degree} (${e.institution})`),
       emptyText: 'No education added yet',
+    },
+    {
+      title: 'Certifications',
+      count: certificationsCount,
+      href: '/admin/certifications',
+      items: recentCertifications.map((c) => `${c.title} (${c.issuer})`),
+      emptyText: 'No certifications added yet',
     },
     {
       title: 'Socials & Contact',

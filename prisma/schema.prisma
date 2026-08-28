@@ -102,3 +102,17 @@ model SocialLink {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 }
+
+model Certification {
+  id            String    @id @default(uuid())
+  title         String    // e.g., "AWS Certified Solutions Architect"
+  issuer        String    // e.g., "Amazon Web Services", "Google Cloud", "Coursera"
+  issueDate     DateTime
+  expiryDate    DateTime?
+  credentialId  String?   // e.g., "ABC-123456"
+  credentialUrl String    // External verification URL (Credly / Coursera / etc.)
+  badgeImageUrl String?   // Optional badge image or logo URL
+  order         Int       @default(0)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}

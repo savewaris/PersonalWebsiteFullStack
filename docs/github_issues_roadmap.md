@@ -223,3 +223,67 @@ Managing project media currently requires manually pasting external URLs for ima
 - [ ] Responsive across all desktop, tablet, and mobile breakpoints.
 - [ ] 0 TypeScript compilation errors (`npx tsc --noEmit`) and successful Next.js build (`npm run build`).
 
+---
+---
+
+## Issue #6: [Feature] Import LinkedIn Credentials & Certifications via CSV/JSON Export & Quick URL Parser
+
+**Labels:** `feature`, `frontend`, `backend`, `admin`, `ui/ux`  
+**Milestone:** `v1.5 — Verification & Trust`  
+**Priority:** `Medium`
+
+### Description
+Managing verified certifications one by one can be tedious for engineers with extensive credentials. This issue adds a batch import feature to the Certifications Admin CMS, allowing administrators to upload their official LinkedIn data export (`Certifications.csv`), paste JSON archives, or import single certificates via Credly/verification URLs. The system includes automatic duplicate detection, issuer logo key mapping, and an interactive review table before persisting records to the database.
+
+---
+
+### Technical Requirements
+
+1. **Backend Import Route (`/api/certifications/import`)**:
+   - Next.js 16 Route Handler supporting `multipart/form-data` (CSV) and JSON payloads.
+   - Authentication gate using `requireAuthSession()`.
+   - CSV Parser handling standard LinkedIn archive columns:
+     - `Name` $\rightarrow$ `title`
+     - `Authority` $\rightarrow$ `issuer`
+     - `Started On` $\rightarrow$ `issueDate`
+     - `Finished On` $\rightarrow$ `expiryDate`
+     - `License Number` $\rightarrow$ `credentialId`
+     - `Url` $\rightarrow$ `credentialUrl` (with `ensureHttps` normalization)
+   - Auto-mapping of issuing organizations to vector logo keys:
+     - `Amazon Web Services` / `AWS` $\rightarrow$ `aws`
+     - `Google Cloud` / `Google` $\rightarrow$ `gcp`
+     - `Microsoft` / `Azure` $\rightarrow$ `azure`
+     - `Meta` $\rightarrow$ `meta`
+     - `DeepLearning.AI` $\rightarrow$ `deeplearning`
+     - `Coursera` $\rightarrow$ `coursera`
+     - `IBM` $\rightarrow$ `ibm`
+     - `HashiCorp` $\rightarrow$ `hashicorp`
+     - `Oracle` $\rightarrow$ `oracle`
+   - Returns parsed credentials with a `isDuplicate: boolean` flag based on existing `(title, issuer)` or `credentialId`.
+
+2. **Interactive Import Review Modal (`src/components/admin/CertificationImportModal.tsx`)**:
+   - Drag-and-drop file dropzone accepting `.csv` and `.json` files.
+   - Single Credly/certificate URL quick parser bar.
+   - Preview table with:
+     - Selective row checkboxes (`Select All`, `Deselect Duplicates`).
+     - Duplicate warning chips (`⚠️ Already Exists`).
+     - Inline editable fields for title, issuer, issue date, credential ID, and URL.
+     - Auto-mapped issuer vector logo preview (`PortfolioIcon`).
+   - Batch import button with progress indicator (`Importing X of Y...`).
+
+3. **Admin Panel Integration (`src/app/admin/certifications/CertificationsClient.tsx`)**:
+   - Add `[ 📥 Import LinkedIn Credentials ]` action button next to `[ + Add Certification ]` in `AdminPageHeader`.
+   - Refresh certifications list and revalidate ISR cache on successful batch import.
+
+---
+
+### Acceptance Criteria
+- [ ] Drag-and-drop upload of LinkedIn `Certifications.csv` parses all columns accurately.
+- [ ] JSON payload import supported for custom or backed-up certificate archives.
+- [ ] Duplicate credentials are automatically detected and flagged in the preview table.
+- [ ] Users can review, edit, and select specific items before importing into PostgreSQL.
+- [ ] Issuers are automatically mapped to official brand vector logos (`PortfolioIcon`).
+- [ ] External verification URLs are validated and normalized to HTTPS.
+- [ ] 0 TypeScript errors (`npx tsc --noEmit`) and production build passes (`npm run build`).
+
+

@@ -11,4 +11,5 @@ export * from './interests';
 export * from './languages';
 export * from './hobbies';
 export * from './socials';
+export * from './certifications';
 export * from './stats';

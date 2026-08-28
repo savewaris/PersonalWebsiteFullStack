@@ -54,6 +54,11 @@ import {
   SiOpenai,
   SiPytorch,
   SiTensorflow,
+  SiCoursera,
+  SiHashicorp,
+  SiOracle,
+  SiUdemy,
+  SiMeta,
 } from 'react-icons/si';
 
 import {
@@ -66,6 +71,9 @@ import {
   FaEnvelope,
   FaGlobe,
   FaCloud,
+  FaCertificate,
+  FaAward,
+  FaMicrosoft,
 } from 'react-icons/fa';
 
 interface PortfolioIconProps {
@@ -189,6 +197,18 @@ export function PortfolioIcon({
   if (target.includes('openai') || target.includes('gpt') || target.includes('llm') || target.includes('ai')) return <SiOpenai size={size} className={className} style={style} />;
   if (target.includes('pytorch')) return <SiPytorch size={size} className={className} style={style} />;
   if (target.includes('tensorflow')) return <SiTensorflow size={size} className={className} style={style} />;
+
+  // ── Certifications & Organizations ───────────────────────
+  if (target.includes('coursera')) return <SiCoursera size={size} className={className} style={style} />;
+  if (target.includes('ibm')) return <FaBuilding size={size} className={className} style={style} />;
+  if (target.includes('hashicorp')) return <SiHashicorp size={size} className={className} style={style} />;
+  if (target.includes('oracle')) return <SiOracle size={size} className={className} style={style} />;
+  if (target.includes('udemy')) return <SiUdemy size={size} className={className} style={style} />;
+  if (target.includes('meta')) return <SiMeta size={size} className={className} style={style} />;
+  if (target.includes('microsoft') || target.includes('azure')) return <FaMicrosoft size={size} className={className} style={style} />;
+  if (target.includes('deeplearning') || target.includes('deeplearning.ai')) return <SiOpenai size={size} className={className} style={style} />;
+  if (target.includes('cert') || target.includes('credential')) return <FaCertificate size={size} className={className} style={style} />;
+  if (target.includes('award') || target.includes('honor')) return <FaAward size={size} className={className} style={style} />;
 
   // ── Career, Education & UI Fallbacks ──────────────────────
   if (target.includes('university') || target.includes('school')) return <FaUniversity size={size} className={className} style={style} />;

@@ -7,6 +7,7 @@ import {
   getInterests,
   getLanguages,
   getSocialLinks,
+  getCertifications,
   getStats,
 } from '@/lib/data';
 import Navbar from '@/components/Navbar';
@@ -17,6 +18,7 @@ import { StatsSection } from '@/components/sections/StatsSection';
 import { AboutSection } from '@/components/sections/AboutSection';
 import { SkillsSection } from '@/components/sections/SkillsSection';
 import { ExperienceEducationSection } from '@/components/sections/ExperienceEducationSection';
+import { CertificationsSection } from '@/components/sections/CertificationsSection';
 import { ProjectsSection } from '@/components/sections/ProjectsSection';
 import { LanguagesInterestsSection } from '@/components/sections/LanguagesInterestsSection';
 import { ContactSection } from '@/components/sections/ContactSection';
@@ -25,7 +27,7 @@ import styles from './page.module.css';
 export const revalidate = 0;
 
 export default async function Home() {
-  const [skills, projects, experiences, education, hobbies, interests, languages, socials, stats] = await Promise.all([
+  const [skills, projects, experiences, education, hobbies, interests, languages, socials, certifications, stats] = await Promise.all([
     getSkills(),
     getProjects(),
     getExperiences(),
@@ -34,6 +36,7 @@ export default async function Home() {
     getInterests(),
     getLanguages(),
     getSocialLinks(),
+    getCertifications(),
     getStats(),
   ]);
 
@@ -48,6 +51,7 @@ export default async function Home() {
             <AboutSection />
             <SkillsSection skills={skills} />
             <ExperienceEducationSection experiences={experiences} education={education} />
+            <CertificationsSection certifications={certifications} />
             <ProjectsSection projects={projects} />
             <LanguagesInterestsSection languages={languages} hobbies={hobbies} interests={interests} />
             <ContactSection socials={socials} />

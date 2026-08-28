@@ -56,11 +56,16 @@ PersonalWebsite/
 
 ## 3. Specialized Subagent Personas
 
-The `.agents/subagents.json` file configures 7 dedicated agent roles for this project:
+## 3. Specialized Subagent Personas
+
+The `.agents/subagents.json` file configures 10 dedicated agent roles for this project:
 
 | Subagent | Role | Focus Areas |
 | :--- | :--- | :--- |
-| `ui-designer` | UI/UX & Motion Specialist | CSS Modules, Framer Motion, Bento grids, accessibility, responsive UI |
+| `ui-designer` | UI/UX & Bento Grid Specialist | CSS Modules, Bento grids, responsive cards, layout architecture |
+| `motion-designer` | Motion Physics & Animation Specialist | Framer Motion physics springs, hover micro-interactions, reduced motion |
+| `design-system-architect` | Design System & Tokens Specialist | Semantic CSS tokens, color ramps, fluid clamp typography scales |
+| `a11y-auditor` | WCAG Accessibility & Quality Auditor | WCAG 2.2 AA audit, color contrast (≥4.5:1), touch targets, ARIA |
 | `db-engineer` | Database & API Architect | Prisma schema, migrations, CRUD Route Handlers, data validation |
 | `roadmap-executor` | Milestone Implementer | End-to-end execution of issues from `docs/github_issues_roadmap.md` |
 | `doc-writer` | Technical Documentation | ADRs, API specs, component guides, and `README.md` syncing |
@@ -77,10 +82,16 @@ Activate skills when undertaking specialized multi-step tasks:
 1. `roadmap-implementer`: Execute issues from `docs/github_issues_roadmap.md`.
 2. `prisma-schema-migration`: Safe schema updates, DB pushes, and migration handling.
 3. `component-generator`: Scaffolding new accessible UI components with CSS Modules & animations.
-4. `doc-architect`: Generating ADRs, API specs, and technical documentation.
-5. `ci-cd-engineer`: Authoring and troubleshooting GitHub Actions CI/CD workflows.
-6. `project-planner`: Translating user requirements into production-ready GitHub Issues.
-7. `codebase-researcher`: Deep audits of dependencies, code quality, and architecture.
+4. `bento-grid-architect`: Responsive Bento grid layouts, asymmetric card systems, radial glow hover.
+5. `framer-motion-physics`: Physics spring curves, interactive micro-interactions, and scroll effects.
+6. `design-system-tokens`: Semantic CSS tokens, HSL palettes, and fluid clamp typography scales.
+7. `wcag-accessibility`: WCAG 2.2 AA accessibility, contrast ratios, and keyboard navigation.
+8. `ux-ui-verifier`: Automated headless UX/UI testing (Playwright + Axe-Core) & self-healing runbook.
+9. `doc-architect`: Generating ADRs, API specs, and technical documentation.
+10. `ci-cd-engineer`: Authoring and troubleshooting GitHub Actions CI/CD workflows.
+11. `project-planner`: Translating user requirements into production-ready GitHub Issues.
+12. `codebase-researcher`: Deep audits of dependencies, code quality, and architecture.
+13. `clean-code-refactor`: Domain decomposition and cross-CLI dynamic file locking.
 
 ---
 
@@ -94,13 +105,14 @@ Activate skills when undertaking specialized multi-step tasks:
    - `npm run agent:doctor` (Validates agent rules, skills, schema, and TS)
    - `npx prisma validate` (Validates DB schema)
    - `npx tsc --noEmit` (0 type errors)
+   - `npm run test:ui` (0 UX/UI violations across mobile, tablet, and desktop)
    - `npm run build` (Clean production Next.js build)
 
 ---
 
 ## 6. Multi-Agent Swarms & Peer Consensus Protocol
 
-- **Multi-Action Trigger**: Whenever a task touches >1 domain (e.g. Schema + UI + Docs), the lead agent proposes a specialized subagent swarm for approval.
+- **Adaptive Hybrid Trigger**: Natural language user prompts automatically activate design skills. Single-component tasks are executed directly with design tokens and physics springs; complex multi-component or page overhauls autonomously deploy the UI Quad Squad pipeline (`ui-designer` -> `motion-designer` -> `a11y-auditor` / `ux-ui-verifier`).
 - **Peer Dialogue**: Subagents exchange messages to discuss interface contracts, payload types, and architectural trade-offs before committing code.
-- **Intelligent Sequencing**: Independent subagent tasks run in parallel; dependent flows (e.g. database schema -> frontend components) are sequentially handed off.
+- **Intelligent Sequencing**: Independent subagent tasks run in parallel; dependent flows (e.g. database schema -> frontend components -> automated verification) are sequentially handed off.
 

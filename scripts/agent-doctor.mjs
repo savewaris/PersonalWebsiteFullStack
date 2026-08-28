@@ -99,6 +99,13 @@ for (const skill of expectedSkills) {
 // 5. Check CI/CD, Documentation & State Assets
 console.log('\n🚀 5. Verifying CI/CD, State & Documentation Assets...');
 check('GitHub Actions CI pipeline (.github/workflows/ci.yml)', existsSync(path.join(ROOT_DIR, '.github', 'workflows', 'ci.yml')));
+check('GitHub Actions Security scan (.github/workflows/security-scan.yml)', existsSync(path.join(ROOT_DIR, '.github', 'workflows', 'security-scan.yml')));
+check('GitHub Actions PR hygiene (.github/workflows/pr-hygiene.yml)', existsSync(path.join(ROOT_DIR, '.github', 'workflows', 'pr-hygiene.yml')));
+check('GitHub Actions UI/UX E2E (.github/workflows/ui-ux-e2e.yml)', existsSync(path.join(ROOT_DIR, '.github', 'workflows', 'ui-ux-e2e.yml')));
+check('GitHub Actions Release (.github/workflows/release.yml)', existsSync(path.join(ROOT_DIR, '.github', 'workflows', 'release.yml')));
+check('Dependabot security config (.github/dependabot.yml)', existsSync(path.join(ROOT_DIR, '.github', 'dependabot.yml')));
+check('Pull Request Template (.github/PULL_REQUEST_TEMPLATE.md)', existsSync(path.join(ROOT_DIR, '.github', 'PULL_REQUEST_TEMPLATE.md')));
+
 check('Playwright config (playwright.config.ts)', existsSync(path.join(ROOT_DIR, 'playwright.config.ts')));
 check('WCAG 2.2 Accessibility test (tests/ui-ux/accessibility-wcag.spec.ts)', existsSync(path.join(ROOT_DIR, 'tests', 'ui-ux', 'accessibility-wcag.spec.ts')));
 check('Responsive overflow test (tests/ui-ux/responsive-overflow.spec.ts)', existsSync(path.join(ROOT_DIR, 'tests', 'ui-ux', 'responsive-overflow.spec.ts')));
