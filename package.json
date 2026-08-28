@@ -36,7 +36,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
-    "mermaid": "^11.16.1",
+    "mermaid": "^11.17.2",
     "prisma": "^6.0.0",
     "typescript": "^5",
     "vitepress": "^1.6.4",
