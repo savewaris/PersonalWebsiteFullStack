@@ -52,6 +52,8 @@ jobs:
           if [ -f "scripts/agent-doctor.mjs" ]; then
             node scripts/agent-doctor.mjs
           fi
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/test?sslmode=disable' }}
 
       - name: Run Unit / Component Tests
         run: npm test --if-present

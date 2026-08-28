@@ -128,7 +128,11 @@ check('Modular domain data layer (src/lib/data/index.ts)', existsSync(path.join(
 // 6. Prisma Validation
 console.log('\n🗄️ 6. Validating Prisma Database Schema...');
 try {
-  execSync('npx prisma validate', { stdio: 'pipe' });
+  const env = {
+    ...process.env,
+    DATABASE_URL: process.env.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/test?sslmode=disable',
+  };
+  execSync('npx prisma validate', { stdio: 'pipe', env });
   check('Prisma schema validation (npx prisma validate)', true);
 } catch (err) {
   check('Prisma schema validation (npx prisma validate)', false, err.message);
