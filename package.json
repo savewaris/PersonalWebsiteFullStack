@@ -38,7 +38,7 @@
     "eslint-config-next": "16.1.6",
     "mermaid": "^11.16.1",
     "prisma": "^6.0.0",
-    "typescript": "^5",
+    "typescript": "^7",
     "vitepress": "^1.6.4",
     "vitepress-plugin-mermaid": "^2.0.17"
   }
