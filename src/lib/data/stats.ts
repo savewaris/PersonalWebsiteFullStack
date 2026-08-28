@@ -7,11 +7,16 @@ export type PortfolioStats = {
 };
 
 export async function getStats(): Promise<PortfolioStats> {
-  const [projects, skills, experience] = await Promise.all([
-    prisma.project.count(),
-    prisma.skill.count(),
-    prisma.experience.count(),
-  ]);
+  try {
+    const [projects, skills, experience] = await Promise.all([
+      prisma.project.count(),
+      prisma.skill.count(),
+      prisma.experience.count(),
+    ]);
 
-  return { projects, skills, experience };
+    return { projects, skills, experience };
+  } catch (error) {
+    console.error('[DATA_ERROR:stats]:', error);
+    return { projects: 0, skills: 0, experience: 0 };
+  }
 }

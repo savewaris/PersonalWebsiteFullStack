@@ -35,6 +35,8 @@ jobs:
             npx prisma validate
             npx prisma generate
           fi
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/test?sslmode=disable' }}
 
       - name: Type Check (TypeScript)
         run: |
@@ -55,9 +57,12 @@ jobs:
         run: npm test --if-present
         env:
           CI: "true"
+          DATABASE_URL: ${{ secrets.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/test?sslmode=disable' }}
 
       - name: Production Build
         run: npm run build --if-present
         env:
-          DATABASE_URL: "file:./dev.db"
+          DATABASE_URL: ${{ secrets.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/test?sslmode=disable' }}
+          ADMIN_SECRET: ${{ secrets.ADMIN_SECRET || 'ci_test_admin_secret_key_12345' }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET || 'ci_test_jwt_secret_key_12345' }}
           NODE_ENV: "production"
