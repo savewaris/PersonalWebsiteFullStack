@@ -1,6 +1,7 @@
 ---
 name: framer-motion-physics
 description: Physics-based spring animations, micro-interactions, scroll-linked effects, layout transitions, and reduced-motion accessibility with Framer Motion. Activate this skill when building or refining animated UI components, interactive cards, modals, or page transitions.
+recommended_model: flash
 ---
 
 # Framer Motion Physics & Micro-Interactions Skill

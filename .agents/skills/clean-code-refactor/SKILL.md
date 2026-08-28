@@ -1,6 +1,7 @@
 ---
 name: clean-code-refactor
 description: Progressive runbook for decomposing monolithic files, modularizing composite components, isolating data access layers, and coordinating cross-CLI file locks.
+recommended_model: pro
 ---
 
 # Clean Code & Modularization Refactoring Runbook

@@ -53,3 +53,5 @@
 - 🟡 **[IN_PROGRESS]** `2026-08-28 11:01:37` | `db-engineer+ui-designer+doc-writer` | **ISSUE-4**: Pushed Certification model to Neon PostgreSQL database and regenerated Prisma Client
 - 🟢 **[DONE]       ** `2026-08-28 11:02:03` | `db-engineer+ui-designer+doc-writer` | **ISSUE-4**: Created Certification model in Neon PostgreSQL and regenerated Prisma Client
 - 🟢 **[DONE]       ** `2026-08-28 11:04:55` | `agent` | **GENERAL**: Task ISSUE-4 (Add Certifications & Credentials Section) marked as COMPLETED and unlocked
+- 🟡 **[IN_PROGRESS]** `2026-08-28 11:18:05` | `agent` | **GENERAL**: Implement AI model tier classification across subagents, skills, project configs, and Second Brain
+- 🟢 **[DONE]       ** `2026-08-28 11:18:08` | `agent` | **GENERAL**: Implement AI model tier classification across subagents, skills, project configs, and Second Brain

@@ -48,7 +48,6 @@ export function SocialButton({
           className={className}
           title={`Click to copy: ${url}`}
           style={{
-            ...style,
             cursor: 'pointer',
             border: 'none',
             outline: 'none',
@@ -57,7 +56,10 @@ export function SocialButton({
             display: 'inline-flex',
             alignItems: 'center',
             justifyContent: 'center',
+            minHeight: '24px',
+            padding: '3px 4px',
             gap: showPlatformLabel ? '6px' : undefined,
+            ...style,
           }}
         >
           <PortfolioIcon platform={platform} url={url} icon={icon} size={size} />
@@ -99,7 +101,14 @@ export function SocialButton({
       rel="noopener noreferrer"
       className={className}
       title={platform}
-      style={style}
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: '24px',
+        padding: '3px 4px',
+        ...style,
+      }}
     >
       <PortfolioIcon platform={platform} url={url} icon={icon} size={size} />
       {showPlatformLabel && <span>{platform}</span>}

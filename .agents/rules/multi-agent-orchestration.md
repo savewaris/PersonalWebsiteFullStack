@@ -13,18 +13,29 @@ When a user request or roadmap item contains **more than one action, file, or do
 
 ---
 
-## 2. Domain-to-Subagent & Model Routing Matrix
+## 2. Domain-to-Subagent, Skill & Model Routing Matrix
 
-| Task Domain | Subagent | Recommended Model | Primary Scope |
-| :--- | :--- | :--- | :--- |
-| **Quick Lookups / Lint** | `qa-verifier` | `flash_lite` | Quick file grep, syntax check, bundle size checks |
-| **Deep Research** | `researcher` | `flash` | Dependency audits, performance benchmarks, architectural review |
-| **UI & Styling** | `ui-designer` | `flash` | CSS Modules, Framer Motion, responsive bento grids |
-| **Documentation** | `doc-writer` | `flash` | Architecture Decision Records (ADRs), API specs, README sync |
-| **DevOps & CI/CD** | `cicd-devops` | `flash` | GitHub Actions workflows, build verification, environment setup |
-| **Database & API** | `db-engineer` | `pro` | Prisma models, migrations, DB push, Next.js route handlers |
-| **Feature Planning** | `project-planner` | `pro` | Translating ideas into structured GitHub issues & milestones |
-| **Full Milestone** | `roadmap-executor` | `pro` / `inherit` | End-to-end execution of complex multi-tier roadmap issues |
+| Task Domain | Subagent | Recommended Model | Primary Scope | Auto-Activated Skills |
+| :--- | :--- | :--- | :--- | :--- |
+| **A11y & Test Audit** | `a11y-auditor` / `qa-verifier` | `flash_lite` | WCAG 2.2 AA audit, Playwright/Axe report check, syntax validation | `wcag-accessibility`, `ux-ui-verifier` |
+| **Deep Research** | `researcher` | `flash` | Dependency audits, performance benchmarks, architectural review | `codebase-researcher` |
+| **UI & Layout** | `ui-designer` | `flash` | CSS Modules, Bento grids, responsive mobile/desktop cards | `bento-grid-architect`, `component-generator` |
+| **Physics Animation** | `motion-designer` | `flash` | Framer Motion physics springs, hover micro-interactions, reduced motion | `framer-motion-physics`, `component-generator` |
+| **Design Tokens** | `design-system-architect` | `flash` | CSS custom properties, color ramps, fluid clamp typography | `design-system-tokens` |
+| **Documentation** | `doc-writer` | `flash` | Architecture Decision Records (ADRs), API specs, README sync | `doc-architect` |
+| **DevOps & CI/CD** | `cicd-devops` | `flash` | GitHub Actions workflows, build verification, test scripts | `ci-cd-engineer` |
+| **Database & API** | `db-engineer` | `pro` | Prisma models, migrations, DB push, Next.js route handlers | `prisma-schema-migration` |
+| **Feature Planning** | `project-planner` | `pro` | Translating ideas into structured GitHub issues & milestones | `project-planner` |
+| **Clean Architecture** | `clean-coder` | `pro` | Domain decoupling, module decomposition, file lock management | `clean-code-refactor` |
+| **Full Milestone** | `roadmap-executor` | `pro` / `inherit` | End-to-end execution of complex multi-tier roadmap issues | `roadmap-implementer`, `prisma-schema-migration`, `component-generator` |
+
+### Dynamic Model Escalation Protocol
+1. **Fast-Path Default**: Leaf UI tasks, documentation, and automated test audits execute on `flash` / `flash_lite`.
+2. **Autonomous Escalation Triggers**:
+   - **Type / Build Failures**: If a `flash` subagent cannot resolve TypeScript compilation errors after 2 iterations, escalate directly to `pro`.
+   - **Database & Data Loss Risk**: Any structural schema migration affecting existing tables or foreign keys routes to `pro`.
+   - **Security / Session Boundaries**: Mutating admin routes or session token validation routes to `pro`.
+3. **Task Slicing**: Complex tasks are planned by `pro`, sliced into independent leaf tasks dispatched to `flash` / `flash_lite`, and re-verified before completion.
 
 ---
 

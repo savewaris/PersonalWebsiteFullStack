@@ -23,7 +23,7 @@ export default defineConfig({
   },
   projects: [
     {
-      name: 'Desktop Chrome (1440x900)',
+      name: 'Desktop (1440x900)',
       use: {
         ...devices['Desktop Chrome'],
         viewport: { width: 1440, height: 900 },
@@ -32,14 +32,14 @@ export default defineConfig({
     {
       name: 'Tablet (768x1024)',
       use: {
-        ...devices['iPad Mini'],
+        ...devices['Desktop Chrome'],
         viewport: { width: 768, height: 1024 },
       },
     },
     {
       name: 'Mobile (375x667)',
       use: {
-        ...devices['iPhone SE'],
+        ...devices['Pixel 5'],
         viewport: { width: 375, height: 667 },
       },
     },

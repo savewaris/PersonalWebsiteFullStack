@@ -1,6 +1,7 @@
 ---
 name: roadmap-implementer
 description: Autonomous runbook for picking and implementing issues from docs/github_issues_roadmap.md end-to-end.
+recommended_model: pro
 ---
 
 # Roadmap & Issue Implementer Skill

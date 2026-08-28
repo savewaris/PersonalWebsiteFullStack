@@ -1,6 +1,7 @@
 ---
 name: doc-architect
 description: Authoring Architecture Decision Records (ADRs), API documentation, component guides, and syncing README.md.
+recommended_model: flash
 ---
 
 # Documentation Architect Skill

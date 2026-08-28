@@ -89,11 +89,13 @@ for (const skill of expectedSkills) {
   const skillFile = path.join(SKILLS_DIR, skill, 'SKILL.md');
   const hasSkill = existsSync(skillFile);
   let hasFrontmatter = false;
+  let hasModel = false;
   if (hasSkill) {
     const content = readFileSync(skillFile, 'utf8');
     hasFrontmatter = content.startsWith('---') && content.includes('description:');
+    hasModel = content.includes('recommended_model:');
   }
-  check(`Skill: ${skill} (SKILL.md + frontmatter)`, hasSkill && hasFrontmatter);
+  check(`Skill: ${skill} (SKILL.md + frontmatter + model tier)`, hasSkill && hasFrontmatter && hasModel);
 }
 
 // 5. Check CI/CD, Documentation & State Assets
@@ -116,6 +118,7 @@ check('ADR 0001 (docs/adr/0001-project-scoped-agents.md)', existsSync(path.join(
 check('ADR 0002 (docs/adr/0002-real-time-step-logging-and-session-handoff.md)', existsSync(path.join(ROOT_DIR, 'docs', 'adr', '0002-real-time-step-logging-and-session-handoff.md')));
 check('ADR 0003 (docs/adr/0003-modular-clean-code-and-cross-cli-file-locking.md)', existsSync(path.join(ROOT_DIR, 'docs', 'adr', '0003-modular-clean-code-and-cross-cli-file-locking.md')));
 check('ADR 0004 (docs/adr/0004-automated-ux-ui-standard-verification.md)', existsSync(path.join(ROOT_DIR, 'docs', 'adr', '0004-automated-ux-ui-standard-verification.md')));
+check('ADR 0005 (docs/adr/0005-ai-model-tier-classification-and-routing.md)', existsSync(path.join(ROOT_DIR, 'docs', 'adr', '0005-ai-model-tier-classification-and-routing.md')));
 check('Roadmap document (docs/github_issues_roadmap.md)', existsSync(path.join(ROOT_DIR, 'docs', 'github_issues_roadmap.md')));
 check('Session handover log (.agents/state/SESSION_LOG.md)', existsSync(path.join(AGENTS_DIR, 'state', 'SESSION_LOG.md')));
 check('Live step action ledger (.agents/state/LIVE_STEP_LOG.md)', existsSync(path.join(AGENTS_DIR, 'state', 'LIVE_STEP_LOG.md')));

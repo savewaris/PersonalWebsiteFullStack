@@ -1,6 +1,7 @@
 ---
 name: design-system-tokens
 description: Establishing semantic design tokens, CSS custom properties, HSL color ramps, fluid typography clamp scales, and theme switching architecture. Activate this skill when auditing, refactoring, or expanding design tokens and theme variables.
+recommended_model: flash
 ---
 
 # Design System Tokens Skill

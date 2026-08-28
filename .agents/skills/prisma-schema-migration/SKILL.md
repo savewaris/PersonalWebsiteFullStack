@@ -1,6 +1,7 @@
 ---
 name: prisma-schema-migration
 description: Runbook for safely updating Prisma schema, executing migrations, regenerating Prisma Client, and verifying database integrity.
+recommended_model: pro
 ---
 
 # Prisma Schema & Database Migration Skill

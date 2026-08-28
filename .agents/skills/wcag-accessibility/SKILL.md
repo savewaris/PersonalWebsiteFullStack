@@ -1,6 +1,7 @@
 ---
 name: wcag-accessibility
 description: Enforcing WCAG 2.1 AA accessibility standards, semantic HTML structure, keyboard navigation, visible focus rings, ARIA roles, and screen reader readiness. Activate this skill when auditing or implementing accessible frontend interfaces.
+recommended_model: flash_lite
 ---
 
 # WCAG Accessibility & Inclusive Design Skill

@@ -1,6 +1,7 @@
 ---
 name: ci-cd-engineer
 description: Authoring, maintaining, scaffolding, and verifying production-grade GitHub Actions CI/CD pipelines, security gates, automated tests, and release workflows. Activate this skill when configuring CI/CD, Gitleaks, Dependabot, PR hygiene, or automated releases.
+recommended_model: flash
 ---
 
 # CI/CD & Build Engineer Skill

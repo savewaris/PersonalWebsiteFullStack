@@ -40,11 +40,11 @@ export default function LoginPage() {
   };
 
   return (
-    <div className={styles.container}>
+    <main className={styles.container}>
       <form onSubmit={handleSubmit} className={styles.form}>
         <div style={{ textAlign: 'center', marginBottom: '8px' }}>
           <h1 className={styles.title}>Admin Access</h1>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>Enter password to access dashboard</p>
+          <p style={{ color: '#A0A0A0', fontSize: '0.9rem' }}>Enter password to access dashboard</p>
         </div>
 
         {error && <p className={styles.error}>{error}</p>}
@@ -64,11 +64,11 @@ export default function LoginPage() {
         </button>
 
         <div style={{ textAlign: 'center', marginTop: '8px' }}>
-          <Link href="/" style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', textDecoration: 'none' }}>
+          <Link href="/" style={{ color: '#A0A0A0', fontSize: '0.85rem', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', minHeight: '24px', padding: '4px 8px' }}>
             ← Back to Portfolio
           </Link>
         </div>
       </form>
-    </div>
+    </main>
   );
 }

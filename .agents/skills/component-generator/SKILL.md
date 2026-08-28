@@ -1,6 +1,7 @@
 ---
 name: component-generator
 description: Scaffolding and authoring UI components adhering to CSS Modules, TypeScript interfaces, and Framer Motion animation patterns.
+recommended_model: flash
 ---
 
 # UI Component Generator Skill

@@ -1,6 +1,7 @@
 ---
 name: codebase-researcher
 description: Performing deep audits of code architecture, dependency health, performance bottlenecks, and Next.js/React patterns.
+recommended_model: flash
 ---
 
 # Codebase & Architecture Researcher Skill

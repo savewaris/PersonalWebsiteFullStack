@@ -1,6 +1,7 @@
 ---
 name: bento-grid-architect
 description: Designing and engineering modern, responsive Bento Grid layouts, asymmetric card structures, radial hover glows, and responsive multi-column layouts using pure CSS Modules and CSS Grid. Activate this skill when building dashboard overviews, project showcases, or featured cards.
+recommended_model: flash
 ---
 
 # Bento Grid Architect Skill

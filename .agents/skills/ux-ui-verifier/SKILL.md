@@ -1,6 +1,7 @@
 ---
 name: ux-ui-verifier
 description: Automated verification and self-healing runbook for global UX/UI standards, WCAG 2.2 AA accessibility, responsive layout integrity, and touch usability.
+recommended_model: flash_lite
 ---
 
 # UX/UI Global Standards Verifier & Self-Healing Skill

@@ -1,6 +1,7 @@
 ---
 name: project-planner
 description: Translating user feature requests into structured GitHub Issues, milestones, acceptance criteria, and task breakdowns.
+recommended_model: pro
 ---
 
 # Project & Feature Planner Skill
