@@ -386,5 +386,60 @@ Understanding audience engagement (who visits the portfolio, where they arrive f
 - [ ] Admin dashboard supports 7d/30d/90d time range toggles.
 - [ ] 0 TypeScript errors (`npx tsc --noEmit`) and successful production build (`npm run build`).
 
+---
+---
+
+## Issue #8: [Feature] Universal Certification & Academy Logo Dataset, Auto-Resolver & Visual Logo Picker
+
+**Labels:** `feature`, `frontend`, `backend`, `admin`, `ui/ux`  
+**Milestone:** `v1.7 — Credential & Logo Intelligence`  
+**Priority:** `High`
+
+### Description
+Showcasing verified certifications and academic credentials requires accurate, high-resolution vector logos from course providers, universities, cloud vendors, and academies. Currently, logos rely on a handful of hardcoded keywords. This issue introduces an extensible dataset of 60+ top academies, learning platforms, universities, and tech ecosystems, an automatic issuer/domain resolver with dynamic CDN fallback, and an interactive Visual Logo Picker modal in the Admin CMS.
+
+---
+
+### Technical Requirements
+
+1. **Universal Organization & Academy Logo Registry (`src/lib/certification-logos.ts`)**:
+   - Curated 5-category dataset with 60+ organizations:
+     - **Cloud & Enterprise**: AWS, Google Cloud, Microsoft Azure, IBM, Oracle, HashiCorp, Red Hat, Cisco, VMware, Snowflake, Databricks, Salesforce, Linux Foundation, CNCF, Docker, Kubernetes.
+     - **Online Learning Platforms & MOOCs**: Coursera, Udemy, edX, Udacity, Pluralsight, DataCamp, Codecademy, FreeCodeCamp, Scrimba, Kaggle, LeetCode, HackerRank, DeepLearning.AI, Khan Academy, LinkedIn Learning, Brilliant.
+     - **AI & Research Institutes**: OpenAI, Anthropic, Hugging Face, NVIDIA Deep Learning Institute, fast.ai, Weights & Biases.
+     - **Global & Regional Universities**: Harvard, MIT, Stanford, Oxford, Cambridge, UC Berkeley, Carnegie Mellon, Chulalongkorn University, Mahidol University, Kasetsart University, KMUTT.
+     - **Developer Ecosystems & Databases**: Meta, Apple Developer, Stripe, Supabase, Vercel, Prisma, MongoDB, Redis.
+   - Each entry contains: `id`, `name`, `category`, `iconKey`, `brandColor`, `aliases: string[]`, `domains: string[]`, `websiteUrl`.
+
+2. **Intelligent Auto-Resolver Engine (`src/lib/resolve-certification-logo.ts`)**:
+   - **Multi-Level Matching Hierarchy**:
+     1. Exact `iconKey` / `id` match.
+     2. Alias / Regex pattern match against issuer name (e.g. `"Stanford Online"` $\rightarrow$ `"stanford"`).
+     3. Domain match against verification URL (e.g. `"coursera.org/verify/..."` $\rightarrow$ `"coursera"`).
+     4. Dynamic CDN Fallback for unlisted organizations via Google Favicon CDN (`https://www.google.com/s2/favicons?domain=...&sz=128`) or SimpleIcons CDN.
+     5. Generic fallback vector badge (`FaCertificate` / `FaAward`).
+
+3. **Enhanced Vector & Hybrid Logo Component (`src/components/PortfolioIcon.tsx`)**:
+   - Expanded Simple Icons / FontAwesome vector bindings for all 60+ new platform keys.
+   - Seamless support for remote CDN/custom image URLs via optimized `next/image` with error fallback to initials/generic badge.
+
+4. **Visual Logo Picker Modal (`src/components/admin/LogoPickerModal.tsx`)**:
+   - Grid visualizer categorized by tabs: `All`, `Cloud & DevOps`, `Learning & MOOCs`, `AI & Data`, `Universities`, `Ecosystems`.
+   - Real-time search filter by organization name, alias, or keyword.
+   - Instant visual preview with brand vector icon and official color accent.
+   - Custom URL input and Favicon fetcher for unlisted organizations.
+   - Direct integration into `/admin/certifications` form and `CertificationImportModal.tsx`.
+
+---
+
+### Acceptance Criteria
+- [ ] Curated dataset of 60+ academies, learning platforms, universities, and cloud providers defined in `src/lib/certification-logos.ts`.
+- [ ] Auto-resolver accurately detects logos from issuer names, aliases, and Credly/verification URLs.
+- [ ] Dynamic CDN fallback retrieves official favicons/logos for unlisted domains.
+- [ ] Visual Logo Picker modal allows searching, filtering by category, and selecting logos in the CMS.
+- [ ] Public certification cards render crisp, brand-accurate vector logos across all screen densities.
+- [ ] 0 TypeScript errors (`npx tsc --noEmit`) and successful Next.js build (`npm run build`).
+
+
 
 
