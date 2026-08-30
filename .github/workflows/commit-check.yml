@@ -1,0 +1,31 @@
+name: Commit Quality Gate & Git Hygiene
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  commit-lint:
+    name: Conventional Commits & Conflict Scanner
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Scan for Merge Conflict Markers
+        run: |
+          echo "Scanning for accidental merge conflict markers..."
+          if git grep -nE "<<<<<<<|=======|>>>>>>>" -- ":!*.log" ":!*.db" ":!package-lock.json" ":!scripts/verify-commits.ps1"; then
+            echo "::error::Merge conflict markers detected in repository!"
+            exit 1
+          fi
+          echo "Zero merge conflict markers found."
+
+      - name: Verify Git Hygiene Script
+        shell: pwsh
+        run: |
+          pwsh -File scripts/verify-commits.ps1
