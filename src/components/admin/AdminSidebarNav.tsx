@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
   FaTachometerAlt,
+  FaChartLine,
   FaCode,
   FaFolderOpen,
   FaBriefcase,
@@ -21,6 +22,7 @@ import styles from '@/app/admin/AdminLayout.module.css';
 
 const NAV_ITEMS = [
   { href: '/admin', label: 'Dashboard', icon: FaTachometerAlt, exact: true },
+  { href: '/admin/analytics', label: 'Analytics', icon: FaChartLine },
   { href: '/admin/skills', label: 'Skills', icon: FaCode },
   { href: '/admin/projects', label: 'Projects', icon: FaFolderOpen },
   { href: '/admin/experience', label: 'Experience', icon: FaBriefcase },

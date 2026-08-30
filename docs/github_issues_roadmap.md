@@ -286,4 +286,105 @@ Managing verified certifications one by one can be tedious for engineers with ex
 - [ ] External verification URLs are validated and normalized to HTTPS.
 - [ ] 0 TypeScript errors (`npx tsc --noEmit`) and production build passes (`npm run build`).
 
+---
+---
+
+## Issue #7: [Feature] Built-in Privacy-Friendly Visitor Telemetry, Outbound Click Tracking & Admin Analytics Dashboard
+
+**Labels:** `feature`, `frontend`, `backend`, `admin`, `database`, `ui/ux`  
+**Milestone:** `v1.6 — Intelligence & Telemetry`  
+**Priority:** `High`
+
+### Description
+Understanding audience engagement (who visits the portfolio, where they arrive from, and which projects, demo links, GitHub repositories, or social profiles they click) is crucial for optimizing recruiter engagement and technical reach. This issue introduces a full-stack, privacy-first, cookieless telemetry engine and an interactive `/admin/analytics` dashboard.
+
+---
+
+### Technical Requirements
+
+1. **Prisma Schema (`prisma/schema.prisma`)**:
+   - Create `PageView` and `ClickEvent` models:
+     ```prisma
+     model PageView {
+       id           String   @id @default(uuid())
+       path         String   // e.g. "/", "/#projects", "/#about"
+       referrer     String?  // e.g. "https://linkedin.com", "https://github.com", "Direct"
+       referrerHost String?  // e.g. "linkedin.com", "github.com", "google.com", "x.com"
+       visitorHash  String   // Daily salted SHA-256 hash (cookieless, GDPR-compliant)
+       country      String?  // Extracted from x-vercel-ip-country or cf-ipcountry (e.g. "US", "TH", "DE")
+       city         String?  // Extracted from headers if available
+       device       String?  // "mobile" | "tablet" | "desktop"
+       browser      String?  // "Chrome" | "Safari" | "Firefox" | "Edge"
+       os           String?  // "Windows" | "macOS" | "iOS" | "Android" | "Linux"
+       createdAt    DateTime @default(now())
+
+       @@index([createdAt])
+       @@index([path])
+       @@index([referrerHost])
+       @@index([visitorHash, createdAt])
+     }
+
+     model ClickEvent {
+       id           String   @id @default(uuid())
+       targetUrl    String   // Outbound URL (e.g. demoUrl, repoUrl, resume download)
+       eventType    String   // "project_demo" | "project_repo" | "social_link" | "resume_download" | "contact_email"
+       elementText  String?  // e.g. "Live Demo", "Source Code", "GitHub"
+       sourcePath   String   // Page/section where click occurred
+       visitorHash  String   // Daily salted hash
+       country      String?
+       createdAt    DateTime @default(now())
+
+       @@index([createdAt])
+       @@index([eventType])
+       @@index([targetUrl])
+     }
+     ```
+
+2. **Ultra-Lightweight Ingestion Route (`/api/analytics/track`)**:
+   - Next.js 16 Route Handler supporting `POST` requests via `navigator.sendBeacon` and `fetch`.
+   - Generates daily salted hash `SHA-256(ip + salt + YYYY-MM-DD)` so unique daily visitors are tracked without storing raw IP addresses or PII.
+   - Extracts country/city from edge CDN headers (`x-vercel-ip-country`, `x-real-ip`, `cf-ipcountry`).
+   - Zero-dependency User-Agent parser for lightweight device/browser classification.
+   - Responds immediately with `{ ok: true }` in under 10ms.
+
+3. **Client-Side Telemetry Hook & Beacon Provider (`src/components/AnalyticsBeacon.tsx`)**:
+   - Automatically tracks page views on initial load and route changes.
+   - Global event listener delegating click events on elements with `data-track-event` (e.g. Project Demo buttons, Repo links, Resume downloads, Social badges).
+   - Uses `navigator.sendBeacon` on page unload / link navigation to prevent dropped events without blocking UI interactions.
+
+4. **Analytics API Endpoint (`/api/analytics/stats`)**:
+   - Protected endpoint for admin sessions (`requireAuthSession()`).
+   - Supports time range filters: `7d` (7 days), `30d` (30 days), `90d` (90 days), and `all`.
+   - Returns aggregated metrics:
+     - Total Views, Unique Visitors, Average Daily Traffic, Bounce rate estimates.
+     - Top Referrer Domains (LinkedIn, GitHub, Google, Twitter/X, Direct).
+     - Top Clicked Links & Projects Leaderboard.
+     - Geographic Distribution (Country code list with percentage & visitor counts).
+     - Device Breakdown (Desktop vs Mobile vs Tablet) and Browser shares.
+     - Recent Real-Time Activity Log (last 20 events with relative timestamps).
+
+5. **Admin Analytics Dashboard Hub (`/admin/analytics` & `src/app/admin/analytics/AnalyticsClient.tsx`)**:
+   - Timeseries line/bar visualizer using pure CSS / SVG charts for traffic trends.
+   - Stat Summary Cards (Total Pageviews, Unique Visitors, Total Outbound Clicks, Top Traffic Source).
+   - Bento Grid Layout:
+     - **Card 1**: Traffic Timeseries Chart with 7d/30d/90d range toggle.
+     - **Card 2**: Top Referrers breakdown with vector logos (`linkedin`, `github`, `google`, `x`).
+     - **Card 3**: Most Clicked Projects & External Links Leaderboard.
+     - **Card 4**: Geographic Country Distribution with flag emojis and country bars.
+     - **Card 5**: Device & Browser Distribution pills.
+     - **Card 6**: Real-Time Live Activity Feed with glowing status pulse.
+   - Integrated into `AdminSidebarNav.tsx` with icon `📊 Analytics`.
+
+---
+
+### Acceptance Criteria
+- [ ] `PageView` and `ClickEvent` models added to Prisma schema with optimized database indexes.
+- [ ] `/api/analytics/track` collects pageviews and outbound clicks without slowing down page load (100/100 Lighthouse performance preserved).
+- [ ] No raw IP addresses or PII stored in database (GDPR-compliant daily salted hashing).
+- [ ] Outbound clicks on Project Demos, GitHub repos, Resume downloads, and Social icons are tracked accurately.
+- [ ] Dedicated `/admin/analytics` dashboard displays timeseries charts, top referrers, clicked links, countries, and live activity feed.
+- [ ] Admin dashboard supports 7d/30d/90d time range toggles.
+- [ ] 0 TypeScript errors (`npx tsc --noEmit`) and successful production build (`npm run build`).
+
+
 

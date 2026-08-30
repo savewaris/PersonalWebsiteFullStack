@@ -1,11 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import { FaEdit, FaTrash, FaExternalLinkAlt, FaCertificate } from 'react-icons/fa';
+import { FaEdit, FaTrash, FaExternalLinkAlt, FaCertificate, FaFileUpload } from 'react-icons/fa';
 import { useAdminCrud } from '@/lib/useAdminCrud';
 import { AdminPageHeader } from '@/components/admin/AdminPageHeader';
 import { AdminModal } from '@/components/admin/AdminModal';
 import { DeleteConfirmModal } from '@/components/admin/DeleteConfirmModal';
+import { CertificationImportModal } from '@/components/admin/CertificationImportModal';
 import { PortfolioIcon } from '@/components/PortfolioIcon';
 import styles from '@/components/admin/admin.module.css';
 
@@ -53,6 +54,7 @@ export default function CertificationsClient({
     deleteItem,
   } = useAdminCrud<CertificationItem>(initialCertifications, '/api/certifications');
 
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [formData, setFormData] = useState<Partial<CertificationItem>>({
     title: '',
     issuer: '',
@@ -111,9 +113,25 @@ export default function CertificationsClient({
         title="Certifications & Credentials"
         description="Manage verified industry certifications, digital badges, and credential verification URLs."
         count={certifications.length}
-        actionLabel="Add Certification"
-        onAction={handleOpenCreate}
-      />
+      >
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <button
+            type="button"
+            onClick={() => setIsImportModalOpen(true)}
+            className={styles.secondaryButton}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+          >
+            <FaFileUpload /> Import LinkedIn / CSV
+          </button>
+          <button
+            type="button"
+            onClick={handleOpenCreate}
+            className={styles.primaryButton}
+          >
+            + Add Certification
+          </button>
+        </div>
+      </AdminPageHeader>
 
       {error && <div className={styles.errorBanner}>{error}</div>}
 
@@ -366,6 +384,16 @@ export default function CertificationsClient({
         isDeleting={isSubmitting}
         onClose={() => setDeletingItem(null)}
         onConfirm={() => deletingItem && deleteItem(deletingItem.id)}
+      />
+
+      {/* Import Modal */}
+      <CertificationImportModal
+        isOpen={isImportModalOpen}
+        onClose={() => setIsImportModalOpen(false)}
+        onSuccess={() => {
+          // Re-fetch or reload window to refresh state
+          window.location.reload();
+        }}
       />
     </div>
   );

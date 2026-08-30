@@ -116,3 +116,38 @@ model Certification {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 }
+
+model PageView {
+  id           String   @id @default(uuid())
+  path         String   // e.g. "/", "/#projects", "/#about"
+  referrer     String?  // Full referrer URL
+  referrerHost String?  // e.g. "linkedin.com", "github.com", "google.com", "x.com"
+  visitorHash  String   // Daily salted SHA-256 hash (cookieless, GDPR-compliant)
+  country      String?  // Extracted from headers (e.g. "US", "TH", "DE")
+  city         String?
+  device       String?  // "mobile" | "tablet" | "desktop"
+  browser      String?  // "Chrome" | "Safari" | "Firefox" | "Edge"
+  os           String?  // "Windows" | "macOS" | "iOS" | "Android" | "Linux"
+  createdAt    DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([path])
+  @@index([referrerHost])
+  @@index([visitorHash, createdAt])
+}
+
+model ClickEvent {
+  id          String   @id @default(uuid())
+  targetUrl   String   // Outbound URL (e.g. demoUrl, repoUrl, resume download)
+  eventType   String   // "project_demo" | "project_repo" | "social_link" | "resume_download" | "contact_email"
+  elementText String?  // e.g. "Live Demo", "Source Code", "GitHub"
+  sourcePath  String   // Page/section where click occurred
+  visitorHash String   // Daily salted hash
+  country     String?
+  createdAt   DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([eventType])
+  @@index([targetUrl])
+}
+

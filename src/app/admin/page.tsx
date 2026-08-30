@@ -16,6 +16,8 @@ export default async function AdminDashboard() {
     languagesCount,
     socialsCount,
     certificationsCount,
+    pageViewsCount,
+    clicksCount,
     recentSkills,
     recentProjects,
     recentExperience,
@@ -34,6 +36,8 @@ export default async function AdminDashboard() {
     prisma.language.count(),
     prisma.socialLink.count(),
     prisma.certification.count(),
+    prisma.pageView.count(),
+    prisma.clickEvent.count(),
     prisma.skill.findMany({
       select: { id: true, name: true, proficiency: true },
       orderBy: { proficiency: 'desc' },
@@ -72,6 +76,14 @@ export default async function AdminDashboard() {
   ]);
 
   const cards = [
+    {
+      title: 'Analytics & Telemetry',
+      count: pageViewsCount,
+      extraBadge: `${clicksCount} clicks`,
+      href: '/admin/analytics',
+      items: [`${pageViewsCount} Pageviews recorded`, `${clicksCount} Outbound conversions`],
+      emptyText: 'No telemetry recorded yet',
+    },
     {
       title: 'Skills',
       count: skillsCount,
