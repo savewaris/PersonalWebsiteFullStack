@@ -1,5 +1,6 @@
 import { StaggerItem } from '@/components/MotionWrappers';
 import { PortfolioIcon } from '@/components/PortfolioIcon';
+import { resolveCertificationLogo } from '@/lib/resolve-certification-logo';
 import { FaExternalLinkAlt } from 'react-icons/fa';
 import styles from '@/app/page.module.css';
 import certStyles from './Certifications.module.css';
@@ -30,11 +31,18 @@ export function CertificationsSection({ certifications }: CertificationsSectionP
             year: 'numeric',
           });
 
+          const resolved = resolveCertificationLogo({
+            issuer: cert.issuer,
+            title: cert.title,
+            credentialUrl: cert.credentialUrl,
+            badgeImageUrl: cert.badgeImageUrl,
+          });
+
           return (
             <div key={cert.id} className={certStyles.certCard}>
               <div className={certStyles.certHeader}>
                 <div className={certStyles.issuerIconWrapper}>
-                  <PortfolioIcon name={cert.issuer} icon={cert.badgeImageUrl} size={20} />
+                  <PortfolioIcon name={cert.issuer} icon={resolved.iconKey} url={cert.credentialUrl} size={20} />
                 </div>
                 <div className={certStyles.certInfo}>
                   <h3 className={certStyles.certTitle}>{cert.title}</h3>
@@ -58,6 +66,8 @@ export function CertificationsSection({ certifications }: CertificationsSectionP
                     target="_blank"
                     rel="noopener noreferrer"
                     className={certStyles.verifyBtn}
+                    data-track-event="cert_verify_click"
+                    data-track-meta={JSON.stringify({ title: cert.title, issuer: cert.issuer })}
                   >
                     <span>Verify</span>
                     <FaExternalLinkAlt size={11} />

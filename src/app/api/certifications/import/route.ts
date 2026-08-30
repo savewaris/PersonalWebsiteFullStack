@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { requireAuthSession, apiSuccess, apiError, revalidatePortfolioData, ensureHttps } from '@/lib/api-utils';
+import { resolveCertificationLogo } from '@/lib/resolve-certification-logo';
 
 export interface RawImportCertItem {
   title: string;
@@ -10,37 +11,6 @@ export interface RawImportCertItem {
   credentialId?: string | null;
   credentialUrl: string;
   badgeImageUrl?: string | null;
-}
-
-const ISSUER_LOGO_MAP: Record<string, string> = {
-  'amazon web services': 'aws',
-  aws: 'aws',
-  'google cloud': 'gcp',
-  google: 'gcp',
-  'microsoft azure': 'azure',
-  azure: 'azure',
-  microsoft: 'azure',
-  meta: 'meta',
-  'deeplearning.ai': 'deeplearning',
-  deeplearning: 'deeplearning',
-  coursera: 'coursera',
-  ibm: 'ibm',
-  hashicorp: 'hashicorp',
-  oracle: 'oracle',
-  'linux foundation': 'linux',
-  docker: 'docker',
-  kubernetes: 'kubernetes',
-};
-
-function resolveBadgeLogo(issuer: string): string {
-  if (!issuer) return 'default-cert';
-  const clean = issuer.toLowerCase().trim();
-  for (const [key, iconKey] of Object.entries(ISSUER_LOGO_MAP)) {
-    if (clean.includes(key)) {
-      return iconKey;
-    }
-  }
-  return 'default-cert';
 }
 
 function parseDateStr(str?: string | null): string {
@@ -85,6 +55,12 @@ function parseCsv(csvText: string): RawImportCertItem[] {
     const credentialId = licIdx >= 0 && row[licIdx] ? row[licIdx].trim() : null;
     const credentialUrl = urlIdx >= 0 && row[urlIdx] ? safeUrl(row[urlIdx]) : 'https://linkedin.com';
 
+    const resolved = resolveCertificationLogo({
+      issuer,
+      title,
+      credentialUrl,
+    });
+
     items.push({
       title,
       issuer,
@@ -92,7 +68,7 @@ function parseCsv(csvText: string): RawImportCertItem[] {
       expiryDate,
       credentialId,
       credentialUrl,
-      badgeImageUrl: resolveBadgeLogo(issuer),
+      badgeImageUrl: resolved.iconKey,
     });
   }
 
@@ -155,15 +131,27 @@ export async function POST(request: Request) {
         parsedItems = parseCsv(csvData);
       } else if (jsonData && Array.isArray(jsonData)) {
         parsedItems = jsonData
-          .map((raw: any) => ({
-            title: String(raw.title || raw.name || '').trim(),
-            issuer: String(raw.issuer || raw.authority || 'Verified Organization').trim(),
-            issueDate: parseDateStr(raw.issueDate || raw.startedOn || raw.started_on),
-            expiryDate: raw.expiryDate || raw.finishedOn ? parseDateStr(raw.expiryDate || raw.finishedOn) : null,
-            credentialId: raw.credentialId || raw.licenseNumber ? String(raw.credentialId || raw.licenseNumber).trim() : null,
-            credentialUrl: safeUrl(raw.credentialUrl || raw.url),
-            badgeImageUrl: raw.badgeImageUrl ? String(raw.badgeImageUrl).trim() : resolveBadgeLogo(raw.issuer || raw.authority || ''),
-          }))
+          .map((raw: any) => {
+            const rawTitle = String(raw.title || raw.name || '').trim();
+            const rawIssuer = String(raw.issuer || raw.authority || 'Verified Organization').trim();
+            const rawUrl = safeUrl(raw.credentialUrl || raw.url);
+            const resolved = resolveCertificationLogo({
+              issuer: rawIssuer,
+              title: rawTitle,
+              credentialUrl: rawUrl,
+              badgeImageUrl: raw.badgeImageUrl,
+            });
+
+            return {
+              title: rawTitle,
+              issuer: rawIssuer,
+              issueDate: parseDateStr(raw.issueDate || raw.startedOn || raw.started_on),
+              expiryDate: raw.expiryDate || raw.finishedOn ? parseDateStr(raw.expiryDate || raw.finishedOn) : null,
+              credentialId: raw.credentialId || raw.licenseNumber ? String(raw.credentialId || raw.licenseNumber).trim() : null,
+              credentialUrl: rawUrl,
+              badgeImageUrl: raw.badgeImageUrl ? String(raw.badgeImageUrl).trim() : resolved.iconKey,
+            };
+          })
           .filter((i: RawImportCertItem) => i.title.length > 0);
       } else if (url) {
         const parsedUrl = safeUrl(url);
@@ -183,6 +171,12 @@ export async function POST(request: Request) {
             detectedIssuer = 'Amazon Web Services';
           } else if (parsedUrl.includes('microsoft.com')) {
             detectedIssuer = 'Microsoft';
+          } else if (parsedUrl.includes('stanford.edu')) {
+            detectedIssuer = 'Stanford Online';
+          } else if (parsedUrl.includes('mit.edu')) {
+            detectedIssuer = 'MIT';
+          } else if (parsedUrl.includes('harvard.edu')) {
+            detectedIssuer = 'Harvard University';
           }
         }
 
@@ -199,6 +193,12 @@ export async function POST(request: Request) {
           }
         }
 
+        const resolved = resolveCertificationLogo({
+          issuer: detectedIssuer,
+          title: detectedTitle,
+          credentialUrl: parsedUrl,
+        });
+
         parsedItems = [
           {
             title: detectedTitle,
@@ -207,7 +207,7 @@ export async function POST(request: Request) {
             expiryDate: null,
             credentialId: null,
             credentialUrl: parsedUrl,
-            badgeImageUrl: resolveBadgeLogo(detectedIssuer),
+            badgeImageUrl: resolved.iconKey,
           },
         ];
       }
@@ -237,6 +237,13 @@ export async function POST(request: Request) {
 
       const created: any[] = [];
       for (const item of items) {
+        const resolved = resolveCertificationLogo({
+          issuer: item.issuer,
+          title: item.title,
+          credentialUrl: item.credentialUrl,
+          badgeImageUrl: item.badgeImageUrl,
+        });
+
         const cert = await prisma.certification.create({
           data: {
             title: item.title,
@@ -245,7 +252,7 @@ export async function POST(request: Request) {
             expiryDate: item.expiryDate ? new Date(item.expiryDate) : null,
             credentialId: item.credentialId || null,
             credentialUrl: safeUrl(item.credentialUrl),
-            badgeImageUrl: item.badgeImageUrl || resolveBadgeLogo(item.issuer),
+            badgeImageUrl: item.badgeImageUrl || resolved.iconKey,
             order: currentOrder++,
           },
         });

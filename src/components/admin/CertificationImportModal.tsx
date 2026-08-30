@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { FaTimes, FaFileUpload, FaLink, FaCode, FaCheck, FaExclamationTriangle } from 'react-icons/fa';
+import { FaTimes, FaFileUpload, FaLink, FaCode, FaCheck, FaExclamationTriangle, FaPalette } from 'react-icons/fa';
 import { PortfolioIcon } from '@/components/PortfolioIcon';
+import { LogoPickerModal } from '@/components/admin/LogoPickerModal';
 import styles from './CertificationImportModal.module.css';
 import adminStyles from '@/components/admin/admin.module.css';
 
@@ -21,7 +22,8 @@ interface ImportItem {
 interface CertificationImportModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSuccess: () => void;
+  existingCertifications?: any[];
+  onSuccess?: () => void;
 }
 
 export function CertificationImportModal({ isOpen, onClose, onSuccess }: CertificationImportModalProps) {
@@ -30,6 +32,9 @@ export function CertificationImportModal({ isOpen, onClose, onSuccess }: Certifi
   const [isLoading, setIsLoading] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Logo Picker state for table rows
+  const [editingRowIdx, setEditingRowIdx] = useState<number | null>(null);
 
   // URL tab form state
   const [urlInput, setUrlInput] = useState('');
@@ -126,20 +131,35 @@ export function CertificationImportModal({ isOpen, onClose, onSuccess }: Certifi
     }
   };
 
-  const toggleSelectAll = (select: boolean) => {
-    setItems((prev) => prev.map((item) => ({ ...item, selected: select })));
-  };
-
   const toggleSelectItem = (index: number) => {
     setItems((prev) =>
       prev.map((item, idx) => (idx === index ? { ...item, selected: !item.selected } : item))
     );
   };
 
+  const toggleSelectAll = (select: boolean) => {
+    setItems((prev) => prev.map((item) => ({ ...item, selected: select })));
+  };
+
   const updateItemField = (index: number, field: keyof ImportItem, value: any) => {
     setItems((prev) =>
       prev.map((item, idx) => (idx === index ? { ...item, [field]: value } : item))
     );
+  };
+
+  const handleRowLogoSelect = (selected: { name: string; iconKey: string; badgeImageUrl?: string }) => {
+    if (editingRowIdx === null) return;
+    setItems((prev) =>
+      prev.map((item, idx) =>
+        idx === editingRowIdx
+          ? {
+              ...item,
+              badgeImageUrl: selected.badgeImageUrl || selected.iconKey,
+            }
+          : item
+      )
+    );
+    setEditingRowIdx(null);
   };
 
   const handleCommitImport = async () => {
@@ -149,8 +169,8 @@ export function CertificationImportModal({ isOpen, onClose, onSuccess }: Certifi
       return;
     }
 
-    setError(null);
     setIsImporting(true);
+    setError(null);
 
     try {
       const res = await fetch('/api/certifications/import', {
@@ -164,14 +184,14 @@ export function CertificationImportModal({ isOpen, onClose, onSuccess }: Certifi
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.error || 'Failed to import certifications');
+        throw new Error(data.error || 'Failed to save imported certifications');
       }
 
-      onSuccess();
+      if (onSuccess) onSuccess();
+      window.location.reload();
       onClose();
     } catch (err: any) {
-      setError(err.message || 'Import error');
-    } finally {
+      setError(err.message || 'Failed to complete import');
       setIsImporting(false);
     }
   };
@@ -181,70 +201,71 @@ export function CertificationImportModal({ isOpen, onClose, onSuccess }: Certifi
   return (
     <div className={styles.modalOverlay} onClick={onClose}>
       <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+        {/* Header */}
         <div className={styles.modalHeader}>
-          <h2>
-            <FaFileUpload /> Import Certifications & Credentials
-          </h2>
-          <button className={styles.closeButton} onClick={onClose} aria-label="Close modal">
+          <div className={styles.headerTitle}>
+            <FaFileUpload className={styles.headerIcon} />
+            <h2>Import LinkedIn & External Certifications</h2>
+          </div>
+          <button className={styles.closeButton} onClick={onClose} aria-label="Close">
             <FaTimes />
           </button>
         </div>
 
+        {/* Body */}
         <div className={styles.modalBody}>
           {error && <div className={styles.errorBanner}>{error}</div>}
 
-          <div className={styles.tabBar}>
+          {/* Tab Navigation */}
+          <div className={styles.tabContainer}>
             <button
               type="button"
-              className={`${styles.tabButton} ${activeTab === 'csv' ? styles.tabButtonActive : ''}`}
+              className={`${styles.tabButton} ${activeTab === 'csv' ? styles.tabActive : ''}`}
               onClick={() => setActiveTab('csv')}
             >
-              <FaFileUpload style={{ marginRight: '6px' }} /> LinkedIn CSV Export
+              <FaFileUpload style={{ marginRight: '6px' }} />
+              Upload LinkedIn CSV / JSON
             </button>
             <button
               type="button"
-              className={`${styles.tabButton} ${activeTab === 'url' ? styles.tabButtonActive : ''}`}
+              className={`${styles.tabButton} ${activeTab === 'url' ? styles.tabActive : ''}`}
               onClick={() => setActiveTab('url')}
             >
-              <FaLink style={{ marginRight: '6px' }} /> Credly / Single URL
-            </button>
-            <button
-              type="button"
-              className={`${styles.tabButton} ${activeTab === 'json' ? styles.tabButtonActive : ''}`}
-              onClick={() => setActiveTab('json')}
-            >
-              <FaCode style={{ marginRight: '6px' }} /> JSON Archive
+              <FaLink style={{ marginRight: '6px' }} />
+              Add via Credly / Verification URL
             </button>
           </div>
 
-          {(activeTab === 'csv' || activeTab === 'json') && (
-            <div>
+          {/* Tab Content: CSV / JSON */}
+          {activeTab === 'csv' && (
+            <div className={styles.uploadArea}>
               <input
                 type="file"
                 ref={fileInputRef}
-                accept={activeTab === 'csv' ? '.csv' : '.json'}
-                style={{ display: 'none' }}
+                accept=".csv,.json,text/csv,application/json"
                 onChange={handleFileUpload}
+                style={{ display: 'none' }}
               />
-              <div
-                className={styles.dropzone}
+              <FaFileUpload className={styles.uploadIcon} />
+              <p className={styles.uploadText}>
+                Drag and drop your LinkedIn <strong>Certifications.csv</strong> or backup <strong>.json</strong> file
+              </p>
+              <p className={styles.uploadSubtext}>
+                (Obtained from LinkedIn &rarr; Settings & Privacy &rarr; Data Privacy &rarr; Get a copy of your data)
+              </p>
+              <button
+                type="button"
+                disabled={isLoading}
                 onClick={() => fileInputRef.current?.click()}
-                role="button"
-                tabIndex={0}
+                className={adminStyles.primaryButton}
+                style={{ marginTop: '12px' }}
               >
-                <FaFileUpload className={styles.dropzoneIcon} />
-                <div className={styles.dropzoneText}>
-                  {isLoading ? 'Processing file...' : `Click or drag your ${activeTab.toUpperCase()} file here`}
-                </div>
-                <div className={styles.dropzoneSubtext}>
-                  {activeTab === 'csv'
-                    ? 'Supports official LinkedIn "Certifications.csv" export'
-                    : 'Supports JSON array of certification objects'}
-                </div>
-              </div>
+                {isLoading ? 'Parsing File...' : 'Choose File to Upload'}
+              </button>
             </div>
           )}
 
+          {/* Tab Content: URL */}
           {activeTab === 'url' && (
             <form onSubmit={handleParseUrl} className={styles.urlForm}>
               <div className={styles.urlRow}>
@@ -270,7 +291,7 @@ export function CertificationImportModal({ isOpen, onClose, onSuccess }: Certifi
                 />
                 <input
                   type="text"
-                  placeholder="Optional Authority (e.g. AWS, Google Cloud)"
+                  placeholder="Optional Authority (e.g. Stanford Online, AWS, Google Cloud)"
                   value={urlIssuer}
                   onChange={(e) => setUrlIssuer(e.target.value)}
                   className={styles.urlInput}
@@ -320,7 +341,7 @@ export function CertificationImportModal({ isOpen, onClose, onSuccess }: Certifi
                       <th>Title</th>
                       <th>Issuer</th>
                       <th>Issue Date</th>
-                      <th>Icon Key</th>
+                      <th>Logo</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -364,7 +385,25 @@ export function CertificationImportModal({ isOpen, onClose, onSuccess }: Certifi
                         </td>
                         <td>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                            <PortfolioIcon name={item.issuer} icon={item.badgeImageUrl || ''} size={14} />
+                            <button
+                              type="button"
+                              onClick={() => setEditingRowIdx(idx)}
+                              title="Pick Logo"
+                              style={{
+                                width: '28px',
+                                height: '28px',
+                                borderRadius: '4px',
+                                background: 'var(--bg-primary)',
+                                border: '1px solid var(--border-subtle)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                cursor: 'pointer',
+                                padding: 0,
+                              }}
+                            >
+                              <PortfolioIcon name={item.issuer} icon={item.badgeImageUrl || ''} size={14} />
+                            </button>
                             <input
                               type="text"
                               value={item.badgeImageUrl || ''}
@@ -383,20 +422,37 @@ export function CertificationImportModal({ isOpen, onClose, onSuccess }: Certifi
           )}
         </div>
 
+        {/* Footer */}
         <div className={styles.modalFooter}>
           <button type="button" onClick={onClose} className={adminStyles.secondaryButton}>
             Cancel
           </button>
           <button
             type="button"
-            disabled={selectedCount === 0 || isImporting}
+            disabled={isImporting || selectedCount === 0}
             onClick={handleCommitImport}
             className={adminStyles.primaryButton}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
           >
-            {isImporting ? 'Importing...' : `Import ${selectedCount} Certification(s)`}
+            {isImporting ? (
+              'Importing...'
+            ) : (
+              <>
+                <FaCheck />
+                <span>Import {selectedCount} Selected Certification(s)</span>
+              </>
+            )}
           </button>
         </div>
       </div>
+
+      {/* Row-level Logo Picker Modal */}
+      <LogoPickerModal
+        isOpen={editingRowIdx !== null}
+        onClose={() => setEditingRowIdx(null)}
+        onSelectLogo={handleRowLogoSelect}
+        currentIconKey={editingRowIdx !== null ? items[editingRowIdx]?.badgeImageUrl || '' : ''}
+      />
     </div>
   );
 }
