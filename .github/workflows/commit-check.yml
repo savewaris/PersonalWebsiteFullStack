@@ -19,7 +19,7 @@ jobs:
       - name: Scan for Merge Conflict Markers
         run: |
           echo "Scanning for accidental merge conflict markers..."
-          if git grep -nE "<<<<<<<|=======|>>>>>>>" -- ":!*.log" ":!*.db" ":!package-lock.json" ":!scripts/verify-commits.ps1"; then
+          if git grep -nE '^[<]{7}( |$)|^[=]{7}$|^[>]{7}( |$)' -- ':!*node_modules*' ':!*.log' ':!*.db' ':!package-lock.json' ':!scripts/verify-commits.ps1' ':!.github/workflows/commit-check.yml'; then
             echo "::error::Merge conflict markers detected in repository!"
             exit 1
           fi

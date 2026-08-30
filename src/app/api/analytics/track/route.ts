@@ -6,7 +6,7 @@ function extractHost(referrer?: string | null): string | null {
   if (!referrer || !referrer.trim()) return null;
   try {
     const url = new URL(referrer);
-    let host = url.hostname.toLowerCase().replace(/^www\./, '');
+    const host = url.hostname.toLowerCase().replace(/^www\./, '');
     if (host.includes('linkedin')) return 'linkedin.com';
     if (host.includes('github')) return 'github.com';
     if (host.includes('google')) return 'google.com';

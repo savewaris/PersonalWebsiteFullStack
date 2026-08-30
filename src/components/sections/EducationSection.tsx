@@ -1,4 +1,5 @@
 import type { Education } from '@prisma/client';
+import { getSafeYear } from '@/lib/format-utils';
 import styles from './ExperienceEducation.module.css';
 
 interface EducationSectionProps {
@@ -21,8 +22,8 @@ export function EducationSection({ education, className }: EducationSectionProps
       ) : (
         <div className={styles.timeline}>
           {education.map((edu) => {
-            const startYear = new Date(edu.startDate).getFullYear();
-            const endYear = edu.endDate ? new Date(edu.endDate).getFullYear() : 'Present';
+            const startYear = getSafeYear(edu.startDate, '2023');
+            const endYear = edu.endDate ? getSafeYear(edu.endDate, 'Present') : 'Present';
 
             return (
               <div key={edu.id} className={styles.timelineItem}>

@@ -443,6 +443,67 @@ Showcasing verified certifications and academic credentials requires accurate, h
 ---
 ---
 
+## Issue #9: [Feature] Interactive View-Only Live Demo Modal, Device Sandbox & Guest Credentials Manager
+
+**Labels:** `feature`, `frontend`, `backend`, `database`, `ui/ux`, `admin`  
+**Milestone:** `v1.8 — Live Demo & Sandbox Experience`  
+**Priority:** `High`
+
+### Description
+Visitors wishing to explore personal full-stack projects should be able to view and interact with live demos safely in **View-Only / Guest mode**, without risking unwanted edits, data corruption, or deletion of personal production data. This issue introduces an interactive in-portfolio **Live Demo Modal & Device Sandbox Viewer** (supporting responsive Desktop, Tablet, and Mobile device frame emulation, a prominent "🔒 View-Only Mode" banner, 1-click guest credentials copying, and iframe sandbox security) alongside database schema enhancements and admin controls to configure demo behavior for each project. It also establishes standardized architecture patterns for external apps (read-only guest tokens, demo seed databases, or mutation-blocking middleware).
+
+---
+
+### Technical Requirements
+
+1. **Prisma Schema Update (`prisma/schema.prisma`)**:
+   - Extend `Project` model with:
+     - `demoType String @default("modal")` — Demo display mode (`modal` | `external` | `embed`).
+     - `demoCredentials String?` — Preconfigured guest credentials (e.g. `demo@example.com / demo123` or `guest:guest`) with 1-click copy support.
+     - `demoNote String?` — Guidance text (e.g. `Read-only guest session preloaded. Personal mutations disabled.`).
+     - `isEmbeddable Boolean @default(true)` — Toggle indicating whether target app permits iframe embedding.
+
+2. **Interactive Live Demo Modal Component (`src/components/ProjectLiveDemoModal.tsx`)**:
+   - Full-viewport modal with animated backdrop (`framer-motion`).
+   - **Header Bar**:
+     - Project title, technology badges, and a glowing `🔒 View-Only Demo` badge chip.
+     - **Responsive Device Frame Switcher**: Desktop (`100%`), Tablet (`768px`), and Mobile (`375px`) viewports with realistic bezel container styling and smooth layout transitions.
+     - Quick Action Controls: `[ 📋 Copy Guest Login ]` (if credentials configured), `[ ↗ Open in New Window ]`, and `[ ✕ Close (Esc) ]`.
+   - **Sandboxed Iframe Player**:
+     - Secure iframe attributes: `sandbox="allow-scripts allow-same-origin allow-forms allow-popups"`.
+     - Loading spinner/skeleton during initial iframe load.
+   - **X-Frame-Options / CSP Fallback Detection**:
+     - Automatically detects if the external domain blocks framing, rendering a sleek fallback launch card explaining how to access the view-only demo externally.
+   - **Safety & Disclaimer Banner**:
+     - Floating disclaimer explaining that the project is running in safe guest/view-only mode.
+
+3. **Public Projects Section Integration (`src/components/sections/ProjectsSection.tsx`)**:
+   - Update `[ Live Demo ↗ ]` CTA button to trigger `ProjectLiveDemoModal` when clicked (with smooth spring entrance).
+   - Display a small `🔒 View-Only` indicator badge on project cards that provide guest demo access.
+
+4. **Admin Project CMS Integration (`src/app/admin/projects/ProjectsClient.tsx`)**:
+   - Form inputs for `Demo Mode Type` (`Modal Sandbox` vs `Direct External`), `Demo Guest Credentials`, `Demo Instructions/Note`, and `Embeddable in Iframe` toggle.
+   - URL validation ensuring `demoUrl` uses HTTPS.
+
+5. **External Project Guest/Read-Only Pattern Guide (`docs/adr/0002-view-only-live-demo-architecture.md`)**:
+   - Architectural reference guide on standardizing external project read-only modes (e.g., Next.js/Express read-only middleware, Prisma guest roles, daily in-memory SQLite/Neon reset databases, or query param demo flags `?demo=guest`).
+
+---
+
+### Acceptance Criteria
+- [ ] `Project` model updated in Prisma schema with `demoType`, `demoCredentials`, `demoNote`, and `isEmbeddable`.
+- [ ] Public Projects section triggers the interactive `ProjectLiveDemoModal` upon clicking "Live Demo".
+- [ ] Modal supports switching between Desktop, Tablet, and Mobile device frames with smooth animations.
+- [ ] Modal displays "🔒 View-Only Mode" banner and 1-click "Copy Demo Credentials" button when applicable.
+- [ ] Secure iframe sandbox protects against malicious frame escape while loading responsive external apps.
+- [ ] Graceful fallback view renders when external domains block iframes via `X-Frame-Options` or CSP headers.
+- [ ] Admin panel allows editing demo mode type, credentials, and notes for each project.
+- [ ] 0 TypeScript compilation errors (`npx tsc --noEmit`) and clean production Next.js build (`npm run build`).
+
+
+---
+---
+
 ## Issue #33: [Feature] Overhaul All Admin Panel Modules to Unified High-Density Responsive Table Format
 
 **Labels:** `feature`, `frontend`, `ui/ux`, `admin`  
@@ -558,6 +619,45 @@ Audit and standardize full in-place and modal **Edit functionality** across ever
 - [ ] Editing any field (text, date, select, emoji, logo, media gallery) persists correctly via the corresponding `PUT` API endpoint.
 - [ ] UI reflects changes immediately without requiring manual browser refresh.
 - [ ] 0 TypeScript errors (`npx tsc --noEmit`) and clean production build (`npm run build`).
+
+---
+---
+
+## Issue #37: [Bug] Fix Vercel Server Component Render Exception & Harden CI/CD Zero-Error Quality Gates
+
+**Labels:** `bug`, `frontend`, `backend`, `ci/cd`, `resilience`  
+**Milestone:** `v1.8 — Admin Experience & Stability Overhaul`  
+**Priority:** `Critical`
+
+### Description
+In production deployment on Vercel (`personal-website-full-stack.vercel.app`), the main landing page fails to render due to an uncaught Server Component exception (`Digest: 2668718372`). This issue establishes root App Router error boundaries, bulletproof safe date parsing, cold-start safe Prisma data access fallbacks, fixes all ESLint and React 19 compiler purity violations, and repairs GitHub Actions workflow scripts to guarantee zero-error execution.
+
+---
+
+### Technical Requirements
+
+1. **App Router Error Boundaries (`src/app/error.tsx` & `src/app/global-error.tsx`)**:
+   - Gracefully catch any unhandled Server Component render exceptions in production with a dark-mode recovery card and retry CTA.
+2. **Resilient Safe Date Utilities (`src/lib/format-utils.ts`)**:
+   - `formatSafeDate` and `getSafeYear` prevent `RangeError: Invalid time value` across `CertificationsSection`, `ExperienceSection`, and `EducationSection`.
+3. **Cold-Start Fallbacks in Data Layer (`src/lib/data/stats.ts` & others)**:
+   - Individual `.catch()` handlers ensure zero uncaught crashes on cold database starts.
+4. **React 19 Compiler Purity Fixes**:
+   - Refactor `src/app/admin/analytics/page.tsx` data computation into pure helper functions.
+5. **CI/CD Quality Gate & Commit Scanner**:
+   - Update `.github/workflows/commit-check.yml` with anchored regex to eliminate false-positive collision.
+   - Integrate ESLint check into `scripts/agent-doctor.mjs` (51/51 checks).
+
+---
+
+### Acceptance Criteria
+- [ ] Root error boundaries (`src/app/error.tsx`, `src/app/global-error.tsx`) installed and functional.
+- [ ] Safe date helpers prevent invalid date runtime crashes.
+- [ ] All ESLint rules (`npm run lint`) pass with 0 errors.
+- [ ] `npm run agent:doctor` passes with 51/51 checks clean.
+- [ ] Next.js production build (`npm run build`) compiles 29/29 routes with 0 errors.
+- [ ] GitHub Actions CI/CD workflows run 100% green on push to `main`.
+
 
 
 

@@ -132,3 +132,11 @@ This file is the official handover memory across developer sessions and AI agent
   - Codified 3-tier AI model classification (flash_lite, flash, pro) across all 10 subagents, 13 skills, Second Brain (.agentrules/subagent-swarm-orchestration.md, skill-matrix.md), AGENTS.md, GEMINI.md, agent doctor (50/50 checks passing), and authored ADR 0005. Verified Playwright test suite with 27/27 UI/UX tests passing.
 - **Queue Status**: 1 tasks remaining in queue.
 - **Recent Completed**: ISSUE-2, ISSUE-3, ISSUE-4
+
+## Session Checkpoint: 2026-08-30
+- **Active Milestone**: `v1.2 — Content Architecture & Taxonomy`
+- **Active Task**: `None (Queue Ready)`
+- **Summary / Key Handoff Notes**:
+  - Resolved architectural interview on View-Only Live Demo feature, added Issue #9 to docs/github_issues_roadmap.md, and created GitHub Issue #36 on savewaris/PersonalWebsiteFullStack
+- **Queue Status**: 1 tasks remaining in queue.
+- **Recent Completed**: ISSUE-2, ISSUE-3, ISSUE-4

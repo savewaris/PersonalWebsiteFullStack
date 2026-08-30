@@ -55,3 +55,5 @@
 - 🟢 **[DONE]       ** `2026-08-28 11:04:55` | `agent` | **GENERAL**: Task ISSUE-4 (Add Certifications & Credentials Section) marked as COMPLETED and unlocked
 - 🟡 **[IN_PROGRESS]** `2026-08-28 11:18:05` | `agent` | **GENERAL**: Implement AI model tier classification across subagents, skills, project configs, and Second Brain
 - 🟢 **[DONE]       ** `2026-08-28 11:18:08` | `agent` | **GENERAL**: Implement AI model tier classification across subagents, skills, project configs, and Second Brain
+- 🟡 **[IN_PROGRESS]** `2026-08-30 12:31:52` | `agent` | **GENERAL**: Add Issue #9 for View-Only Live Demo to roadmap and create GitHub Issue #36
+- 🟢 **[DONE]       ** `2026-08-30 12:31:54` | `agent` | **GENERAL**: Created GitHub Issue #36 and updated docs/github_issues_roadmap.md with Issue #9

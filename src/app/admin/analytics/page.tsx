@@ -3,7 +3,7 @@ import AnalyticsClient from './AnalyticsClient';
 
 export const revalidate = 0;
 
-export default async function AnalyticsPage() {
+async function fetchInitialAnalyticsData() {
   const startDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
   const whereClause = { createdAt: { gte: startDate } };
 
@@ -185,7 +185,7 @@ export default async function AnalyticsPage() {
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
     .slice(0, 20);
 
-  const initialData = {
+  return {
     range: '30d',
     summary: {
       totalViews,
@@ -202,6 +202,9 @@ export default async function AnalyticsPage() {
     browsers,
     recentFeed: combinedFeed,
   };
+}
 
+export default async function AnalyticsPage() {
+  const initialData = await fetchInitialAnalyticsData();
   return <AnalyticsClient initialData={initialData} />;
 }

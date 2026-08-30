@@ -147,6 +147,15 @@ try {
   check('TypeScript check (npx tsc --noEmit: 0 errors)', false, err.message);
 }
 
+// 8. ESLint Quality Check
+console.log('\n🧹 8. Running ESLint Code Quality Gate...');
+try {
+  execSync('npm run lint', { stdio: 'pipe' });
+  check('ESLint check (npm run lint: 0 errors)', true);
+} catch (err) {
+  check('ESLint check (npm run lint: 0 errors)', false, err.message);
+}
+
 // Summary
 console.log('\n======================================================');
 if (failedChecks === 0) {

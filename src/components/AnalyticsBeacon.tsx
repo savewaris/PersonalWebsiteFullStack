@@ -47,7 +47,7 @@ export function AnalyticsBeacon() {
 
         let targetUrl = '';
         let eventType = 'outbound_link';
-        let elementText = target.textContent?.trim() || target.getAttribute('aria-label') || '';
+        const elementText = target.textContent?.trim() || target.getAttribute('aria-label') || '';
 
         if (target.tagName.toLowerCase() === 'a') {
           const href = (target as HTMLAnchorElement).href;

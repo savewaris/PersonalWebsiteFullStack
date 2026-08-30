@@ -54,7 +54,7 @@ export function CertificationImportModal({ isOpen, onClose, onSuccess }: Certifi
 
     try {
       const text = await file.text();
-      let payload: any = { mode: 'preview' };
+      const payload: any = { mode: 'preview' };
 
       if (file.name.endsWith('.csv') || file.type.includes('csv')) {
         payload.csvData = text;

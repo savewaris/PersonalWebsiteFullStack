@@ -1,4 +1,5 @@
 import type { Experience } from '@prisma/client';
+import { getSafeYear } from '@/lib/format-utils';
 import styles from './ExperienceEducation.module.css';
 
 interface ExperienceSectionProps {
@@ -79,8 +80,8 @@ export function ExperienceSection({ experiences, className }: ExperienceSectionP
       ) : (
         <div className={styles.timeline}>
           {experiences.map((exp) => {
-            const startYear = new Date(exp.startDate).getFullYear();
-            const endYear = exp.endDate ? new Date(exp.endDate).getFullYear() : 'Present';
+            const startYear = getSafeYear(exp.startDate, '2023');
+            const endYear = exp.endDate ? getSafeYear(exp.endDate, 'Present') : 'Present';
             const empType = exp.employmentType || 'Full-time';
             const locType = exp.locationType || 'On-site';
 

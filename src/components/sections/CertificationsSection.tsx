@@ -1,6 +1,7 @@
 import { StaggerItem } from '@/components/MotionWrappers';
 import { PortfolioIcon } from '@/components/PortfolioIcon';
 import { resolveCertificationLogo } from '@/lib/resolve-certification-logo';
+import { formatSafeDate } from '@/lib/format-utils';
 import { FaExternalLinkAlt } from 'react-icons/fa';
 import styles from '@/app/page.module.css';
 import certStyles from './Certifications.module.css';
@@ -26,10 +27,10 @@ export function CertificationsSection({ certifications }: CertificationsSectionP
 
       <div className={certStyles.certGrid}>
         {certifications.map((cert) => {
-          const issueDateFormatted = new Date(cert.issueDate).toLocaleDateString('en-US', {
+          const issueDateFormatted = formatSafeDate(cert.issueDate, {
             month: 'short',
             year: 'numeric',
-          });
+          }, 'Recent');
 
           const resolved = resolveCertificationLogo({
             issuer: cert.issuer,
