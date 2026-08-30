@@ -433,12 +433,132 @@ Showcasing verified certifications and academic credentials requires accurate, h
 ---
 
 ### Acceptance Criteria
-- [ ] Curated dataset of 60+ academies, learning platforms, universities, and cloud providers defined in `src/lib/certification-logos.ts`.
-- [ ] Auto-resolver accurately detects logos from issuer names, aliases, and Credly/verification URLs.
-- [ ] Dynamic CDN fallback retrieves official favicons/logos for unlisted domains.
-- [ ] Visual Logo Picker modal allows searching, filtering by category, and selecting logos in the CMS.
-- [ ] Public certification cards render crisp, brand-accurate vector logos across all screen densities.
-- [ ] 0 TypeScript errors (`npx tsc --noEmit`) and successful Next.js build (`npm run build`).
+- [x] Curated dataset of 60+ academies, learning platforms, universities, and cloud providers defined in `src/lib/certification-logos.ts`.
+- [x] Auto-resolver accurately detects logos from issuer names, aliases, and Credly/verification URLs.
+- [x] Dynamic CDN fallback retrieves official favicons/logos for unlisted domains.
+- [x] Visual Logo Picker modal allows searching, filtering by category, and selecting logos in the CMS.
+- [x] Public certification cards render crisp, brand-accurate vector logos across all screen densities.
+- [x] 0 TypeScript errors (`npx tsc --noEmit`) and successful Next.js build (`npm run build`).
+
+---
+---
+
+## Issue #33: [Feature] Overhaul All Admin Panel Modules to Unified High-Density Responsive Table Format
+
+**Labels:** `feature`, `frontend`, `ui/ux`, `admin`  
+**Milestone:** `v1.8 — Admin Experience Overhaul`  
+**Priority:** `High`
+
+### Description
+Transform all entity management modules in the Admin CMS from bulky card grids into a unified, high-density, responsive Table format. This aligns the entire Admin experience with `/admin/certifications` and `/admin/analytics`, providing clean data scannability, sticky headers, media/icon badges, category tags, and action toolbars.
+
+---
+
+### Technical Requirements
+
+1. **Skills Management (`/admin/skills` & `SkillsClient.tsx`)**:
+   - Table Columns: `Icon`, `Skill Name`, `Category Badge`, `Proficiency Bar (%)`, `Order`, `Actions (Edit / Delete)`.
+2. **Projects Management (`/admin/projects` & `ProjectsClient.tsx`)**:
+   - Table Columns: `Media Preview`, `Title`, `Category`, `Featured Indicator`, `Technologies`, `Demo / Repo Links`, `Actions`.
+3. **Experience & Education (`/admin/experience`, `/admin/education`)**:
+   - Table Columns: `Logo / Icon`, `Role / Degree`, `Company / School`, `Period`, `Location`, `Type Badge`, `Actions`.
+4. **Interests & Hobbies (`/admin/interests`, `/admin/hobbies`)**:
+   - Table Columns: `Emoji`, `Name`, `Category Pill`, `Display Order`, `Actions`.
+5. **Languages & Social Links (`/admin/languages`, `/admin/socials`)**:
+   - Table Columns: `Icon`, `Platform / Language`, `Proficiency / URL`, `Actions`.
+
+---
+
+### Acceptance Criteria
+- [ ] All 8 admin manager modules render data in high-density responsive tables.
+- [ ] Tables include sticky headers, category badges, and quick action buttons.
+- [ ] Mobile and tablet views support horizontal scroll without breaking viewport boundaries.
+- [ ] 0 TypeScript errors (`npx tsc --noEmit`) and successful production build (`npm run build`).
+
+---
+---
+
+## Issue #34: [Feature] Expand Certification & Academy Logo Dataset with Comprehensive AI Platforms & Model Academies
+
+**Labels:** `feature`, `frontend`, `backend`, `admin`, `ui/ux`  
+**Milestone:** `v1.8 — AI Academy Ecosystem`  
+**Priority:** `High`
+
+### Description
+Expand the Universal Certification & Organization Logo Dataset (`src/lib/certification-logos.ts`) with a dedicated, extensive category of modern AI platforms, LLM model academies, agent frameworks, and AI cloud/vector infrastructure.
+
+---
+
+### Technical Requirements
+
+1. **Frontier AI Labs & Developer Academies**:
+   - **Anthropic / Claude**: `claude`, `anthropic`, `claude developer academy` (Brand color: `#D97757`).
+   - **OpenAI Academy**: `openai`, `chatgpt`, `openai developers` (Brand color: `#10A37F`).
+   - **Google DeepMind & AI Studio**: `deepmind`, `google-ai`, `gemini` (Brand color: `#4285F4`).
+   - **Meta AI / PyTorch Foundation**: `meta-ai`, `pytorch` (Brand color: `#EE4C2C`).
+   - **Mistral AI**: `mistral`, `mistral academy`, `la plateforme` (Brand color: `#FA520F`).
+   - **Cohere**: `cohere`, `cohere llm university` (Brand color: `#39594C`).
+
+2. **AI Agent Frameworks & Tooling**:
+   - **LangChain Academy**: `langchain`, `langsmith`, `langgraph` (Brand color: `#1C3C3C`).
+   - **LlamaIndex**: `llamaindex`, `llama-parse` (Brand color: `#7B2CBF`).
+   - **Hugging Face Academy**: `huggingface`, `hf audio/nlp course` (Brand color: `#FFD21E`).
+   - **Weights & Biases (W&B)**: `wandb`, `weights & biases academy` (Brand color: `#FFBE00`).
+   - **DeepLearning.AI**: `deeplearning`, `andrew ng` (Brand color: `#FF6F00`).
+   - **fast.ai**: `fastai`, `practical deep learning` (Brand color: `#000000`).
+
+3. **AI Compute, Data & Vector Infrastructure**:
+   - **NVIDIA Deep Learning Institute (DLI)**: `nvidia`, `nvidia dli` (Brand color: `#76B900`).
+   - **Pinecone Academy**: `pinecone`, `vector database certified` (Brand color: `#000000`).
+   - **Qdrant**: `qdrant`, `vector search` (Brand color: `#DC2626`).
+   - **Weaviate**: `weaviate`, `weaviate academy` (Brand color: `#00D2B4`).
+   - **Databricks Generative AI**: `databricks-ai` (Brand color: `#FF3621`).
+
+---
+
+### Acceptance Criteria
+- [ ] Curated AI category expanded with 15+ modern AI platforms and academies.
+- [ ] Auto-resolver detects Claude/Anthropic, LangChain, LlamaIndex, W&B, and OpenAI credentials seamlessly.
+- [ ] Visual Logo Picker modal (`LogoPickerModal.tsx`) renders the new AI academy logos with official brand colors.
+- [ ] 0 TypeScript errors (`npx tsc --noEmit`) and successful production build (`npm run build`).
+
+---
+---
+
+## Issue #35: [Enhancement] Standardize Universal Modal & In-Place Edit Functionality Across All Admin Manager Sections
+
+**Labels:** `enhancement`, `frontend`, `backend`, `admin`  
+**Milestone:** `v1.8 — Admin Experience Overhaul`  
+**Priority:** `High`
+
+### Description
+Audit and standardize full in-place and modal **Edit functionality** across every entity manager in the Admin CMS (`/admin/certifications`, `/admin/projects`, `/admin/skills`, `/admin/experience`, `/admin/education`, `/admin/interests`, `/admin/hobbies`, `/admin/languages`, `/admin/socials`). Ensure all fields, relations, image previews, emojis, and arrays are pre-populated accurately on edit click and updated reactively with zero page reloads.
+
+---
+
+### Technical Requirements
+
+1. **Certifications Edit Modal**:
+   - Verify Edit Modal opens with pre-populated `title`, `issuer`, `issueDate`, `expiryDate`, `credentialId`, `credentialUrl`, `badgeImageUrl`, and `order`.
+   - Ensure `LogoPickerModal` can update the certification logo in edit mode without clearing other fields.
+2. **Projects Edit Modal**:
+   - Pre-populate all fields including media gallery, video URL, tags/technologies array, demo URL, and repo URL.
+3. **Experience & Education Edit Modals**:
+   - Correctly pre-populate date ranges (`startDate`, `endDate`, `current`), descriptions (bullet points/markdown), company/school logos, and employment types.
+4. **Skills, Interests, Hobbies, Languages & Socials Edit Modals**:
+   - Support instant emoji / icon re-selection in edit mode.
+   - Provide clean typecasting for numeric proficiencies and orders.
+5. **State & Cache Reactivity**:
+   - `saveItem` updates the client state immediately and triggers Next.js server cache revalidation (`revalidatePortfolioData`).
+
+---
+
+### Acceptance Criteria
+- [ ] Every admin manager module provides a fully functional, pre-populated Edit modal.
+- [ ] Editing any field (text, date, select, emoji, logo, media gallery) persists correctly via the corresponding `PUT` API endpoint.
+- [ ] UI reflects changes immediately without requiring manual browser refresh.
+- [ ] 0 TypeScript errors (`npx tsc --noEmit`) and clean production build (`npm run build`).
+
 
 
 
