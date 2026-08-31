@@ -23,7 +23,7 @@
     "@prisma/client": "^6.19.2",
     "framer-motion": "^12.38.0",
     "next": "16.1.6",
-    "react": "19.2.3",
+    "react": "19.2.8",
     "react-dom": "19.2.3",
     "react-icons": "^5.5.0",
     "react-markdown": "^10.1.0"
