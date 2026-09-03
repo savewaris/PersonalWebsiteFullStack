@@ -156,11 +156,16 @@ async function runAudit() {
       for (const vp of VIEWPORTS) {
         console.log(`  📱 Testing Viewport: ${vp.name} (${vp.width}x${vp.height})`);
         
-        const context = await browser.newContext({
+        const authPath = path.join(process.cwd(), '.agents', 'auth', 'storage-state.json');
+        const contextOpts = {
           viewport: { width: vp.width, height: vp.height },
           isMobile: vp.isMobile,
           hasTouch: vp.isMobile
-        });
+        };
+        if (fs.existsSync(authPath)) {
+          contextOpts.storageState = authPath;
+        }
+        const context = await browser.newContext(contextOpts);
 
         const page = await context.newPage();
         
