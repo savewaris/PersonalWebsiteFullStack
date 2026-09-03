@@ -198,6 +198,23 @@ async function runAudit() {
           console.warn(`    ⚠️ Page load warning: ${e.message}`);
         }
 
+        // Check if Vercel Platform Authentication blocked the preview
+        const isVercelBlocked = await page.evaluate(() => {
+          return document.body?.innerText?.includes('Log in to Vercel') ||
+                 window.location.href.includes('vercel.com/login') ||
+                 document.title.includes('Log in to Vercel');
+        });
+
+        if (isVercelBlocked) {
+          console.warn(`    ⚠️ Vercel Platform Authentication detected on ${fullUrl}.`);
+          console.warn(`    🔄 Falling back to local server (http://localhost:3000${route})...`);
+          try {
+            await page.goto('http://localhost:3000' + route, { waitUntil: 'networkidle', timeout: 15000 });
+          } catch (fallbackErr) {
+            console.warn(`    ⚠️ Fallback navigation warning: ${fallbackErr.message}`);
+          }
+        }
+
         // Layout sanity checks
         const layoutMetrics = await page.evaluate(() => {
           const docEl = document.documentElement;
