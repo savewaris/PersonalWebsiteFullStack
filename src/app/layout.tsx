@@ -28,7 +28,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body>
+      <body className="overflow-x-hidden w-full antialiased bg-background text-foreground">
         <AnalyticsBeacon />
         {children}
       </body>
