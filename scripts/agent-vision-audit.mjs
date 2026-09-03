@@ -396,8 +396,18 @@ ${isAiPassed ? 'Build satisfies baseline browser stability. Ready for production
       const hasFatalErrors = summaryData.totalErrors > 0;
       isAiPassed = !hasFatalErrors;
     } catch (err) {
-      console.warn(`⚠️ [AI WARN] Multimodal visual analysis warning: ${err.message}`);
-      diagnosisText = `## 🚦 AI Visual Audit Verdict: PASS (Fallback Advisory)\n\nNote: Multimodal AI service returned: ${err.message}\nRuntime checks clean.`;
+      // AI models are rate-limited (429) or temporarily under high load (503).
+      // This is NOT a code defect — silently rotate and treat as advisory PASS.
+      // Only real browser crashes (totalErrors > 0) should fail the gate.
+      const isQuotaOrServiceError = /429|503|quota|rate.?limit|temporarily unavailable|high demand|RESOURCE_EXHAUSTED|UNAVAILABLE/i.test(err.message);
+      if (isQuotaOrServiceError) {
+        console.warn(`⚠️ [AI ADVISORY] All AI vision models temporarily unavailable (quota/service load). Skipping visual analysis — will retry next run.`);
+        console.warn(`   This is not a build failure. Runtime browser errors: ${summaryData.totalErrors || 0}`);
+        diagnosisText = `## 🚦 AI Visual Audit Verdict: PASS (Advisory — AI Quota Throttle)\n\nAll vision AI endpoints hit their free-tier rate limit or are under high load.\nThis is **not a code error** — the CI build is clean. Visual analysis will resume on next run.\n\n- Runtime browser errors detected: ${summaryData.totalErrors || 0} (gate threshold: 0)\n- Horizontal overflows: ${summaryData.totalOverflows || 0}`;
+      } else {
+        console.warn(`⚠️ [AI WARN] Multimodal visual analysis warning: ${err.message}`);
+        diagnosisText = `## 🚦 AI Visual Audit Verdict: PASS (Fallback Advisory)\n\nNote: Multimodal AI service returned: ${err.message}\nRuntime checks clean.`;
+      }
       isAiPassed = (summaryData.totalErrors || 0) === 0;
     }
   }
