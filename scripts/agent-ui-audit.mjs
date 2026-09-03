@@ -139,10 +139,57 @@ async function runAudit() {
     routes: []
   };
 
+  // ============================
+  // AUTO ROUTE DISCOVERY ENGINE
+  // ============================
+  // 1. Scan Next.js app/pages directory structure
+  const discoveredRoutes = new Set(ROUTES);
+  const routeDirs = ['src/app', 'app', 'src/pages', 'pages'];
+  for (const dir of routeDirs) {
+    const absDir = path.join(process.cwd(), dir);
+    if (!fs.existsSync(absDir)) continue;
+    const walkDir = (base, prefix = '') => {
+      const entries = fs.readdirSync(base, { withFileTypes: true });
+      for (const entry of entries) {
+        if (entry.name.startsWith('_') || entry.name.startsWith('.') || entry.name === 'api' || entry.name === 'node_modules') continue;
+        const fullPath = path.join(base, entry.name);
+        if (entry.isDirectory()) {
+          walkDir(fullPath, `${prefix}/${entry.name}`);
+        } else if (/^page\.(tsx?|jsx?)$/.test(entry.name) || /^(index|page)\.(tsx?|jsx?)$/.test(entry.name)) {
+          const route = prefix || '/';
+          // Strip dynamic segments for testing with placeholder
+          const testRoute = route.replace(/\[\.\.\..*?\]/g, '').replace(/\[.*?\]/g, '1').replace(/\/+/g, '/') || '/';
+          discoveredRoutes.add(testRoute);
+        }
+      }
+    };
+    walkDir(absDir);
+  }
+
+  // 2. Link Crawler: open homepage and collect all internal hrefs
+  const crawlBrowser = await chromium.launch({ headless: true });
   try {
-    for (const route of ROUTES) {
+    const crawlPage = await crawlBrowser.newPage();
+    await crawlPage.goto(TARGET_URL, { waitUntil: 'domcontentloaded', timeout: 10000 }).catch(() => {});
+    const hrefs = await crawlPage.evaluate((base) => {
+      return Array.from(document.querySelectorAll('a[href]'))
+        .map(a => a.getAttribute('href'))
+        .filter(h => h && h.startsWith('/') && !h.startsWith('/api') && !h.startsWith('/_next'));
+    }, TARGET_URL).catch(() => []);
+    hrefs.forEach(h => discoveredRoutes.add(h.split('?')[0].split('#')[0] || '/'));
+    await crawlPage.close();
+  } finally {
+    await crawlBrowser.close();
+  }
+
+  const EFFECTIVE_ROUTES = Array.from(discoveredRoutes).filter(r => r && r.startsWith('/'));
+  console.log(`\n🗺️  [ROUTE DISCOVERY] Auto-discovered ${EFFECTIVE_ROUTES.length} routes to audit: ${EFFECTIVE_ROUTES.join(', ')}\n`);
+
+  try {
+    for (const route of EFFECTIVE_ROUTES) {
       const fullUrl = new URL(route, TARGET_URL).toString();
       console.log(`\n📄 Auditing Route: ${route} (${fullUrl})`);
+
       
       const routeResult = {
         route,
@@ -182,13 +229,26 @@ async function runAudit() {
           routeResult.consoleLogs.push({ type: 'uncaught-error', text: err.message, viewport: vp.name });
         });
 
+        // Domains outside the project's control — errors here should NOT fail the gate
+        const THIRD_PARTY_SKIP_DOMAINS = [
+          'vercel.com/api', 'sentry.io', 'ingest.sentry.io',
+          'accounts.google.com', 'apis.google.com', 'googletagmanager.com',
+          'google-analytics.com', 'fonts.googleapis.com', 'cdn.jsdelivr.net',
+          'js.stripe.com', 'api.segment.io', 'hotjar.com', 'intercom.io'
+        ];
+        const SKIP_THIRD_PARTY = process.env.AUDIT_SKIP_THIRD_PARTY_ERRORS === 'true';
+
         page.on('response', (res) => {
           if (res.status() >= 400) {
-            routeResult.networkErrors.push({
-              status: res.status(),
-              url: res.url(),
-              viewport: vp.name
-            });
+            const url = res.url();
+            const isThirdParty = SKIP_THIRD_PARTY && THIRD_PARTY_SKIP_DOMAINS.some(d => url.includes(d));
+            if (!isThirdParty) {
+              routeResult.networkErrors.push({
+                status: res.status(),
+                url,
+                viewport: vp.name
+              });
+            }
           }
         });
 
@@ -196,6 +256,23 @@ async function runAudit() {
           await page.goto(fullUrl, { waitUntil: 'networkidle', timeout: 15000 });
         } catch (e) {
           console.warn(`    ⚠️ Page load warning: ${e.message}`);
+        }
+
+        // Check if Vercel Platform Authentication blocked the preview
+        const isVercelBlocked = await page.evaluate(() => {
+          return document.body?.innerText?.includes('Log in to Vercel') ||
+                 window.location.href.includes('vercel.com/login') ||
+                 document.title.includes('Log in to Vercel');
+        });
+
+        if (isVercelBlocked) {
+          console.warn(`    ⚠️ Vercel Platform Authentication detected on ${fullUrl}.`);
+          console.warn(`    🔄 Falling back to local server (http://localhost:3000${route})...`);
+          try {
+            await page.goto('http://localhost:3000' + route, { waitUntil: 'networkidle', timeout: 15000 });
+          } catch (fallbackErr) {
+            console.warn(`    ⚠️ Fallback navigation warning: ${fallbackErr.message}`);
+          }
         }
 
         // Layout sanity checks
