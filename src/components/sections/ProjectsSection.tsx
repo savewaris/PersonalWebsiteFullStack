@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import dynamic from 'next/dynamic';
+import ReactMarkdown from 'react-markdown';
 import { StaggerItem } from '@/components/MotionWrappers';
 import { PortfolioIcon } from '@/components/PortfolioIcon';
 import { ProjectMediaPreview } from '@/components/ProjectMediaPreview';
@@ -9,10 +9,6 @@ import { ProjectLightbox } from '@/components/ProjectLightbox';
 import { ensureHttps } from '@/lib/url-utils';
 import styles from '@/app/page.module.css';
 import type { Project } from '@prisma/client';
-
-const ReactMarkdown = dynamic(() => import('react-markdown'), {
-  loading: () => <div style={{ height: '20px', opacity: 0.5 }}>Loading...</div>,
-});
 
 interface ProjectsSectionProps {
   projects: Project[];

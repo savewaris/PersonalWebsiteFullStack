@@ -1,4 +1,6 @@
-import React from 'react';
+'use client';
+
+import React, { useState } from 'react';
 import {
   SiGmail,
   SiGoogle,
@@ -118,9 +120,11 @@ export function PortfolioIcon({
   className,
   style,
 }: PortfolioIconProps) {
+  const [imgError, setImgError] = useState(false);
+
   const getIconElement = () => {
     // 1. Remote Image URL (CDN / Google Favicon / Custom Upload)
-    if (icon && (icon.startsWith('http://') || icon.startsWith('https://') || icon.startsWith('data:image'))) {
+    if (!imgError && icon && (icon.startsWith('http://') || icon.startsWith('https://') || icon.startsWith('data:image'))) {
       return (
         <img
           src={icon}
@@ -137,9 +141,9 @@ export function PortfolioIcon({
             ...style,
           }}
           className={className}
-          onError={(e) => {
-            // Hide broken image on error
-            (e.target as HTMLImageElement).style.display = 'none';
+          onError={() => {
+            // Gracefully switch to fallback vector icon/symbol
+            setImgError(true);
           }}
         />
       );

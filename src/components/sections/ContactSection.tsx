@@ -1,12 +1,8 @@
-import dynamic from 'next/dynamic';
+import ContactForm from '@/components/ContactForm';
 import { StaggerItem } from '@/components/MotionWrappers';
 import { SocialButton } from '@/components/SocialButton';
 import styles from '@/app/page.module.css';
 import { SocialLink } from '@prisma/client';
-
-const ContactForm = dynamic(() => import('@/components/ContactForm'), {
-  loading: () => <div style={{ height: '200px', opacity: 0.5, animation: 'pulse 2s infinite' }}>Loading form...</div>,
-});
 
 interface ContactSectionProps {
   socials?: SocialLink[];

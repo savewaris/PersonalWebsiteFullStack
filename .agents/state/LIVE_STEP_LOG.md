@@ -57,3 +57,5 @@
 - 🟢 **[DONE]       ** `2026-08-28 11:18:08` | `agent` | **GENERAL**: Implement AI model tier classification across subagents, skills, project configs, and Second Brain
 - 🟡 **[IN_PROGRESS]** `2026-08-30 12:31:52` | `agent` | **GENERAL**: Add Issue #9 for View-Only Live Demo to roadmap and create GitHub Issue #36
 - 🟢 **[DONE]       ** `2026-08-30 12:31:54` | `agent` | **GENERAL**: Created GitHub Issue #36 and updated docs/github_issues_roadmap.md with Issue #9
+- 🟡 **[IN_PROGRESS]** `2026-09-03 05:57:26` | `agent` | **GENERAL**: Fixed Next.js Server Components render 500 error in PortfolioIcon and section components
+- 🟢 **[DONE]       ** `2026-09-03 05:57:29` | `agent` | **GENERAL**: Fixed Next.js Server Components render 500 error in PortfolioIcon and section components
