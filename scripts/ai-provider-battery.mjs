@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+﻿#!/usr/bin/env node
 
 /**
  * Universal 24/7 Multi-Provider Free-Tier AI Dispatcher with Zero-Cost Guard
@@ -11,6 +11,9 @@
  * 
  * If a model hits rate limit or quota, it automatically rotates to the next free provider.
  * NEVER incurs financial charges.
+ * 
+ * ModelStatusRegistry: Tracks per-model quota/overload state, persists to
+ * .agents/state/model-availability.json, and sends Discord advisories on auto-rotation.
  */
 
 import fs from 'fs';
@@ -43,8 +46,199 @@ function loadEnv() {
 loadEnv();
 
 const USAGE_TRACKER_PATH = path.join(process.cwd(), '.agents', 'state', 'provider-usage.json');
+const MODEL_AVAILABILITY_PATH = path.join(process.cwd(), '.agents', 'state', 'model-availability.json');
 const CEREBRAS_DAILY_HARD_CAP = 200; // Hard cap to guarantee $0 spend
 
+// ============================================================
+// ModelStatusRegistry — Quota-aware model availability tracker
+// ============================================================
+class ModelStatusRegistry {
+  constructor() {
+    this._state = {};
+    this._advisoryCooldowns = {};
+    this._load();
+  }
+
+  _stateDir() {
+    return path.dirname(MODEL_AVAILABILITY_PATH);
+  }
+
+  _load() {
+    try {
+      if (fs.existsSync(MODEL_AVAILABILITY_PATH)) {
+        this._state = JSON.parse(fs.readFileSync(MODEL_AVAILABILITY_PATH, 'utf8'));
+      }
+    } catch {
+      this._state = {};
+    }
+  }
+
+  _save() {
+    try {
+      const dir = this._stateDir();
+      if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+      fs.writeFileSync(MODEL_AVAILABILITY_PATH, JSON.stringify(this._state, null, 2), 'utf8');
+    } catch (e) {
+      console.warn(`[ModelStatusRegistry] Could not save state: ${e.message}`);
+    }
+  }
+
+  _key(provider, model) {
+    return `${provider}/${model}`;
+  }
+
+  isModelAvailable(provider, model) {
+    const key = this._key(provider, model);
+    const entry = this._state[key];
+    if (!entry) return true;
+
+    const now = Date.now();
+    const throttledAt = new Date(entry.throttledAt).getTime();
+    const cooldownEnd = throttledAt + (entry.retryAfterMs || 0);
+
+    if (now >= cooldownEnd) {
+      delete this._state[key];
+      this._save();
+      return true;
+    }
+    return false;
+  }
+
+  markModelUnavailable(provider, model, errorMsg, errorBody) {
+    const key = this._key(provider, model);
+    const now = new Date();
+
+    let status = 'unavailable';
+    let retryAfterMs = 60 * 60 * 1000;
+    let quotaLimit = null;
+
+    const is429 = errorMsg.includes('429') || (errorBody && (errorBody.includes('429') || errorBody.includes('RESOURCE_EXHAUSTED')));
+    const is503 = errorMsg.includes('503') || (errorBody && errorBody.includes('503'));
+
+    if (is429) {
+      status = 'quota_exhausted';
+      retryAfterMs = 60 * 60 * 1000;
+
+      if (errorBody) {
+        try {
+          const parsed = JSON.parse(errorBody);
+          const details = parsed?.error?.details || [];
+          for (const detail of details) {
+            const delay = detail?.retryDelay || detail?.metadata?.retryDelay;
+            if (delay) {
+              const seconds = parseInt(String(delay).replace('s', ''), 10);
+              if (!isNaN(seconds)) retryAfterMs = seconds * 1000;
+              break;
+            }
+          }
+          for (const detail of details) {
+            const limit = detail?.quotaLimit || detail?.metadata?.quotaLimit;
+            if (limit) { quotaLimit = parseInt(limit, 10) || null; break; }
+          }
+        } catch {}
+      }
+
+      const totalSeconds = Math.floor(retryAfterMs / 1000);
+      const hours = Math.floor(totalSeconds / 3600);
+      const minutes = Math.floor((totalSeconds % 3600) / 60);
+      const retryAfterHuman = hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
+
+      this._state[key] = {
+        status,
+        throttledAt: now.toISOString(),
+        retryAfterMs,
+        retryAfterHuman,
+        ...(quotaLimit !== null ? { quotaLimit } : {})
+      };
+    } else if (is503) {
+      status = 'overloaded';
+      retryAfterMs = 5 * 60 * 1000;
+      this._state[key] = { status, throttledAt: now.toISOString(), retryAfterMs };
+    } else {
+      retryAfterMs = 2 * 60 * 1000;
+      this._state[key] = { status: 'error', throttledAt: now.toISOString(), retryAfterMs };
+    }
+
+    this._save();
+    console.warn(`[ModelStatusRegistry] Marked ${key} as '${status}' for ${Math.round(retryAfterMs / 60000)}min`);
+  }
+
+  getStatusSummary() {
+    const now = Date.now();
+    const rows = [];
+
+    for (const [key, entry] of Object.entries(this._state)) {
+      const throttledAt = new Date(entry.throttledAt).getTime();
+      const cooldownEnd = throttledAt + (entry.retryAfterMs || 0);
+      if (now >= cooldownEnd) continue;
+
+      const retryAt = new Date(cooldownEnd).toISOString().replace('T', ' ').substring(0, 19) + ' UTC';
+      const statusEmoji = entry.status === 'quota_exhausted' ? '🔴' : entry.status === 'overloaded' ? '🟠' : '⚫';
+      rows.push(`| ${statusEmoji} | \`${key}\` | ${entry.status} | ${entry.retryAfterHuman || Math.round((entry.retryAfterMs || 0) / 60000) + 'm'} | ${retryAt} |`);
+    }
+
+    if (rows.length === 0) return '_No models currently throttled. All systems nominal._';
+
+    return [
+      '| Status | Model | Reason | Retry In | Available At |',
+      '|--------|-------|--------|----------|--------------|',
+      ...rows
+    ].join('\n');
+  }
+
+  async sendThrottleAdvisory(webhookUrl, throttledModel, fallbackModel, statusSummary) {
+    if (!webhookUrl) return;
+
+    const now = Date.now();
+    const lastSent = this._advisoryCooldowns[throttledModel] || 0;
+    const ADVISORY_COOLDOWN_MS = 30 * 60 * 1000;
+
+    if (now - lastSent < ADVISORY_COOLDOWN_MS) {
+      console.log(`ℹ️ [ModelStatusRegistry] Advisory for ${throttledModel} suppressed (sent ${Math.round((now - lastSent) / 60000)}min ago)`);
+      return;
+    }
+
+    const entry = this._state[throttledModel] || {};
+    const retryTime = entry.throttledAt
+      ? new Date(new Date(entry.throttledAt).getTime() + (entry.retryAfterMs || 0)).toISOString().replace('T', ' ').substring(0, 16) + ' UTC'
+      : 'unknown';
+
+    const embed = {
+      title: '⚠️ AI Model Advisory — Auto-Rotated',
+      color: 0xFFA500,
+      fields: [
+        { name: '🔴 Skipped Model', value: `\`${throttledModel}\``, inline: true },
+        { name: '✅ Fallback Used', value: `\`${fallbackModel || 'none'}\``, inline: true },
+        { name: '⏰ Retry At', value: retryTime, inline: true },
+        { name: '📊 Model Status Table', value: statusSummary.substring(0, 1020) }
+      ],
+      footer: { text: 'AI Provider Battery — Zero-Cost Guard Active' },
+      timestamp: new Date().toISOString()
+    };
+
+    try {
+      const res = await fetch(webhookUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ embeds: [embed] })
+      });
+      if (res.ok) {
+        this._advisoryCooldowns[throttledModel] = now;
+        console.log(`📣 [ModelStatusRegistry] Discord advisory sent for ${throttledModel}`);
+      } else {
+        console.warn(`⚠️ [ModelStatusRegistry] Discord webhook returned ${res.status}`);
+      }
+    } catch (e) {
+      console.warn(`⚠️ [ModelStatusRegistry] Discord advisory failed: ${e.message}`);
+    }
+  }
+}
+
+const registry = new ModelStatusRegistry();
+
+// ============================================================
+// Usage tracking
+// ============================================================
 function getDailyUsage() {
   const today = new Date().toISOString().split('T')[0];
   let usage = { date: today, cerebrasCount: 0, totalRequests: 0 };
@@ -68,6 +262,9 @@ function incrementUsage(provider) {
   fs.writeFileSync(USAGE_TRACKER_PATH, JSON.stringify(usage, null, 2), 'utf8');
 }
 
+// ============================================================
+// Provider call implementations
+// ============================================================
 async function callGoogle(model, prompt, options = {}, retryDepth = 0) {
   const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
   if (!apiKey) throw new Error('GEMINI_API_KEY missing');
@@ -87,7 +284,6 @@ async function callGoogle(model, prompt, options = {}, retryDepth = 0) {
 
   if (!res.ok) {
     const errText = await res.text();
-    // Edge case self-healing: Google model deprecated (404) with recommended model replacement
     if (res.status === 404 && retryDepth < 2 && errText.includes('models/')) {
       const recMatch = errText.match(/models\/([a-zA-Z0-9.\-_]+)/);
       if (recMatch && recMatch[1] && recMatch[1] !== model) {
@@ -96,7 +292,10 @@ async function callGoogle(model, prompt, options = {}, retryDepth = 0) {
         return await callGoogle(recommendedModel, prompt, options, retryDepth + 1);
       }
     }
-    throw new Error(`Google API error ${res.status}: ${errText}`);
+    const err = new Error(`Google API error ${res.status}: ${errText}`);
+    err.errorBody = errText;
+    err.statusCode = res.status;
+    throw err;
   }
 
   const data = await res.json();
@@ -105,12 +304,10 @@ async function callGoogle(model, prompt, options = {}, retryDepth = 0) {
 }
 
 async function callOpenAiCompatible(baseUrl, apiKey, model, prompt, options = {}, providerName = '') {
-  // STRICT $0 GUARD: If OpenRouter, strictly enforce that model ends with :free
   if (providerName === 'openrouter' && !model.endsWith(':free')) {
     throw new Error(`STRICT $0 GUARD: Rejected paid model '${model}'. Only ':free' endpoints allowed.`);
   }
 
-  // STRICT $0 GUARD: If Cerebras, check hard daily limit
   if (providerName === 'cerebras') {
     const usage = getDailyUsage();
     if (usage.cerebrasCount >= CEREBRAS_DAILY_HARD_CAP) {
@@ -134,7 +331,11 @@ async function callOpenAiCompatible(baseUrl, apiKey, model, prompt, options = {}
   });
 
   if (!res.ok) {
-    throw new Error(`${providerName} API error ${res.status}: ${await res.text()}`);
+    const errText = await res.text();
+    const err = new Error(`${providerName} API error ${res.status}: ${errText}`);
+    err.errorBody = errText;
+    err.statusCode = res.status;
+    throw err;
   }
 
   const data = await res.json();
@@ -142,12 +343,10 @@ async function callOpenAiCompatible(baseUrl, apiKey, model, prompt, options = {}
   return data.choices?.[0]?.message?.content || '';
 }
 
+// ============================================================
+// Main export: queryAiWithFallback
+// ============================================================
 export async function queryAiWithFallback(prompt, options = {}) {
-  // Provider Hierarchy for Guaranteed 100% Free Operation:
-  // 1. Google Gemini Active Models (gemini-2.5-flash, gemini-2.0-flash, gemini-1.5-flash)
-  // 2. Groq Cloud (14,400 free req/day at 800 tok/s)
-  // 3. OpenRouter Free Endpoints (100% free models)
-  // 4. Cerebras Free Tier (Hard capped at 200 req/day)
   const candidateChain = [
     { provider: 'google', model: 'gemini-2.5-flash' },
     { provider: 'google', model: 'gemini-2.0-flash' },
@@ -161,31 +360,69 @@ export async function queryAiWithFallback(prompt, options = {}) {
   ];
 
   let lastError = null;
+  let lastThrottledModel = null;
+  const discordWebhook = process.env.DISCORD_WEBHOOK_URL || '';
 
   for (const candidate of candidateChain) {
     const { provider, model } = candidate;
-    try {
-      if (provider === 'google' && (process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY)) {
-        return await callGoogle(model, prompt, options);
-      } else if (provider === 'groq' && process.env.GROQ_API_KEY) {
-        return await callOpenAiCompatible('https://api.groq.com/openai/v1', process.env.GROQ_API_KEY, model, prompt, options, 'groq');
-      } else if (provider === 'openrouter' && process.env.OPENROUTER_API_KEY) {
-        return await callOpenAiCompatible('https://openrouter.ai/api/v1', process.env.OPENROUTER_API_KEY, model, prompt, options, 'openrouter');
-      } else if (provider === 'cerebras' && process.env.CEREBRAS_API_KEY) {
-        return await callOpenAiCompatible('https://api.cerebras.ai/v1', process.env.CEREBRAS_API_KEY, model, prompt, options, 'cerebras');
-      }
-    } catch (err) {
-      lastError = err;
-      console.warn(`⚠️ [AI BATTERY AUTO-FAILOVER] ${provider}/${model} unavailable (${err.message.substring(0, 100)}...). Rotating to next free model...`);
+    const modelKey = `${provider}/${model}`;
+
+    // Pre-flight: skip models in cooldown
+    if (!registry.isModelAvailable(provider, model)) {
+      const entry = registry._state[modelKey] || {};
+      const cooldownEnd = new Date(new Date(entry.throttledAt).getTime() + (entry.retryAfterMs || 0));
+      const retryTime = cooldownEnd.toISOString().replace('T', ' ').substring(0, 16) + ' UTC';
+      console.log(`ℹ️ [SKIPPING] ${modelKey} — quota cooldown until ${retryTime}`);
+      continue;
     }
+
+    try {
+      let result;
+      if (provider === 'google' && (process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY)) {
+        result = await callGoogle(model, prompt, options);
+      } else if (provider === 'groq' && process.env.GROQ_API_KEY) {
+        result = await callOpenAiCompatible('https://api.groq.com/openai/v1', process.env.GROQ_API_KEY, model, prompt, options, 'groq');
+      } else if (provider === 'openrouter' && process.env.OPENROUTER_API_KEY) {
+        result = await callOpenAiCompatible('https://openrouter.ai/api/v1', process.env.OPENROUTER_API_KEY, model, prompt, options, 'openrouter');
+      } else if (provider === 'cerebras' && process.env.CEREBRAS_API_KEY) {
+        result = await callOpenAiCompatible('https://api.cerebras.ai/v1', process.env.CEREBRAS_API_KEY, model, prompt, options, 'cerebras');
+      } else {
+        continue;
+      }
+
+      // Success — send advisory if a previous model was throttled
+      if (lastThrottledModel && discordWebhook) {
+        const statusSummary = registry.getStatusSummary();
+        await registry.sendThrottleAdvisory(discordWebhook, lastThrottledModel, modelKey, statusSummary);
+      }
+
+      return result;
+    } catch (err) {
+      const errorBody = err.errorBody || '';
+      lastError = err;
+      lastThrottledModel = modelKey;
+
+      console.warn(`⚠️ [AI BATTERY AUTO-FAILOVER] ${modelKey} unavailable (${err.message.substring(0, 100)}...). Rotating to next free model...`);
+      registry.markModelUnavailable(provider, model, err.message, errorBody);
+    }
+  }
+
+  if (lastThrottledModel && discordWebhook) {
+    const statusSummary = registry.getStatusSummary();
+    await registry.sendThrottleAdvisory(discordWebhook, lastThrottledModel, 'NONE — all models exhausted', statusSummary);
   }
 
   throw new Error(`All free-tier models in the 24/7 battery exhausted. Last error: ${lastError?.message}`);
 }
 
+// ============================================================
 // CLI Test
+// ============================================================
 if (process.argv[1]?.endsWith('ai-provider-battery.mjs')) {
   console.log('\n🔋 Testing 24/7 Multi-Provider Free-Tier Battery with $0 Hard Guard...');
+  console.log('📋 Current Model Status Summary:\n');
+  console.log(registry.getStatusSummary());
+  console.log('');
   queryAiWithFallback('Say "Zero Spend Guard Active" in 4 words')
     .then(res => {
       console.log('✅ Response:', res.trim());

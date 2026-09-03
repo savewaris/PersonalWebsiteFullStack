@@ -40,6 +40,13 @@ jobs:
           node-version: 22
           cache: 'npm'
 
+      - name: Restore AI Model Availability Registry
+        uses: actions/cache@v4
+        with:
+          path: .agents/state/model-availability.json
+          key: ai-model-registry-${{ github.repository }}
+          restore-keys: ai-model-registry-
+
       - name: Install Dependencies
         run: npm ci || npm install
 
@@ -105,6 +112,7 @@ jobs:
         env:
           CI: "true"
           AUDIT_SKIP_THIRD_PARTY_ERRORS: "true"
+          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
 
       - name: Execute Gemini Multimodal AI Visual Audit & Sentry
         run: |
@@ -113,6 +121,7 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          CEREBRAS_API_KEY: ${{ secrets.CEREBRAS_API_KEY }}
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
           GITHUB_REPOSITORY: ${{ github.repository }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -153,3 +162,10 @@ jobs:
             .agents/audit-screenshots/
           if-no-files-found: ignore
           retention-days: 14
+
+      - name: Save AI Model Availability Registry
+        if: always()
+        uses: actions/cache@v4
+        with:
+          path: .agents/state/model-availability.json
+          key: ai-model-registry-${{ github.repository }}

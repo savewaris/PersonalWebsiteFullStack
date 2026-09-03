@@ -267,6 +267,29 @@ async function runAudit() {
           }
         });
 
+        // Auto-login to admin panel if ADMIN_PASSWORD is set and route is /admin or /admin/*
+        if (process.env.ADMIN_PASSWORD && (route === '/admin' || route.startsWith('/admin/'))) {
+          try {
+            await page.goto('http://localhost:3000/login', { waitUntil: 'domcontentloaded', timeout: 10000 });
+            // Fill password field — try common selectors
+            const pwField = page.locator('input[type="password"]').first();
+            if (await pwField.isVisible({ timeout: 3000 }).catch(() => false)) {
+              await pwField.fill(process.env.ADMIN_PASSWORD);
+              // Submit — try Enter key or submit button
+              const submitBtn = page.locator('button[type="submit"], button:has-text("Login"), button:has-text("Sign in")').first();
+              if (await submitBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
+                await submitBtn.click();
+              } else {
+                await pwField.press('Enter');
+              }
+              await page.waitForTimeout(2000);
+              console.log(`    🔑 Admin login attempted for route: ${route}`);
+            }
+          } catch (loginErr) {
+            console.warn(`    ⚠️ Admin login attempt failed: ${loginErr.message}`);
+          }
+        }
+
         try {
           await page.goto(fullUrl, { waitUntil: 'networkidle', timeout: 15000 });
         } catch (e) {
