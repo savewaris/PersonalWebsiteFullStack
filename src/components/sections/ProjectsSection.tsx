@@ -8,6 +8,7 @@ import { ProjectMediaPreview } from '@/components/ProjectMediaPreview';
 import { ProjectLightbox } from '@/components/ProjectLightbox';
 import { ensureHttps } from '@/lib/url-utils';
 import styles from '@/app/page.module.css';
+import projectStyles from './Projects.module.css';
 import type { Project } from '@prisma/client';
 
 interface ProjectsSectionProps {
@@ -60,17 +61,15 @@ export function ProjectsSection({ projects }: ProjectsSectionProps) {
 
   return (
     <>
-      <StaggerItem id="projects" className={`${styles.bentoItem} ${styles.span2} ${styles.rowSpan2}`}>
-        <h2 className={styles.bentoTitle}>Featured Projects</h2>
-        <div
-          className={styles.bentoScrollArea}
-          style={{
-            maxHeight: '100%',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '24px',
-          }}
-        >
+      <StaggerItem id="projects" className={`${styles.bentoItem} ${styles.span4}`}>
+        <div className={projectStyles.sectionHeader}>
+          <h2 className={projectStyles.sectionTitle}>
+            <span>🚀</span> Featured Projects
+          </h2>
+          <span className={projectStyles.badgeCount}>{projects.length} Projects</span>
+        </div>
+
+        <div className={projectStyles.projectsGrid}>
           {projects.map((project) => {
             const liveDemoLink = ensureHttps(project.demoUrl);
             const githubRepoLink = ensureHttps(project.repoUrl);
@@ -89,19 +88,7 @@ export function ProjectsSection({ projects }: ProjectsSectionProps) {
               : [];
 
             return (
-              <div
-                key={project.id}
-                className={styles.projectCard}
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  borderRadius: '16px',
-                  border: '1px solid var(--border)',
-                  overflow: 'hidden',
-                  background: 'rgba(255, 255, 255, 0.02)',
-                  transition: 'border-color 0.2s ease, transform 0.2s ease',
-                }}
-              >
+              <div key={project.id} className={projectStyles.projectCard}>
                 {/* Rich Media Container: Hover-to-Play Video + Poster + Lightbox Click */}
                 <ProjectMediaPreview
                   title={project.title}
@@ -111,57 +98,35 @@ export function ProjectsSection({ projects }: ProjectsSectionProps) {
                   onOpenGallery={(index) => handleOpenGallery(project, index)}
                 />
 
-                <div className={styles.projectContent} style={{ padding: '20px', display: 'flex', flexDirection: 'column' }}>
-                  <h3 className={styles.projectTitle} style={{ fontSize: '1.2rem', marginBottom: '8px' }}>
+                <div className={projectStyles.projectContent}>
+                  <h3 className={projectStyles.projectTitle}>
                     {project.title}
                   </h3>
 
                   {/* Technology Badges */}
                   {tags.length > 0 && (
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '12px' }}>
+                    <div className={projectStyles.tagContainer}>
                       {tags.map((tag, idx) => (
-                        <span
-                          key={idx}
-                          style={{
-                            fontSize: '0.75rem',
-                            padding: '3px 8px',
-                            borderRadius: '4px',
-                            background: 'rgba(255, 255, 255, 0.05)',
-                            border: '1px solid var(--border)',
-                            color: 'var(--text-secondary)',
-                            fontWeight: 500,
-                          }}
-                        >
+                        <span key={idx} className={projectStyles.tagBadge}>
                           {tag}
                         </span>
                       ))}
                     </div>
                   )}
 
-                  <div className={styles.projectDesc} style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: '16px' }}>
+                  <div className={projectStyles.projectDesc}>
                     <ReactMarkdown>{project.description}</ReactMarkdown>
                   </div>
 
                   {/* Standardized Action CTAs */}
-                  <div className={styles.projectLinks} style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+                  <div className={projectStyles.projectLinks}>
                     {liveDemoLink && (
                       <a
                         href={liveDemoLink}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className={styles.projectLink}
-                        style={{
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: '6px',
-                          padding: '8px 16px',
-                          background: 'var(--text-primary)',
-                          color: 'var(--bg-primary)',
-                          borderRadius: '6px',
-                          fontSize: '0.85rem',
-                          fontWeight: 600,
-                          transition: 'opacity 0.2s',
-                        }}
+                        className={projectStyles.btnPrimary}
+                        data-track-event="project_demo"
                       >
                         <PortfolioIcon platform="Web" size={14} />
                         <span>Live Demo</span>
@@ -172,20 +137,8 @@ export function ProjectsSection({ projects }: ProjectsSectionProps) {
                         href={githubRepoLink}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className={styles.projectLink}
-                        style={{
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: '6px',
-                          padding: '8px 16px',
-                          background: 'transparent',
-                          border: '1px solid var(--border)',
-                          color: 'var(--text-primary)',
-                          borderRadius: '6px',
-                          fontSize: '0.85rem',
-                          fontWeight: 600,
-                          transition: 'border-color 0.2s',
-                        }}
+                        className={projectStyles.btnSecondary}
+                        data-track-event="project_repo"
                       >
                         <PortfolioIcon platform="GitHub" size={14} />
                         <span>GitHub</span>
