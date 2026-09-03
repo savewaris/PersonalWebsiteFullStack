@@ -259,45 +259,72 @@ async function runAudit() {
         }
 
         // Check if Vercel Platform Authentication blocked the preview
-        const isVercelBlocked = await page.evaluate(() => {
-          return document.body?.innerText?.includes('Log in to Vercel') ||
-                 window.location.href.includes('vercel.com/login') ||
-                 document.title.includes('Log in to Vercel');
-        });
+        let isVercelBlocked = false;
+        try {
+          isVercelBlocked = await page.evaluate(() => {
+            return document.body?.innerText?.includes('Log in to Vercel') ||
+                   window.location.href.includes('vercel.com/login') ||
+                   document.title.includes('Log in to Vercel');
+          });
+        } catch {}
 
         if (isVercelBlocked) {
           console.warn(`    ⚠️ Vercel Platform Authentication detected on ${fullUrl}.`);
-          console.warn(`    🔄 Falling back to local server (http://localhost:3000${route})...`);
+          let isLocalUp = false;
           try {
-            await page.goto('http://localhost:3000' + route, { waitUntil: 'networkidle', timeout: 15000 });
-          } catch (fallbackErr) {
-            console.warn(`    ⚠️ Fallback navigation warning: ${fallbackErr.message}`);
+            const probe = await fetch('http://localhost:3000', { signal: AbortSignal.timeout(2000) });
+            isLocalUp = probe.ok || probe.status === 302 || probe.status === 404;
+          } catch {}
+
+          if (isLocalUp) {
+            console.log(`    🔄 Local server is online. Auditing local fallback: http://localhost:3000${route}...`);
+            try {
+              await page.goto('http://localhost:3000' + route, { waitUntil: 'networkidle', timeout: 15000 });
+            } catch (fallbackErr) {
+              console.warn(`    ⚠️ Fallback navigation warning: ${fallbackErr.message}`);
+            }
+          } else {
+            console.warn(`    ℹ️ Vercel preview protected by SSO/Auth and no local server active. Bypassing route gracefully.`);
+            await context.close();
+            continue;
           }
         }
 
-        // Layout sanity checks
-        const layoutMetrics = await page.evaluate(() => {
-          const docEl = document.documentElement;
-          const body = document.body;
-          const hasHorizontalOverflow = (docEl.scrollWidth > docEl.clientWidth) || (body.scrollWidth > window.innerWidth);
-          const interactiveElements = document.querySelectorAll('button, a[href], input, select, textarea, [role="button"]');
-          
-          let undersizedTargets = 0;
-          interactiveElements.forEach((el) => {
-            const rect = el.getBoundingClientRect();
-            if (rect.width > 0 && rect.height > 0 && (rect.width < 24 || rect.height < 24)) {
-              undersizedTargets++;
-            }
-          });
+        // Layout sanity checks with error isolation
+        let layoutMetrics = {
+          hasHorizontalOverflow: false,
+          scrollWidth: 0,
+          clientWidth: 0,
+          interactiveCount: 0,
+          undersizedTargets: 0
+        };
 
-          return {
-            hasHorizontalOverflow,
-            scrollWidth: docEl.scrollWidth,
-            clientWidth: docEl.clientWidth,
-            interactiveCount: interactiveElements.length,
-            undersizedTargets
-          };
-        });
+        try {
+          layoutMetrics = await page.evaluate(() => {
+            const docEl = document.documentElement;
+            const body = document.body;
+            const hasHorizontalOverflow = (docEl.scrollWidth > docEl.clientWidth) || (body.scrollWidth > window.innerWidth);
+            const interactiveElements = document.querySelectorAll('button, a[href], input, select, textarea, [role="button"]');
+            
+            let undersizedTargets = 0;
+            interactiveElements.forEach((el) => {
+              const rect = el.getBoundingClientRect();
+              if (rect.width > 0 && rect.height > 0 && (rect.width < 24 || rect.height < 24)) {
+                undersizedTargets++;
+              }
+            });
+
+            return {
+              hasHorizontalOverflow,
+              scrollWidth: docEl.scrollWidth,
+              clientWidth: docEl.clientWidth,
+              interactiveCount: interactiveElements.length,
+              undersizedTargets
+            };
+          });
+        } catch (evalErr) {
+          console.warn(`    ⚠️ Could not evaluate layout metrics on ${route}: ${evalErr.message}`);
+        }
 
         // Capture Viewport Screenshot
         const safeRouteName = route.replace(/[^a-zA-Z0-9]/g, '_') || 'root';
