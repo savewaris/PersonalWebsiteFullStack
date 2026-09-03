@@ -54,6 +54,7 @@ import {
   SiLinuxfoundation,
   SiGit,
   SiNginx,
+  SiAnthropic,
   SiOpenai,
   SiHuggingface,
   SiNvidia,
@@ -194,10 +195,20 @@ export function PortfolioIcon({
       if (lower === 'khanacademy') return <SiKhanacademy size={size} className={className} style={style} />;
 
       // AI & Data
+      if (lower === 'anthropic' || lower === 'claude') return <SiAnthropic size={size} className={className} style={style} />;
       if (lower === 'deeplearning') return <SiOpenai size={size} className={className} style={style} />;
-      if (lower === 'openai') return <SiOpenai size={size} className={className} style={style} />;
+      if (lower === 'openai' || lower === 'chatgpt') return <SiOpenai size={size} className={className} style={style} />;
+      if (lower === 'googleai' || lower === 'deepmind' || lower === 'gemini') return <SiGoogle size={size} className={className} style={style} />;
       if (lower === 'huggingface') return <SiHuggingface size={size} className={className} style={style} />;
       if (lower === 'nvidia') return <SiNvidia size={size} className={className} style={style} />;
+      if (lower === 'pytorch' || lower === 'metaai') return <SiPytorch size={size} className={className} style={style} />;
+      if (lower === 'fastai') return <SiPython size={size} className={className} style={style} />;
+      if (['mistral', 'cohere', 'langchain', 'llamaindex', 'wandb'].includes(lower)) {
+        return <SiOpenai size={size} className={className} style={style} />;
+      }
+      if (['pinecone', 'qdrant', 'weaviate'].includes(lower)) {
+        return <SiDatabricks size={size} className={className} style={style} />;
+      }
 
       // Ecosystems
       if (lower === 'meta') return <SiMeta size={size} className={className} style={style} />;
