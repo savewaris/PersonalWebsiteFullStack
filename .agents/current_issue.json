@@ -1,13 +1,13 @@
 {
-  "issueNumber": 34,
-  "title": "[Feature] Expand Certification & Academy Logo Dataset with Comprehensive AI Platforms & Model Academies",
-  "url": "https://github.com/savewaris/PersonalWebsiteFullStack/issues/34",
+  "issueNumber": 35,
+  "title": "[Enhancement] Standardize Universal Modal & In-Place Edit Functionality Across All Admin Manager Sections",
+  "url": "https://github.com/savewaris/PersonalWebsiteFullStack/issues/35",
   "labels": [
     {
-      "id": "LA_kwDORFuvfM8AAAACwu6wHQ",
-      "name": "feature",
-      "description": "",
-      "color": "0e8a16"
+      "id": "LA_kwDORFuvfM8AAAACWnVe6w",
+      "name": "enhancement",
+      "description": "New feature or request",
+      "color": "a2eeef"
     },
     {
       "id": "LA_kwDORFuvfM8AAAACwu6wfw",
@@ -22,22 +22,16 @@
       "color": "5319e7"
     },
     {
-      "id": "LA_kwDORFuvfM8AAAACwu6y-g",
-      "name": "ui/ux",
-      "description": "",
-      "color": "f9d0c4"
-    },
-    {
       "id": "LA_kwDORFuvfM8AAAACynX42g",
       "name": "admin",
       "description": "",
       "color": "6f42c1"
     }
   ],
-  "fetchedAt": "2026-09-03T09:55:09.794Z",
-  "objective": "Expand the Universal Certification & Organization Logo Dataset (`src/lib/certification-logos.ts`) with a dedicated, extensive category of **AI platforms, LLM model academies, agent frameworks, and AI cloud/vector infrastructure**. This allows modern AI engineers to showcase verified credentials from cutting-edge frontier labs and developer bootcamps with brand-accurate vector logos and official brand colors.\n\n---",
+  "fetchedAt": "2026-09-03T09:55:18.184Z",
+  "objective": "Audit and standardize full in-place and modal **Edit functionality** across every entity manager in the Admin CMS (`/admin/certifications`, `/admin/projects`, `/admin/skills`, `/admin/experience`, `/admin/education`, `/admin/interests`, `/admin/hobbies`, `/admin/languages`, `/admin/socials`). Ensure all fields, relations, image previews, emojis, and arrays are pre-populated accurately on edit click and updated reactively with zero page reloads.\n\n---",
   "targetFiles": "Not explicitly specified in issue body",
   "nonGoals": "Standard quality and non-regression invariants",
-  "technicalRequirements": "### Summary & Objective\nExpand the Universal Certification & Organization Logo Dataset (`src/lib/certification-logos.ts`) with a dedicated, extensive category of **AI platforms, LLM model academies, agent frameworks, and AI cloud/vector infrastructure**. This allows modern AI engineers to showcase verified credentials from cutting-edge frontier labs and developer bootcamps with brand-accurate vector logos and official brand colors.\n\n---\n\n### Expanded AI Organization & Academy Matrix\n\n1. **Frontier AI Labs & Developer Academies**:\n   - **Anthropic / Claude**: `claude`, `anthropic`, `claude developer academy` (Brand color: `#D97757` / `#CC785C`).\n   - **OpenAI Academy**: `openai`, `chatgpt`, `openai developers` (Brand color: `#10A37F`).\n   - **Google DeepMind & AI Studio**: `deepmind`, `google-ai`, `gemini` (Brand color: `#4285F4`).\n   - **Meta AI / PyTorch**: `meta-ai`, `pytorch`, `pytorch foundation` (Brand color: `#EE4C2C`).\n   - **Mistral AI**: `mistral`, `mistral academy`, `la plateforme` (Brand color: `#FA520F`).\n   - **Cohere**: `cohere`, `cohere llm university` (Brand color: `#39594C`).\n\n2. **AI Agent Frameworks & Tooling**:\n   - **LangChain Academy**: `langchain`, `langsmith`, `langgraph` (Brand color: `#1C3C3C`).\n   - **LlamaIndex**: `llamaindex`, `llama-parse` (Brand color: `#7B2CBF`).\n   - **Hugging Face Academy**: `huggingface`, `hf audio/nlp/diffusion course` (Brand color: `#FFD21E`).\n   - **Weights & Biases (W&B)**: `wandb`, `weights & biases academy` (Brand color: `#FFBE00`).\n   - **DeepLearning.AI**: `deeplearning`, `andrew ng` (Brand color: `#FF6F00`).\n   - **fast.ai**: `fastai`, `practical deep learning` (Brand color: `#000000`).\n\n3. **AI Compute, Data & Vector Infrastructure**:\n   - **NVIDIA Deep Learning Institute (DLI)**: `nvidia`, `nvidia dli` (Brand color: `#76B900`).\n   - **Pinecone Academy**: `pinecone`, `vector database certified` (Brand color: `#000000`).\n   - **Qdrant**: `qdrant`, `vector search` (Brand color: `#DC2626`).\n   - **Weaviate**: `weaviate`, `weaviate academy` (Brand color: `#00D2B4`).\n   - **Databricks Generative AI**: `databricks-ai`, `databricks generative ai engineer` (Brand color: `#FF3621`).\n\n---\n\n### Technical Updates\n- Update `src/lib/certification-logos.ts` with all new AI entries, aliases, and official domains.\n- Update `src/lib/resolve-certification-logo.ts` with auto-matching regex patterns.\n- Expand vector bindings in `src/components/PortfolioIcon.tsx` (`SiAnthropic`, `SiOpenai`, `SiPytorch`, `SiHuggingface`, etc.).\n\n---\n\n### Acceptance Criteria\n- [ ] Curated AI category expanded with 15+ modern AI platforms and academies.\n- [ ] Auto-resolver detects Claude/Anthropic, LangChain, LlamaIndex, W&B, and OpenAI credentials seamlessly.\n- [ ] Visual Logo Picker modal (`LogoPickerModal.tsx`) renders the new AI academy logos with official brand colors.\n- [ ] 0 TypeScript errors (`npx tsc --noEmit`) and successful production build (`npm run build`).\n",
-  "verificationChecklist": "- [ ] Curated AI category expanded with 15+ modern AI platforms and academies.\n- [ ] Auto-resolver detects Claude/Anthropic, LangChain, LlamaIndex, W&B, and OpenAI credentials seamlessly.\n- [ ] Visual Logo Picker modal (`LogoPickerModal.tsx`) renders the new AI academy logos with official brand colors.\n- [ ] 0 TypeScript errors (`npx tsc --noEmit`) and successful production build (`npm run build`)."
+  "technicalRequirements": "1. **Certifications Management (`/admin/certifications`)**:\n   - Verify Edit Modal opens with pre-populated `title`, `issuer`, `issueDate`, `expiryDate`, `credentialId`, `credentialUrl`, `badgeImageUrl`, and `order`.\n   - Ensure `LogoPickerModal` can update the certification logo in edit mode without clearing other fields.\n\n2. **Projects Management (`/admin/projects`)**:\n   - Pre-populate all fields including media gallery, video URL, tags/technologies array, demo URL, and repo URL.\n   - Support editing gallery screenshots without losing existing uploads.\n\n3. **Experience & Education (`/admin/experience`, `/admin/education`)**:\n   - Correctly pre-populate date ranges (`startDate`, `endDate`, `current`), descriptions (bullet points/markdown), company/school logos, and employment types.\n\n4. **Skills, Interests, Hobbies, Languages & Socials**:\n   - Support instant emoji / icon re-selection in edit mode.\n   - Provide clean typecasting for numeric proficiencies and orders.\n\n5. **State & Cache Reactivity**:\n   - `saveItem` updates the client state immediately and triggers Next.js server cache revalidation (`revalidatePortfolioData`).\n   - Clean error banners if validation or network requests fail.\n\n---",
+  "verificationChecklist": "- [ ] Every admin manager module provides a fully functional, pre-populated Edit modal.\n- [ ] Editing any field (text, date, select, emoji, logo, media gallery) persists correctly via the corresponding `PUT` API endpoint.\n- [ ] UI reflects changes immediately without requiring manual browser refresh.\n- [ ] 0 TypeScript errors (`npx tsc --noEmit`) and clean production build (`npm run build`)."
 }
