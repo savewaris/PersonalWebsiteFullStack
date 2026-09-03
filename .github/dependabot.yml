@@ -8,6 +8,10 @@ updates:
       day: "monday"
       time: "05:00"
       timezone: "UTC"
+    groups:
+      dependencies:
+        patterns:
+          - "*"
     open-pull-requests-limit: 10
     commit-message:
       prefix: "chore"
@@ -16,27 +20,6 @@ updates:
     labels:
       - "dependencies"
       - "automated"
-    groups:
-      react:
-        patterns:
-          - "react"
-          - "react-dom"
-          - "@types/react"
-          - "@types/react-dom"
-      types:
-        patterns:
-          - "@types/*"
-    ignore:
-      # Ignore breaking major version upgrades until framework supports them
-      - dependency-name: "eslint"
-        update-types: ["version-update:semver-major"]
-      - dependency-name: "typescript"
-        update-types: ["version-update:semver-major"]
-      - dependency-name: "@prisma/client"
-        update-types: ["version-update:semver-major"]
-      - dependency-name: "prisma"
-        update-types: ["version-update:semver-major"]
-      - dependency-name: "react-icons"
 
   # Maintain GitHub Actions dependencies
   - package-ecosystem: "github-actions"
@@ -46,13 +29,11 @@ updates:
       day: "monday"
       time: "05:00"
       timezone: "UTC"
-    labels:
-      - "ci/cd"
-      - "automated"
     groups:
       actions:
         patterns:
-          - "actions/*"
-          - "*-action*"
-          - "amannn/*"
-          - "softprops/*"
+          - "*"
+    labels:
+      - "ci/cd"
+      - "automated"
+
