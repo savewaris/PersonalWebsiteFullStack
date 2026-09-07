@@ -41,7 +41,7 @@ jobs:
           cache: 'npm'
 
       - name: Restore AI Model Availability Registry
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: .agents/state/model-availability.json
           key: ai-model-registry-${{ github.repository }}
@@ -165,7 +165,7 @@ jobs:
 
       - name: Save AI Model Availability Registry
         if: always()
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: .agents/state/model-availability.json
           key: ai-model-registry-${{ github.repository }}
