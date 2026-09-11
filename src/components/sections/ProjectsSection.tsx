@@ -6,6 +6,7 @@ import { StaggerItem } from '@/components/MotionWrappers';
 import { PortfolioIcon } from '@/components/PortfolioIcon';
 import { ProjectMediaPreview } from '@/components/ProjectMediaPreview';
 import { ProjectLightbox } from '@/components/ProjectLightbox';
+import { ProjectLiveDemoModal } from '@/components/ProjectLiveDemoModal';
 import { ensureHttps } from '@/lib/url-utils';
 import styles from '@/app/page.module.css';
 import projectStyles from './Projects.module.css';
@@ -16,6 +17,7 @@ interface ProjectsSectionProps {
 }
 
 export function ProjectsSection({ projects }: ProjectsSectionProps) {
+  const [selectedDemoProject, setSelectedDemoProject] = useState<Project | null>(null);
   const [activeLightbox, setActiveLightbox] = useState<{
     isOpen: boolean;
     images: string[];
@@ -103,16 +105,19 @@ export function ProjectsSection({ projects }: ProjectsSectionProps) {
                     {project.title}
                   </h3>
 
-                  {/* Technology Badges */}
-                  {tags.length > 0 && (
-                    <div className={projectStyles.tagContainer}>
-                      {tags.map((tag, idx) => (
-                        <span key={idx} className={projectStyles.tagBadge}>
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                  )}
+                  {/* Technology Badges & View-Only Indicator */}
+                  <div className={projectStyles.tagContainer}>
+                    {tags.map((tag, idx) => (
+                      <span key={idx} className={projectStyles.tagBadge}>
+                        {tag}
+                      </span>
+                    ))}
+                    {liveDemoLink && (project.demoCredentials || project.demoType !== 'external' || project.isEmbeddable) && (
+                      <span className={projectStyles.badgeViewOnly} title="Interactive View-Only Demo Available">
+                        🔒 View-Only
+                      </span>
+                    )}
+                  </div>
 
                   <div className={projectStyles.projectDesc}>
                     <ReactMarkdown>{project.description}</ReactMarkdown>
@@ -121,16 +126,29 @@ export function ProjectsSection({ projects }: ProjectsSectionProps) {
                   {/* Standardized Action CTAs */}
                   <div className={projectStyles.projectLinks}>
                     {liveDemoLink && (
-                      <a
-                        href={liveDemoLink}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={projectStyles.btnPrimary}
-                        data-track-event="project_demo"
-                      >
-                        <PortfolioIcon platform="Web" size={14} />
-                        <span>Live Demo</span>
-                      </a>
+                      project.demoType === 'external' ? (
+                        <a
+                          href={liveDemoLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className={projectStyles.btnPrimary}
+                          data-track-event="project_demo"
+                        >
+                          <PortfolioIcon platform="Web" size={14} />
+                          <span>Live Demo</span>
+                        </a>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => setSelectedDemoProject(project)}
+                          className={projectStyles.btnPrimary}
+                          data-track-event="project_demo_modal"
+                          style={{ cursor: 'pointer', border: 'none' }}
+                        >
+                          <PortfolioIcon platform="Web" size={14} />
+                          <span>Live Demo</span>
+                        </button>
+                      )
                     )}
                     {githubRepoLink && (
                       <a
@@ -159,6 +177,13 @@ export function ProjectsSection({ projects }: ProjectsSectionProps) {
         initialIndex={activeLightbox.initialIndex}
         title={activeLightbox.title}
         onClose={() => setActiveLightbox((prev) => ({ ...prev, isOpen: false }))}
+      />
+
+      {/* Interactive Live Demo Modal */}
+      <ProjectLiveDemoModal
+        isOpen={Boolean(selectedDemoProject)}
+        project={selectedDemoProject}
+        onClose={() => setSelectedDemoProject(null)}
       />
     </>
   );

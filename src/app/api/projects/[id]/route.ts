@@ -18,6 +18,10 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
     image?: string;
     videoPreviewUrl?: string;
     galleryImages?: string[] | string;
+    demoType?: string;
+    demoCredentials?: string | null;
+    demoNote?: string | null;
+    isEmbeddable?: boolean;
   }>(request);
 
   if (error || !data) {
@@ -60,6 +64,10 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
         ...(image !== undefined ? { imageUrl: ensureHttps(image) } : {}),
         ...(data.videoPreviewUrl !== undefined ? { videoPreviewUrl: ensureHttps(data.videoPreviewUrl) } : {}),
         ...(galleryString !== undefined ? { galleryImages: galleryString } : {}),
+        ...(data.demoType !== undefined ? { demoType: data.demoType } : {}),
+        ...(data.demoCredentials !== undefined ? { demoCredentials: data.demoCredentials ? data.demoCredentials.trim() : null } : {}),
+        ...(data.demoNote !== undefined ? { demoNote: data.demoNote ? data.demoNote.trim() : null } : {}),
+        ...(data.isEmbeddable !== undefined ? { isEmbeddable: data.isEmbeddable } : {}),
       },
     });
     revalidatePortfolioData();

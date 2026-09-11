@@ -27,6 +27,10 @@ model Project {
   demoUrl         String?
   repoUrl         String?
   tags            String   // JSON string or comma-separated tags
+  demoType        String   @default("modal") // "modal" | "external" | "embed"
+  demoCredentials String?  // Preconfigured guest credentials (e.g. guest / guest123)
+  demoNote        String?  // Guidance text (e.g. Read-only guest session)
+  isEmbeddable    Boolean  @default(true)
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 }

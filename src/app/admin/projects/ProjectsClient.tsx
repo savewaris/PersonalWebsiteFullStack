@@ -1,13 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { FaEdit, FaTrash, FaExternalLinkAlt, FaGithub, FaVideo, FaImages } from 'react-icons/fa';
+import { FaEdit, FaTrash, FaExternalLinkAlt, FaGithub, FaVideo, FaImages, FaLock, FaGlobe } from 'react-icons/fa';
 import { useAdminCrud } from '@/lib/useAdminCrud';
 import { AdminPageHeader } from '@/components/admin/AdminPageHeader';
-import { AdminModal } from '@/components/admin/AdminModal';
 import { DeleteConfirmModal } from '@/components/admin/DeleteConfirmModal';
-import { MediaDropzone } from '@/components/admin/MediaDropzone';
-import { ProjectGalleryManager } from '@/components/admin/ProjectGalleryManager';
+import { ProjectFormModal, type ProjectFormData } from './ProjectFormModal';
 import styles from '@/components/admin/admin.module.css';
 
 export interface Project {
@@ -20,7 +18,26 @@ export interface Project {
   demoUrl: string | null;
   repoUrl: string | null;
   tags: string;
+  demoType?: string;
+  demoCredentials?: string | null;
+  demoNote?: string | null;
+  isEmbeddable?: boolean;
 }
+
+const DEFAULT_FORM: ProjectFormData = {
+  title: '',
+  description: '',
+  imageUrl: '',
+  videoPreviewUrl: '',
+  galleryImages: '',
+  demoUrl: '',
+  repoUrl: '',
+  tags: '',
+  demoType: 'modal',
+  demoCredentials: '',
+  demoNote: '',
+  isEmbeddable: true,
+};
 
 export default function ProjectsClient({ initialProjects }: { initialProjects: Project[] }) {
   const {
@@ -38,46 +55,34 @@ export default function ProjectsClient({ initialProjects }: { initialProjects: P
     deleteItem,
   } = useAdminCrud<Project>(initialProjects, '/api/projects');
 
-  const [formData, setFormData] = useState<Partial<Project>>({
-    title: '',
-    description: '',
-    imageUrl: '',
-    videoPreviewUrl: '',
-    galleryImages: '',
-    demoUrl: '',
-    repoUrl: '',
-    tags: '',
-  });
+  const [formData, setFormData] = useState<ProjectFormData>(DEFAULT_FORM);
 
   const handleOpenCreate = () => {
-    setFormData({
-      title: '',
-      description: '',
-      imageUrl: '',
-      videoPreviewUrl: '',
-      galleryImages: '',
-      demoUrl: '',
-      repoUrl: '',
-      tags: '',
-    });
+    setFormData(DEFAULT_FORM);
     openCreate();
   };
 
   const handleOpenEdit = (project: Project) => {
-    setFormData(project);
+    setFormData({
+      ...project,
+      demoType: project.demoType || 'modal',
+      demoCredentials: project.demoCredentials || '',
+      demoNote: project.demoNote || '',
+      isEmbeddable: project.isEmbeddable ?? true,
+    });
     openEdit(project);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await saveItem(formData);
+    await saveItem(formData as Partial<Project>);
   };
 
   return (
     <div>
       <AdminPageHeader
         title="Projects Management"
-        description="Manage the portfolio projects showcasing your work, rich media videos, screenshot galleries, and open-source repositories."
+        description="Manage portfolio projects, live demo sandboxes, guest credentials, videos, and screenshot galleries."
         count={projects.length}
         actionLabel="Add Project"
         onAction={handleOpenCreate}
@@ -86,208 +91,165 @@ export default function ProjectsClient({ initialProjects }: { initialProjects: P
       {error && <div className={styles.errorBanner}>{error}</div>}
 
       {projects.length === 0 ? (
-        <div className={styles.emptyState}>No projects added yet. Click &ldquo;+ Add Project&rdquo; to showcase your work.</div>
+        <div className={styles.emptyState}>
+          <p>No projects added yet. Click &ldquo;+ Add Project&rdquo; to showcase your work.</p>
+          <button onClick={handleOpenCreate} className={styles.primaryButton} style={{ marginTop: '14px' }}>
+            + Add First Project
+          </button>
+        </div>
       ) : (
-        <div className={styles.cardGrid}>
-          {projects.map((project) => {
-            const galleryCount = project.galleryImages
-              ? project.galleryImages.split(',').filter((s) => s.trim().length > 0).length
-              : 0;
+        <div className={styles.tableContainer}>
+          <table className={styles.table}>
+            <thead>
+              <tr>
+                <th style={{ width: '60px' }}>Media</th>
+                <th>Project Title & Description</th>
+                <th>Tech Stack</th>
+                <th>Demo & Sandbox</th>
+                <th>Links</th>
+                <th style={{ textAlign: 'right', width: '120px' }}>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {projects.map((project) => {
+                const galleryCount = project.galleryImages
+                  ? project.galleryImages.split(',').filter((s) => s.trim().length > 0).length
+                  : 0;
 
-            return (
-              <div key={project.id} className={styles.card}>
-                <div className={styles.cardHeader}>
-                  <div className={styles.cardInfo}>
-                    <h3 className={styles.cardTitle}>{project.title}</h3>
-                    
-                    {/* Media Badges */}
-                    <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginTop: '6px' }}>
-                      {project.videoPreviewUrl && (
+                return (
+                  <tr key={project.id}>
+                    <td>
+                      <div
+                        style={{
+                          width: '44px',
+                          height: '44px',
+                          borderRadius: '8px',
+                          background: 'var(--bg-tertiary)',
+                          border: '1px solid var(--border)',
+                          overflow: 'hidden',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                        }}
+                      >
+                        {project.imageUrl ? (
+                          <img
+                            src={project.imageUrl}
+                            alt={project.title}
+                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                          />
+                        ) : (
+                          <FaGlobe size={18} color="var(--text-secondary)" />
+                        )}
+                      </div>
+                    </td>
+                    <td>
+                      <div style={{ fontWeight: 600, color: 'var(--text-primary)', marginBottom: '3px' }}>
+                        {project.title}
+                      </div>
+                      <div
+                        style={{
+                          fontSize: '0.8rem',
+                          color: 'var(--text-secondary)',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap',
+                          maxWidth: '260px',
+                        }}
+                        title={project.description}
+                      >
+                        {project.description}
+                      </div>
+                    </td>
+                    <td>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', maxWidth: '220px' }}>
+                        {project.tags
+                          ? project.tags.split(',').slice(0, 3).map((tag, i) => (
+                              <span
+                                key={i}
+                                style={{
+                                  fontSize: '0.72rem',
+                                  padding: '2px 6px',
+                                  borderRadius: '4px',
+                                  background: 'rgba(255, 255, 255, 0.06)',
+                                  border: '1px solid var(--border)',
+                                }}
+                              >
+                                {tag.trim()}
+                              </span>
+                            ))
+                          : '-'}
+                      </div>
+                    </td>
+                    <td>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
                         <span
                           style={{
                             fontSize: '0.72rem',
-                            padding: '2px 8px',
-                            borderRadius: '4px',
-                            background: 'rgba(59, 130, 246, 0.15)',
-                            color: '#60a5fa',
-                            border: '1px solid rgba(59, 130, 246, 0.3)',
                             display: 'inline-flex',
                             alignItems: 'center',
                             gap: '4px',
+                            color: project.demoType === 'external' ? '#fbbf24' : '#34d399',
                           }}
                         >
-                          <FaVideo size={10} /> Video
+                          <FaLock size={10} />
+                          {project.demoType === 'external' ? 'External' : 'Modal Sandbox'}
                         </span>
-                      )}
-                      {galleryCount > 0 && (
-                        <span
-                          style={{
-                            fontSize: '0.72rem',
-                            padding: '2px 8px',
-                            borderRadius: '4px',
-                            background: 'rgba(168, 85, 247, 0.15)',
-                            color: '#c084fc',
-                            border: '1px solid rgba(168, 85, 247, 0.3)',
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: '4px',
-                          }}
-                        >
-                          <FaImages size={10} /> {galleryCount} Screenshot{galleryCount > 1 ? 's' : ''}
-                        </span>
-                      )}
-                      {project.tags &&
-                        project.tags.split(',').map((tag, i) => (
-                          <span key={i} className={styles.badgeCount} style={{ fontSize: '0.72rem' }}>
-                            {tag.trim()}
+                        {project.demoCredentials && (
+                          <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>
+                            <code>{project.demoCredentials}</code>
                           </span>
-                        ))}
-                    </div>
-                  </div>
-                </div>
-
-                <p className={styles.cardDescription}>
-                  {project.description}
-                </p>
-
-                <div style={{ display: 'flex', gap: '12px', fontSize: '0.85rem', flexWrap: 'wrap' }}>
-                  {project.demoUrl && (
-                    <a
-                      href={project.demoUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      style={{ color: 'var(--accent)', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
-                    >
-                      <FaExternalLinkAlt /> Live Demo
-                    </a>
-                  )}
-                  {project.repoUrl && (
-                    <a
-                      href={project.repoUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      style={{ color: 'var(--text-secondary)', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
-                    >
-                      <FaGithub /> Repository
-                    </a>
-                  )}
-                </div>
-
-                <div className={styles.cardActions}>
-                  <button type="button" onClick={() => handleOpenEdit(project)} className={styles.actionBtn}>
-                    <FaEdit style={{ marginRight: '4px' }} /> Edit
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setDeletingItem(project)}
-                    className={`${styles.actionBtn} ${styles.deleteBtn}`}
-                  >
-                    <FaTrash style={{ marginRight: '4px' }} /> Delete
-                  </button>
-                </div>
-              </div>
-            );
-          })}
+                        )}
+                      </div>
+                    </td>
+                    <td>
+                      <div style={{ display: 'flex', gap: '8px', fontSize: '0.85rem' }}>
+                        {project.demoUrl && (
+                          <a href={project.demoUrl} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent)' }} title="Open Demo">
+                            <FaExternalLinkAlt />
+                          </a>
+                        )}
+                        {project.repoUrl && (
+                          <a href={project.repoUrl} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--text-secondary)' }} title="Open Repo">
+                            <FaGithub />
+                          </a>
+                        )}
+                        {project.videoPreviewUrl && (
+                          <span title="Video Preview" style={{ color: '#60a5fa' }}><FaVideo /></span>
+                        )}
+                        {galleryCount > 0 && (
+                          <span title={`${galleryCount} Screenshots`} style={{ color: '#c084fc' }}><FaImages /></span>
+                        )}
+                      </div>
+                    </td>
+                    <td>
+                      <div className={styles.tableActions}>
+                        <button type="button" onClick={() => handleOpenEdit(project)} className={styles.actionBtn} title="Edit Project">
+                          <FaEdit />
+                        </button>
+                        <button type="button" onClick={() => setDeletingItem(project)} className={`${styles.actionBtn} ${styles.deleteBtn}`} title="Delete Project">
+                          <FaTrash />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         </div>
       )}
 
-      {/* Add / Edit Modal */}
-      <AdminModal
+      {/* Add / Edit Form Modal */}
+      <ProjectFormModal
         isOpen={isModalOpen}
+        isSubmitting={isSubmitting}
+        isEditing={Boolean(editingItem)}
+        formData={formData}
+        onChange={setFormData}
+        onSubmit={handleSubmit}
         onClose={closeModal}
-        title={editingItem ? 'Edit Project' : 'Add New Project'}
-      >
-        <form onSubmit={handleSubmit} className={styles.form}>
-          <div className={styles.formGroup}>
-            <label>Project Title</label>
-            <input
-              type="text"
-              required
-              value={formData.title || ''}
-              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              placeholder="e.g. AI Portfolio Platform"
-            />
-          </div>
-
-          <div className={styles.formGroup}>
-            <label>Description (Markdown supported)</label>
-            <textarea
-              required
-              rows={4}
-              value={formData.description || ''}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              placeholder="Detailed description of features, tech stack, and impact..."
-            />
-          </div>
-
-          <div className={styles.formGroup}>
-            <MediaDropzone
-              label="Cover / Poster Image"
-              value={formData.imageUrl}
-              onChange={(url) => setFormData({ ...formData, imageUrl: url })}
-              mediaType="image"
-              placeholder="https://example.com/cover.png"
-            />
-          </div>
-
-          <div className={styles.formGroup}>
-            <MediaDropzone
-              label="Video Preview (MP4 / WebM / MOV)"
-              value={formData.videoPreviewUrl}
-              onChange={(url) => setFormData({ ...formData, videoPreviewUrl: url })}
-              mediaType="video"
-              placeholder="https://example.com/demo.mp4"
-            />
-          </div>
-
-          <div className={styles.formGroup}>
-            <ProjectGalleryManager
-              value={formData.galleryImages}
-              onChange={(val) => setFormData({ ...formData, galleryImages: val })}
-            />
-          </div>
-
-          <div className={styles.formRow}>
-            <div className={styles.formGroup}>
-              <label>Demo URL</label>
-              <input
-                type="url"
-                value={formData.demoUrl || ''}
-                onChange={(e) => setFormData({ ...formData, demoUrl: e.target.value })}
-                placeholder="https://myproject.com"
-              />
-            </div>
-            <div className={styles.formGroup}>
-              <label>GitHub / Repo URL</label>
-              <input
-                type="url"
-                value={formData.repoUrl || ''}
-                onChange={(e) => setFormData({ ...formData, repoUrl: e.target.value })}
-                placeholder="https://github.com/username/project"
-              />
-            </div>
-          </div>
-
-          <div className={styles.formGroup}>
-            <label>Tags (Comma separated)</label>
-            <input
-              type="text"
-              value={formData.tags || ''}
-              onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
-              placeholder="React, Next.js, PostgreSQL, TypeScript"
-            />
-          </div>
-
-          <div className={styles.modalFooter}>
-            <button type="button" onClick={closeModal} className={styles.secondaryButton}>
-              Cancel
-            </button>
-            <button type="submit" disabled={isSubmitting} className={styles.primaryButton}>
-              {isSubmitting ? 'Saving...' : editingItem ? 'Update Project' : 'Create Project'}
-            </button>
-          </div>
-        </form>
-      </AdminModal>
+      />
 
       {/* Delete Confirmation */}
       <DeleteConfirmModal

@@ -29,6 +29,10 @@ export async function POST(request: Request) {
     image?: string;
     videoPreviewUrl?: string;
     galleryImages?: string[] | string;
+    demoType?: string;
+    demoCredentials?: string;
+    demoNote?: string;
+    isEmbeddable?: boolean;
   }>(request);
 
   if (error || !data?.title || !data.description) {
@@ -60,6 +64,10 @@ export async function POST(request: Request) {
         imageUrl: ensureHttps(data.imageUrl || data.image),
         videoPreviewUrl: ensureHttps(data.videoPreviewUrl),
         galleryImages: galleryString,
+        demoType: data.demoType || 'modal',
+        demoCredentials: data.demoCredentials ? data.demoCredentials.trim() : null,
+        demoNote: data.demoNote ? data.demoNote.trim() : null,
+        isEmbeddable: data.isEmbeddable ?? true,
       },
     });
     revalidatePortfolioData();
