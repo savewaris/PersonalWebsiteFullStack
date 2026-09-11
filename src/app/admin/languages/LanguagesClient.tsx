@@ -80,31 +80,60 @@ export default function LanguagesClient({ initialLanguages }: { initialLanguages
       {languages.length === 0 ? (
         <div className={styles.emptyState}>No languages added yet. Pick from the suggestions above or click &ldquo;+ Add Language&rdquo;.</div>
       ) : (
-        <div className={styles.cardGrid}>
-          {languages.map((lang) => (
-            <div key={lang.id} className={styles.card}>
-              <div className={styles.cardHeader}>
-                <div>
-                  <h3 className={styles.cardTitle}>{lang.name}</h3>
-                  <div className={styles.cardSubtitle}>{lang.proficiency}</div>
-                </div>
-                <span className={styles.badgeCount}>{lang.proficiency}</span>
-              </div>
-
-              <div className={styles.cardActions}>
-                <button type="button" onClick={() => handleOpenEdit(lang)} className={styles.actionBtn}>
-                  <FaEdit style={{ marginRight: '4px' }} /> Edit
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setDeletingItem(lang)}
-                  className={`${styles.actionBtn} ${styles.deleteBtn}`}
-                >
-                  <FaTrash style={{ marginRight: '4px' }} /> Delete
-                </button>
-              </div>
-            </div>
-          ))}
+        <div className={styles.tableContainer}>
+          <table className={styles.table}>
+            <thead>
+              <tr>
+                <th>Language</th>
+                <th>Proficiency Level</th>
+                <th style={{ textAlign: 'right', width: '100px' }}>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {languages.map((lang) => (
+                <tr key={lang.id}>
+                  <td>
+                    <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{lang.name}</span>
+                  </td>
+                  <td>
+                    <span
+                      style={{
+                        fontSize: '0.78rem',
+                        padding: '3px 10px',
+                        borderRadius: '999px',
+                        background: 'rgba(94, 106, 210, 0.12)',
+                        color: 'var(--accent)',
+                        border: '1px solid rgba(94, 106, 210, 0.25)',
+                        fontWeight: 500,
+                      }}
+                    >
+                      {lang.proficiency}
+                    </span>
+                  </td>
+                  <td>
+                    <div className={styles.tableActions}>
+                      <button
+                        type="button"
+                        onClick={() => handleOpenEdit(lang)}
+                        className={styles.actionBtn}
+                        title="Edit Language"
+                      >
+                        <FaEdit />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setDeletingItem(lang)}
+                        className={`${styles.actionBtn} ${styles.deleteBtn}`}
+                        title="Delete Language"
+                      >
+                        <FaTrash />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
 

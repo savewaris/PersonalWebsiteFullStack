@@ -95,47 +95,102 @@ export default function SkillsClient({ initialSkills }: { initialSkills: Skill[]
       {skills.length === 0 ? (
         <div className={styles.emptyState}>No skills added yet. Add your first skill or pick from suggestions above.</div>
       ) : (
-        <div className={styles.cardGrid}>
-          {skills.map((skill) => (
-            <div key={skill.id} className={styles.card}>
-              <div className={styles.cardHeader}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1, minWidth: 0 }}>
-                  <div
-                    style={{
-                      width: '36px',
-                      height: '36px',
-                      borderRadius: '8px',
-                      background: 'rgba(255, 255, 255, 0.05)',
-                      border: '1px solid var(--border)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      flexShrink: 0,
-                    }}
-                  >
-                    <PortfolioIcon name={skill.name} icon={skill.icon} category={skill.category} size={18} />
-                  </div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <h3 className={styles.cardTitle}>{skill.name}</h3>
-                    <div className={styles.cardSubtitle}>{skill.category}</div>
-                  </div>
-                </div>
-                <span className={styles.badgeCount}>{skill.proficiency}%</span>
-              </div>
-              <div className={styles.cardActions}>
-                <button type="button" onClick={() => handleOpenEdit(skill)} className={styles.actionBtn}>
-                  <FaEdit style={{ marginRight: '4px' }} /> Edit
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setDeletingItem(skill)}
-                  className={`${styles.actionBtn} ${styles.deleteBtn}`}
-                >
-                  <FaTrash style={{ marginRight: '4px' }} /> Delete
-                </button>
-              </div>
-            </div>
-          ))}
+        <div className={styles.tableContainer}>
+          <table className={styles.table}>
+            <thead>
+              <tr>
+                <th style={{ width: '48px' }}>Icon</th>
+                <th>Skill Name</th>
+                <th>Category</th>
+                <th style={{ width: '180px' }}>Proficiency</th>
+                <th style={{ textAlign: 'right', width: '100px' }}>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {skills.map((skill) => (
+                <tr key={skill.id}>
+                  <td>
+                    <div
+                      style={{
+                        width: '36px',
+                        height: '36px',
+                        borderRadius: '8px',
+                        background: 'rgba(255, 255, 255, 0.05)',
+                        border: '1px solid var(--border)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}
+                    >
+                      <PortfolioIcon name={skill.name} icon={skill.icon} category={skill.category} size={18} />
+                    </div>
+                  </td>
+                  <td>
+                    <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{skill.name}</span>
+                  </td>
+                  <td>
+                    <span
+                      style={{
+                        fontSize: '0.75rem',
+                        padding: '3px 8px',
+                        borderRadius: '4px',
+                        background: 'rgba(255, 255, 255, 0.05)',
+                        border: '1px solid var(--border)',
+                        color: 'var(--text-secondary)',
+                      }}
+                    >
+                      {skill.category}
+                    </span>
+                  </td>
+                  <td>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <div
+                        style={{
+                          flex: 1,
+                          height: '6px',
+                          background: 'rgba(255, 255, 255, 0.08)',
+                          borderRadius: '999px',
+                          overflow: 'hidden',
+                        }}
+                      >
+                        <div
+                          style={{
+                            width: `${skill.proficiency}%`,
+                            height: '100%',
+                            background: 'var(--accent, #5e6ad2)',
+                            borderRadius: '999px',
+                          }}
+                        />
+                      </div>
+                      <span style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', minWidth: '32px' }}>
+                        {skill.proficiency}%
+                      </span>
+                    </div>
+                  </td>
+                  <td>
+                    <div className={styles.tableActions}>
+                      <button
+                        type="button"
+                        onClick={() => handleOpenEdit(skill)}
+                        className={styles.actionBtn}
+                        title="Edit Skill"
+                      >
+                        <FaEdit />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setDeletingItem(skill)}
+                        className={`${styles.actionBtn} ${styles.deleteBtn}`}
+                        title="Delete Skill"
+                      >
+                        <FaTrash />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
 

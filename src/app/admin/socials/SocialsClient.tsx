@@ -104,96 +104,111 @@ export default function SocialsClient({ initialSocials }: { initialSocials: Soci
       {socials.length === 0 ? (
         <div className={styles.emptyState}>No social links added yet. Click &ldquo;+ Add Social Link&rdquo; or pick from suggestions above.</div>
       ) : (
-        <div className={styles.cardGrid}>
-          {socials.map((social) => (
-            <div key={social.id} className={styles.card}>
-              <div className={styles.cardHeader}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1, minWidth: 0 }}>
-                  <div
-                    style={{
-                      width: '40px',
-                      height: '40px',
-                      borderRadius: '10px',
-                      background: 'rgba(255, 255, 255, 0.05)',
-                      border: '1px solid var(--border)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontSize: '1.25rem',
-                      color: 'var(--text-primary)',
-                      flexShrink: 0,
-                    }}
-                  >
-                    <PortfolioIcon platform={social.platform} url={social.url} icon={social.icon} size={20} />
-                  </div>
-                  <div style={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
-                    <h3 className={styles.cardTitle}>{social.platform}</h3>
+        <div className={styles.tableContainer}>
+          <table className={styles.table}>
+            <thead>
+              <tr>
+                <th style={{ width: '48px' }}>Icon</th>
+                <th>Platform</th>
+                <th>Target URL / Handle</th>
+                <th>Type</th>
+                <th style={{ width: '60px' }}>Order</th>
+                <th style={{ textAlign: 'right', width: '100px' }}>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {socials.map((social) => (
+                <tr key={social.id}>
+                  <td>
                     <div
                       style={{
+                        width: '36px',
+                        height: '36px',
+                        borderRadius: '8px',
+                        background: 'rgba(255, 255, 255, 0.05)',
+                        border: '1px solid var(--border)',
                         display: 'flex',
                         alignItems: 'center',
-                        gap: '6px',
-                        fontSize: '0.82rem',
-                        color: 'var(--text-secondary)',
-                        marginTop: '2px',
-                        minWidth: 0,
+                        justifyContent: 'center',
+                        color: 'var(--text-primary)',
                       }}
                     >
-                      <span
-                        style={{
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          whiteSpace: 'nowrap',
-                          flexShrink: 1,
-                        }}
-                        title={social.url}
-                      >
-                        {social.url.replace(/^https?:\/\//, '').replace(/^mailto:/, '')}
-                      </span>
-                      <span
-                        style={{
-                          fontSize: '0.7rem',
-                          padding: '1px 6px',
-                          borderRadius: '8px',
-                          background: social.actionType === 'copy' ? 'rgba(34, 197, 94, 0.15)' : 'rgba(94, 106, 210, 0.15)',
-                          color: social.actionType === 'copy' ? '#4ade80' : 'var(--accent)',
-                          border: `1px solid ${social.actionType === 'copy' ? 'rgba(34, 197, 94, 0.3)' : 'rgba(94, 106, 210, 0.3)'}`,
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: '3px',
-                          flexShrink: 0,
-                        }}
-                      >
-                        {social.actionType === 'copy' ? (
-                          <>
-                            <FaCopy size={8} /> Copy
-                          </>
-                        ) : (
-                          <>
-                            <FaGlobe size={8} /> Redirect
-                          </>
-                        )}
-                      </span>
+                      <PortfolioIcon platform={social.platform} url={social.url} icon={social.icon} size={18} />
                     </div>
-                  </div>
-                </div>
-                <span className={styles.badgeCount}>#{social.order || 1}</span>
-              </div>
-
-              <div className={styles.cardActions}>
-                <button type="button" onClick={() => handleOpenEdit(social)} className={styles.actionBtn}>
-                  <FaEdit style={{ marginRight: '4px' }} /> Edit
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setDeletingItem(social)}
-                  className={`${styles.actionBtn} ${styles.deleteBtn}`}
-                >
-                  <FaTrash style={{ marginRight: '4px' }} /> Delete
-                </button>
-              </div>
-            </div>
-          ))}
+                  </td>
+                  <td>
+                    <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{social.platform}</span>
+                  </td>
+                  <td>
+                    <span
+                      style={{
+                        fontSize: '0.82rem',
+                        color: 'var(--text-secondary)',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                        display: 'inline-block',
+                        maxWidth: '260px',
+                      }}
+                      title={social.url}
+                    >
+                      {social.url.replace(/^https?:\/\//, '').replace(/^mailto:/, '')}
+                    </span>
+                  </td>
+                  <td>
+                    <span
+                      style={{
+                        fontSize: '0.7rem',
+                        padding: '2px 8px',
+                        borderRadius: '999px',
+                        background: social.actionType === 'copy' ? 'rgba(34, 197, 94, 0.15)' : 'rgba(94, 106, 210, 0.15)',
+                        color: social.actionType === 'copy' ? '#4ade80' : 'var(--accent)',
+                        border: `1px solid ${social.actionType === 'copy' ? 'rgba(34, 197, 94, 0.3)' : 'rgba(94, 106, 210, 0.3)'}`,
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '3px',
+                      }}
+                    >
+                      {social.actionType === 'copy' ? (
+                        <>
+                          <FaCopy size={8} /> Copy
+                        </>
+                      ) : (
+                        <>
+                          <FaGlobe size={8} /> Redirect
+                        </>
+                      )}
+                    </span>
+                  </td>
+                  <td>
+                    <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                      #{social.order || 1}
+                    </span>
+                  </td>
+                  <td>
+                    <div className={styles.tableActions}>
+                      <button
+                        type="button"
+                        onClick={() => handleOpenEdit(social)}
+                        className={styles.actionBtn}
+                        title="Edit Social Link"
+                      >
+                        <FaEdit />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setDeletingItem(social)}
+                        className={`${styles.actionBtn} ${styles.deleteBtn}`}
+                        title="Delete Social Link"
+                      >
+                        <FaTrash />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
 

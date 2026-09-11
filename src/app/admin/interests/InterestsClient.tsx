@@ -131,47 +131,67 @@ export default function InterestsClient({ initialInterests }: { initialInterests
             : `No interests in category "${selectedCategoryFilter}".`}
         </div>
       ) : (
-        <div className={styles.cardGrid}>
-          {filteredInterests.map((interest) => (
-            <div key={interest.id} className={styles.card}>
-              <div className={styles.cardHeader}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <span style={{ fontSize: '1.8rem' }}>{interest.emoji || '💡'}</span>
-                  <div>
-                    <h3 className={styles.cardTitle}>{interest.name}</h3>
+        <div className={styles.tableContainer}>
+          <table className={styles.table}>
+            <thead>
+              <tr>
+                <th style={{ width: '50px' }}>Emoji</th>
+                <th>Interest Name</th>
+                <th>Category</th>
+                <th style={{ textAlign: 'right', width: '100px' }}>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredInterests.map((interest) => (
+                <tr key={interest.id}>
+                  <td>
+                    <span style={{ fontSize: '1.4rem' }}>{interest.emoji || '💡'}</span>
+                  </td>
+                  <td>
+                    <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{interest.name}</span>
+                  </td>
+                  <td>
                     <span
                       style={{
-                        display: 'inline-block',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '4px',
                         fontSize: '0.75rem',
-                        padding: '2px 8px',
+                        padding: '3px 8px',
                         borderRadius: '4px',
-                        background: 'rgba(255, 255, 255, 0.06)',
+                        background: 'rgba(255, 255, 255, 0.05)',
                         color: 'var(--text-secondary)',
                         border: '1px solid var(--border)',
-                        marginTop: '4px',
                       }}
                     >
-                      <FaLayerGroup style={{ marginRight: '4px', fontSize: '0.65rem' }} />
+                      <FaLayerGroup style={{ fontSize: '0.65rem' }} />
                       {interest.category || 'Engineering & Core Tech'}
                     </span>
-                  </div>
-                </div>
-              </div>
-
-              <div className={styles.cardActions}>
-                <button type="button" onClick={() => handleOpenEdit(interest)} className={styles.actionBtn}>
-                  <FaEdit style={{ marginRight: '4px' }} /> Edit
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setDeletingItem(interest)}
-                  className={`${styles.actionBtn} ${styles.deleteBtn}`}
-                >
-                  <FaTrash style={{ marginRight: '4px' }} /> Delete
-                </button>
-              </div>
-            </div>
-          ))}
+                  </td>
+                  <td>
+                    <div className={styles.tableActions}>
+                      <button
+                        type="button"
+                        onClick={() => handleOpenEdit(interest)}
+                        className={styles.actionBtn}
+                        title="Edit Interest"
+                      >
+                        <FaEdit />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setDeletingItem(interest)}
+                        className={`${styles.actionBtn} ${styles.deleteBtn}`}
+                        title="Delete Interest"
+                      >
+                        <FaTrash />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
 

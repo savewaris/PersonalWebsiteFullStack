@@ -99,61 +99,99 @@ export default function ExperienceClient({ initialExperience }: { initialExperie
       {experiences.length === 0 ? (
         <div className={styles.emptyState}>No work experience recorded. Click &ldquo;+ Add Experience&rdquo; to add your roles.</div>
       ) : (
-        <div className={styles.cardGrid}>
-          {experiences.map((exp) => (
-            <div key={exp.id} className={styles.card}>
-              <div className={styles.cardHeader}>
-                <div className={styles.cardInfo}>
-                  <h3 className={styles.cardTitle}>{exp.role}</h3>
-                  <div className={styles.cardSubtitle}>
-                    {exp.company} {exp.location ? `• ${exp.location}` : ''}
-                  </div>
-                  <div style={{ display: 'flex', gap: '6px', marginTop: '6px', flexWrap: 'wrap' }}>
-                    <span style={{
-                      fontSize: '0.75rem',
-                      padding: '2px 8px',
-                      borderRadius: '999px',
-                      background: 'rgba(124, 58, 237, 0.15)',
-                      color: 'var(--accent)',
-                      border: '1px solid rgba(124, 58, 237, 0.3)',
-                    }}>
-                      💼 {exp.employmentType || 'Full-time'}
+        <div className={styles.tableContainer}>
+          <table className={styles.table}>
+            <thead>
+              <tr>
+                <th>Role & Position</th>
+                <th>Company & Location</th>
+                <th>Period</th>
+                <th>Type</th>
+                <th style={{ textAlign: 'right', width: '100px' }}>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {experiences.map((exp) => (
+                <tr key={exp.id}>
+                  <td>
+                    <div style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{exp.role}</div>
+                    <div
+                      style={{
+                        fontSize: '0.78rem',
+                        color: 'var(--text-secondary)',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                        maxWidth: '240px',
+                      }}
+                      title={exp.description}
+                    >
+                      {exp.description}
+                    </div>
+                  </td>
+                  <td>
+                    <div style={{ color: 'var(--text-primary)' }}>{exp.company}</div>
+                    {exp.location && (
+                      <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>{exp.location}</div>
+                    )}
+                  </td>
+                  <td>
+                    <span style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>
+                      {new Date(exp.startDate).getFullYear()} - {exp.endDate ? new Date(exp.endDate).getFullYear() : 'Present'}
                     </span>
-                    <span style={{
-                      fontSize: '0.75rem',
-                      padding: '2px 8px',
-                      borderRadius: '999px',
-                      background: 'rgba(59, 130, 246, 0.15)',
-                      color: '#60a5fa',
-                      border: '1px solid rgba(59, 130, 246, 0.3)',
-                    }}>
-                      🌐 {exp.locationType || 'On-site'}
-                    </span>
-                  </div>
-                </div>
-                <span className={styles.badgeCount}>
-                  {new Date(exp.startDate).getFullYear()} - {exp.endDate ? new Date(exp.endDate).getFullYear() : 'Present'}
-                </span>
-              </div>
-
-              <p className={styles.cardDescription}>
-                {exp.description}
-              </p>
-
-              <div className={styles.cardActions}>
-                <button type="button" onClick={() => handleOpenEdit(exp)} className={styles.actionBtn}>
-                  <FaEdit style={{ marginRight: '4px' }} /> Edit
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setDeletingItem(exp)}
-                  className={`${styles.actionBtn} ${styles.deleteBtn}`}
-                >
-                  <FaTrash style={{ marginRight: '4px' }} /> Delete
-                </button>
-              </div>
-            </div>
-          ))}
+                  </td>
+                  <td>
+                    <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+                      <span
+                        style={{
+                          fontSize: '0.72rem',
+                          padding: '2px 6px',
+                          borderRadius: '4px',
+                          background: 'rgba(94, 106, 210, 0.12)',
+                          color: 'var(--accent)',
+                          border: '1px solid rgba(94, 106, 210, 0.25)',
+                        }}
+                      >
+                        {exp.employmentType || 'Full-time'}
+                      </span>
+                      <span
+                        style={{
+                          fontSize: '0.72rem',
+                          padding: '2px 6px',
+                          borderRadius: '4px',
+                          background: 'rgba(59, 130, 246, 0.12)',
+                          color: '#60a5fa',
+                          border: '1px solid rgba(59, 130, 246, 0.25)',
+                        }}
+                      >
+                        {exp.locationType || 'On-site'}
+                      </span>
+                    </div>
+                  </td>
+                  <td>
+                    <div className={styles.tableActions}>
+                      <button
+                        type="button"
+                        onClick={() => handleOpenEdit(exp)}
+                        className={styles.actionBtn}
+                        title="Edit Experience"
+                      >
+                        <FaEdit />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setDeletingItem(exp)}
+                        className={`${styles.actionBtn} ${styles.deleteBtn}`}
+                        title="Delete Experience"
+                      >
+                        <FaTrash />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
 

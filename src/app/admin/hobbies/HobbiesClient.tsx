@@ -81,30 +81,48 @@ export default function HobbiesClient({ initialHobbies }: { initialHobbies: Hobb
       {hobbies.length === 0 ? (
         <div className={styles.emptyState}>No hobbies added yet. Pick from the suggestions above or click &ldquo;+ Add Hobby&rdquo;.</div>
       ) : (
-        <div className={styles.cardGrid}>
-          {hobbies.map((hobby) => (
-            <div key={hobby.id} className={styles.card}>
-              <div className={styles.cardHeader}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <span style={{ fontSize: '1.8rem' }}>{hobby.emoji || '✨'}</span>
-                  <h3 className={styles.cardTitle}>{hobby.name}</h3>
-                </div>
-              </div>
-
-              <div className={styles.cardActions}>
-                <button type="button" onClick={() => handleOpenEdit(hobby)} className={styles.actionBtn}>
-                  <FaEdit style={{ marginRight: '4px' }} /> Edit
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setDeletingItem(hobby)}
-                  className={`${styles.actionBtn} ${styles.deleteBtn}`}
-                >
-                  <FaTrash style={{ marginRight: '4px' }} /> Delete
-                </button>
-              </div>
-            </div>
-          ))}
+        <div className={styles.tableContainer}>
+          <table className={styles.table}>
+            <thead>
+              <tr>
+                <th style={{ width: '50px' }}>Emoji</th>
+                <th>Hobby Name</th>
+                <th style={{ textAlign: 'right', width: '100px' }}>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {hobbies.map((hobby) => (
+                <tr key={hobby.id}>
+                  <td>
+                    <span style={{ fontSize: '1.4rem' }}>{hobby.emoji || '✨'}</span>
+                  </td>
+                  <td>
+                    <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{hobby.name}</span>
+                  </td>
+                  <td>
+                    <div className={styles.tableActions}>
+                      <button
+                        type="button"
+                        onClick={() => handleOpenEdit(hobby)}
+                        className={styles.actionBtn}
+                        title="Edit Hobby"
+                      >
+                        <FaEdit />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setDeletingItem(hobby)}
+                        className={`${styles.actionBtn} ${styles.deleteBtn}`}
+                        title="Delete Hobby"
+                      >
+                        <FaTrash />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
 

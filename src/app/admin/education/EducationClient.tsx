@@ -91,60 +91,84 @@ export default function EducationClient({ initialEducation }: { initialEducation
       {educationList.length === 0 ? (
         <div className={styles.emptyState}>No education records found. Click &ldquo;+ Add Education&rdquo; to add your academic degrees.</div>
       ) : (
-        <div className={styles.cardGrid}>
-          {educationList.map((edu) => (
-            <div key={edu.id} className={styles.card}>
-              <div className={styles.cardHeader}>
-                <div className={styles.cardInfo}>
-                  <h3 className={styles.cardTitle}>{edu.degree} in {edu.fieldOfStudy}</h3>
-                  <div className={styles.cardSubtitle}>{edu.institution}</div>
-                  <div style={{ display: 'flex', gap: '8px', marginTop: '8px', flexWrap: 'wrap' }}>
+        <div className={styles.tableContainer}>
+          <table className={styles.table}>
+            <thead>
+              <tr>
+                <th>Degree & Field</th>
+                <th>Institution & Faculty</th>
+                <th>Period</th>
+                <th>Score</th>
+                <th style={{ textAlign: 'right', width: '100px' }}>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {educationList.map((edu) => (
+                <tr key={edu.id}>
+                  <td>
+                    <div style={{ fontWeight: 600, color: 'var(--text-primary)' }}>
+                      {edu.degree}
+                    </div>
+                    <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                      {edu.fieldOfStudy}
+                    </div>
+                  </td>
+                  <td>
+                    <div style={{ color: 'var(--text-primary)' }}>{edu.institution}</div>
                     {edu.faculty && (
-                      <span style={{
-                        fontSize: '0.78rem',
-                        padding: '2px 8px',
-                        borderRadius: '6px',
-                        background: 'rgba(124, 58, 237, 0.12)',
-                        color: 'var(--accent)',
-                        border: '1px solid rgba(124, 58, 237, 0.25)',
-                      }}>
-                        🏛️ {edu.faculty}
-                      </span>
+                      <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
+                        {edu.faculty}
+                      </div>
                     )}
-                    {edu.score && (
-                      <span style={{
-                        fontSize: '0.78rem',
-                        padding: '2px 8px',
-                        borderRadius: '999px',
-                        background: 'rgba(245, 158, 11, 0.12)',
-                        color: '#fbbf24',
-                        border: '1px solid rgba(245, 158, 11, 0.25)',
-                        fontWeight: 600,
-                      }}>
-                        🏆 GPA: {edu.score}
+                  </td>
+                  <td>
+                    <span style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>
+                      {new Date(edu.startDate).getFullYear()} - {edu.endDate ? new Date(edu.endDate).getFullYear() : 'Present'}
+                    </span>
+                  </td>
+                  <td>
+                    {edu.score ? (
+                      <span
+                        style={{
+                          fontSize: '0.75rem',
+                          padding: '2px 8px',
+                          borderRadius: '999px',
+                          background: 'rgba(245, 158, 11, 0.12)',
+                          color: '#fbbf24',
+                          border: '1px solid rgba(245, 158, 11, 0.25)',
+                          fontWeight: 600,
+                        }}
+                      >
+                        {edu.score}
                       </span>
+                    ) : (
+                      <span style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>-</span>
                     )}
-                  </div>
-                </div>
-                <span className={styles.badgeCount}>
-                  Class of {edu.endDate ? new Date(edu.endDate).getFullYear() : 'Present'}
-                </span>
-              </div>
-
-              <div className={styles.cardActions}>
-                <button type="button" onClick={() => handleOpenEdit(edu)} className={styles.actionBtn}>
-                  <FaEdit style={{ marginRight: '4px' }} /> Edit
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setDeletingItem(edu)}
-                  className={`${styles.actionBtn} ${styles.deleteBtn}`}
-                >
-                  <FaTrash style={{ marginRight: '4px' }} /> Delete
-                </button>
-              </div>
-            </div>
-          ))}
+                  </td>
+                  <td>
+                    <div className={styles.tableActions}>
+                      <button
+                        type="button"
+                        onClick={() => handleOpenEdit(edu)}
+                        className={styles.actionBtn}
+                        title="Edit Education"
+                      >
+                        <FaEdit />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setDeletingItem(edu)}
+                        className={`${styles.actionBtn} ${styles.deleteBtn}`}
+                        title="Delete Education"
+                      >
+                        <FaTrash />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
 
