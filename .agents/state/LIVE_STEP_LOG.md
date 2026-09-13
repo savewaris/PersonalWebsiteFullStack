@@ -63,3 +63,29 @@
 - 🟢 **[DONE]       ** `2026-09-03 09:34:12` | `agent` | **GENERAL**: Seeded Agent Second Brain and Personal Planner projects into Neon PostgreSQL database
 - 🟡 **[IN_PROGRESS]** `2026-09-03 09:52:21` | `agent` | **GENERAL**: Created and implemented GitHub issue #43 for multi-column Featured Projects Bento grid
 - 🟢 **[DONE]       ** `2026-09-03 09:52:26` | `agent` | **GENERAL**: Created and implemented GitHub issue #43 for multi-column Featured Projects Bento grid
+- 🟡 **[IN_PROGRESS]** `2026-09-13 08:16:12` | `agent` | **GENERAL**: Document aligned portfolio decisions and design specifications in task.md
+- 🟢 **[DONE]       ** `2026-09-13 08:16:28` | `agent` | **GENERAL**: Document aligned portfolio decisions and design specifications in task.md
+- 🟡 **[IN_PROGRESS]** `2026-09-13 08:16:31` | `agent` | **GENERAL**: Run npx prisma db push to synchronize database schema
+- 🟢 **[DONE]       ** `2026-09-13 08:16:55` | `agent` | **GENERAL**: Run npx prisma db push to synchronize database schema
+- 🟡 **[IN_PROGRESS]** `2026-09-13 08:16:57` | `agent` | **GENERAL**: Seed 5 curated GitHub projects into database
+- 🟢 **[DONE]       ** `2026-09-13 08:17:18` | `agent` | **GENERAL**: Seed 5 curated GitHub projects into database
+- 🟡 **[IN_PROGRESS]** `2026-09-13 08:17:22` | `agent` | **GENERAL**: Build ArchitectureModal and upgrade ProjectsSection with category filtering and Linear Bento styling
+- 🟢 **[DONE]       ** `2026-09-13 08:19:55` | `agent` | **GENERAL**: Build ArchitectureModal and upgrade ProjectsSection with category filtering and Linear Bento styling
+- 🟡 **[IN_PROGRESS]** `2026-09-13 08:30:22` | `agent` | **GENERAL**: Remove 3 unwanted projects (TaskFlow, Empire Video, Real-Time Chat) from database and update seed script
+- 🟢 **[DONE]       ** `2026-09-13 08:31:18` | `agent` | **GENERAL**: Remove 3 unwanted projects (TaskFlow, Empire Video, Real-Time Chat) from database and update seed script
+- 🟡 **[IN_PROGRESS]** `2026-09-13 08:48:37` | `agent` | **GENERAL**: Update database project links: set verified live URL for Personal Planner and nullify demoUrl for non-web projects
+- 🟢 **[DONE]       ** `2026-09-13 08:50:27` | `agent` | **GENERAL**: Update database project links: set verified live URL for Personal Planner and nullify demoUrl for non-web projects
+- 🟡 **[IN_PROGRESS]** `2026-09-13 08:56:26` | `agent` | **GENERAL**: Restore Task Management live link in DB and upgrade ArchitectureModal with dynamic blueprints for Nutrin and Agent Second Brain
+- 🟡 **[IN_PROGRESS]** `2026-09-13 15:22:56` | `agent` | **GENERAL**: Created autonomous gap-auditor skill & audit runner
+- 🟢 **[DONE]       ** `2026-09-13 15:22:59` | `agent` | **GENERAL**: Created autonomous gap-auditor skill & audit runner
+- 🟡 **[IN_PROGRESS]** `2026-09-13 15:26:48` | `agent` | **GENERAL**: Created universal slash-commands skill and synced cross-project
+- 🟢 **[DONE]       ** `2026-09-13 15:26:51` | `agent` | **GENERAL**: Created universal slash-commands skill and synced cross-project
+- 🟡 **[IN_PROGRESS]** `2026-09-13 15:41:37` | `agent` | **GENERAL**: Resolved all 4 gap auditor findings with multi-role resume system
+- 🟢 **[DONE]       ** `2026-09-13 15:41:40` | `agent` | **GENERAL**: Resolved all 4 gap auditor findings with multi-role resume system
+- 🟡 **[IN_PROGRESS]** `2026-09-13 15:51:30` | `agent` | **GENERAL**: Created GitHub Issue #65 for Custom Resume CMS & Plugin Adapter API via /permissioned-github
+- 🟢 **[DONE]       ** `2026-09-13 15:51:34` | `agent` | **GENERAL**: Created GitHub Issue #65 for Custom Resume CMS & Plugin Adapter API via /permissioned-github
+- 🟡 **[IN_PROGRESS]** `2026-09-13 16:05:22` | `agent` | **GENERAL**: Created GitHub Issue #66 for Traffic Separation & Segmented Analytics via /permissioned-github
+- 🟢 **[DONE]       ** `2026-09-13 16:05:25` | `agent` | **GENERAL**: Created GitHub Issue #66 for Traffic Separation & Segmented Analytics via /permissioned-github
+- 🟡 **[IN_PROGRESS]** `2026-09-13 16:16:10` | `agent` | **GENERAL**: Close GitHub Issues #65 and #66
+- 🟢 **[DONE]       ** `2026-09-13 16:16:13` | `agent` | **GENERAL**: Close GitHub Issues #65 and #66
+- 🟢 **[DONE]       ** `2026-09-13 16:48:50` | `agent` | **GENERAL**: Implemented Resume Upload fix #67 and Unified Modal System #68

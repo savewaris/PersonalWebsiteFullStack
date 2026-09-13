@@ -658,6 +658,185 @@ In production deployment on Vercel (`personal-website-full-stack.vercel.app`), t
 - [ ] Next.js production build (`npm run build`) compiles 29/29 routes with 0 errors.
 - [ ] GitHub Actions CI/CD workflows run 100% green on push to `main`.
 
+---
+---
+
+## Issue #65: [Feature] Custom Resume CMS Upload Page & Plugin Adapter API
+
+**Labels:** `feature`, `admin`, `backend`, `frontend`, `api`  
+**Milestone:** `v1.4 — Admin CMS & Extensions`  
+**Priority:** `High`  
+**Status:** Closed / Completed  
+**GitHub URL:** https://github.com/savewaris/PersonalWebsiteFullStack/issues/65
+
+### Description
+Remove the static/hardcoded resume mockup generator and introduce a dedicated **Resume Management section** in the Admin CMS panel (`/admin/resumes`). This allows manual upload and management of real PDF resumes, while providing an authenticated REST API adapter so an upcoming external resume project can plug in and sync tailored resumes automatically.
+
+---
+
+### Architectural Decisions (Aligned via `/grill-me`)
+
+1. **Database-Backed Storage (`Prisma Resume Model`)**:
+   - Add a `Resume` model to `prisma/schema.prisma` (`id`, `title`, `roleCategory`, `fileUrl`, `fileSize`, `isPrimary`, `isActive`).
+   - File uploads handled via API and stored in `public/uploads/resumes/` with sanitized filenames.
+
+2. **Admin CMS Panel (`/admin/resumes`)**:
+   - Dedicated management view matching existing admin design tokens.
+   - Drag-and-drop PDF file uploader with size and MIME validation (`application/pdf`, max 10MB).
+   - Fields: Title, Role Category, Primary toggle, Active toggle.
+   - Actions: Download, Copy Link, Set Primary, Delete.
+
+3. **Public Homepage Dynamic UX**:
+   - 1 Active Resume: Clicking "Download CV" downloads the file directly in 1 click.
+   - 2+ Active Resumes: Opens modal selector showing only real uploaded resumes.
+
+4. **External Plugin Adapter (`/api/resumes` REST Endpoint)**:
+   - Authenticated via `Authorization: Bearer <ADMIN_SECRET>`.
+   - Enables upcoming external resume project to push and sync compiled PDFs directly via HTTP.
+
+5. **Mockup Cleanup**:
+   - Remove `scripts/generate-resumes.mjs` and purge mockup PDFs in `public/resumes/`.
+   - Update `gap-audit.mjs` to verify real uploaded resumes.
+
+---
+
+### Acceptance Criteria
+- [x] Prisma schema updated with `Resume` model and database pushed.
+- [x] Next.js Route Handlers implemented: `GET /api/resumes`, `POST /api/resumes`, `PUT /api/resumes/[id]`, `DELETE /api/resumes/[id]`.
+- [x] Admin navigation sidebar updated with "Resumes" link and icon.
+- [x] Admin page created at `src/app/admin/resumes/page.tsx` with upload modal and card list.
+- [x] Homepage `HeroSection` dynamically adapts: 1-click download if 1 resume, selector modal if 2+.
+- [x] Hardcoded mock generator removed; audit script updated.
+- [x] Passes 55/55 quality gate (`npm run agent:doctor`, `npx tsc --noEmit`, `npm run build`).
+
+---
+---
+
+## Issue #66: [Feature] Separate Real User Traffic from Test, Admin & Bot Clicks
+
+**Labels:** `feature`, `analytics`, `backend`, `frontend`, `domain`  
+**Milestone:** `v1.5 — Telemetry & Conversion Intelligence`  
+**Priority:** `High`  
+**Status:** Closed / Completed  
+**GitHub URL:** https://github.com/savewaris/PersonalWebsiteFullStack/issues/66
+
+### Description
+Currently, all pageviews and click telemetry (outbound demo clicks, GitHub repo visits, resume downloads) are recorded without distinguishing between genuine visitors (recruiters, external developers) and internal activity (local development, Playwright E2E test runs, logged-in admin preview clicks, and web bots).
+
+This issue implements **Multi-Signal Traffic Classification** and a **Segmented Analytics Dashboard** to cleanly separate real user engagement metrics from test clicks.
+
+---
+
+### Architectural Decisions (Aligned via `/grill-me`)
+
+1. **Prisma Schema Update**:
+   - Update `PageView` and `ClickEvent` models in `prisma/schema.prisma`:
+     ```prisma
+     isTest      Boolean  @default(false)
+     trafficType String   @default("real") // "real" | "test" | "bot"
+     
+     @@index([trafficType, createdAt])
+     ```
+   - Non-breaking schema migration; all existing entries default to `"real"`.
+
+2. **Multi-Signal Detection Engine (`src/domain/analytics/traffic-classifier.ts`)**:
+   - **Test Signals**: Localhost/127.0.0.1, active Admin session cookie, query param `?test=true`, and test runner user-agents (Playwright, Cypress, HeadlessChrome).
+   - **Bot Signals**: Standard web crawlers, search spiders, and automated scanners.
+   - **Real User**: Production origin, standard browser, no admin session, no test flags.
+
+3. **Telemetry Beacon Integration (`src/components/AnalyticsBeacon.tsx`)**:
+   - Beacon and route `/api/analytics/track` compute and persist `trafficType` and `isTest`.
+
+4. **Analytics API & Repository Filtering**:
+   - Update analytics repository to support `trafficFilter`: `'real'` (default), `'all'`, `'test'`, `'bot'`.
+
+5. **Admin Analytics Dashboard UX (`/admin/analytics`)**:
+   - Segmented filter control: `[ 👤 Real Users (Default) ]` | `[ 🌐 All Traffic ]` | `[ 🧪 Test & Admin Activity ]`.
+   - Guarantees 100% accurate recruiter conversion metrics without test data pollution.
+
+---
+
+### Acceptance Criteria
+- [x] `prisma/schema.prisma` updated with `isTest` and `trafficType` on `PageView` and `ClickEvent`.
+- [x] Database schema synchronized with `npx prisma db push`.
+- [x] Pure domain classifier implemented in `src/domain/analytics/`.
+- [x] Ingestion endpoint `/api/analytics/track` records correct `trafficType`.
+- [x] Analytics repository and API route support `?filter=real|all|test`.
+- [x] Admin Analytics UI features segmented filter buttons with real-time switching.
+- [x] Passes 55/55 quality gate (`npm run agent:doctor`, `npx tsc --noEmit`, `npm run build`).
+
+---
+---
+
+## Issue #67: [Bug] Resume Upload Failure & API Response Contract Alignment
+
+**Labels:** `bug`, `admin`, `backend`  
+**Milestone:** `v1.5 — Admin Polish & Integrity`  
+**Priority:** `High`  
+**Status:** Closed / Completed  
+**GitHub URL:** https://github.com/savewaris/PersonalWebsiteFullStack/issues/67
+
+### Description
+Uploading a new PDF resume in the Admin panel (`/admin/resumes`) currently fails with a runtime error alert.
+
+### Root Cause
+In `src/app/admin/resumes/ResumesClient.tsx`, the upload handler checks `if (!res.ok || !json.success)`. However, the API route `/api/resumes` uses `apiSuccess(newResume, 201)` which returns the entity directly without a `success` wrapper. This causes `!json.success` to evaluate to `true` and throw an error. Additionally, `json.data` is `undefined`.
+
+### Scope of Fix
+1. Make payload parsing in `ResumesClient.tsx` resilient to both raw and wrapped response payloads (`json.data || json`).
+2. Standardize `/api/resumes` POST endpoint response contract.
+3. Add client-side file size validation (< 10MB) before initiating upload.
+4. Replace browser `alert()` with responsive inline error/success alerts matching Admin styling.
+
+### Acceptance Criteria
+- [x] Resume PDF upload succeeds reliably from Admin UI without false error alerts.
+- [x] Uploaded resume immediately reflects in the table with role category and badges.
+- [x] Client validates file size (<10MB) and PDF extension before sending.
+- [x] Clean error handling with inline alert banner.
+- [x] 0 TypeScript errors (`npx tsc --noEmit`) and successful build (`npm run build`).
+
+---
+---
+
+## Issue #68: [Feature] Centralized Unified Modal System & 1-File Design Configuration
+
+**Labels:** `feature`, `frontend`, `ui/ux`  
+**Milestone:** `v1.6 — Design System & Modals`  
+**Priority:** `High`  
+**Status:** Closed / Completed  
+**GitHub URL:** https://github.com/savewaris/PersonalWebsiteFullStack/issues/68
+
+### Description
+Currently, modals across the codebase (`AdminModal`, `ResumeDownloadModal`, `ProjectLiveDemoModal`, `ArchitectureModal`, `CertificationImportModal`, `LogoPickerModal`) use disparate overlay wrappers, inconsistent CSS rules, varied backdrop blurs, and different animation timings.
+
+This issue creates a centralized **Unified Modal System** driven by a single configuration file (`src/config/modal.config.ts`) and migrates all modals across both Admin CMS and Public views to use the unified modal primitive.
+
+### Architecture
+1. **Central Config (`src/config/modal.config.ts`)**:
+   - Single source of truth for modal sizing tiers (`sm`, `md`, `lg`, `xl`, `fullscreen`).
+   - Animation physics (Framer Motion spring curves, dampening, stiffness).
+   - Visual tokens: backdrop blur, background glass, border radius, z-index hierarchy, padding.
+2. **Unified Modal Component (`src/components/ui/Modal.tsx` / `Modal.module.css`)**:
+   - Framer Motion `AnimatePresence` + spring physics.
+   - Accessible keyboard interactions (Escape key listener, body scroll lock, focus trap readiness).
+   - Configurable `size`, `title`, `subtitle`, `icon`, `closeOnClickOutside`, and custom header actions.
+3. **Migration of All Modals**:
+   - `AdminModal` (which powers Admin CRUD forms and Delete Confirm).
+   - `ResumeDownloadModal` (Public homepage).
+   - `ProjectLiveDemoModal` (Interactive project iframe sandbox).
+   - `ArchitectureModal` (Interactive system architecture blueprints).
+   - `LogoPickerModal` & `CertificationImportModal`.
+   - Resume upload modal in `ResumesClient.tsx`.
+
+### Acceptance Criteria
+- [x] 1-file configuration (`modal.config.ts`) governs styling tokens, sizes, and physics.
+- [x] Unified `Modal` primitive implemented with Framer Motion animations.
+- [x] All Admin and Public modals refactored to use the unified modal primitive.
+- [x] Responsive across mobile, tablet, and desktop without horizontal overflow.
+- [x] 0 TypeScript errors (`npx tsc --noEmit`) and passes 55/55 quality gate.
+
+
+
 
 
 

@@ -83,6 +83,8 @@ const expectedSkills = [
   'design-system-tokens',
   'wcag-accessibility',
   'ux-ui-verifier',
+  'gap-auditor',
+  'slash-commands',
 ];
 
 for (const skill of expectedSkills) {
@@ -124,6 +126,8 @@ check('Session handover log (.agents/state/SESSION_LOG.md)', existsSync(path.joi
 check('Live step action ledger (.agents/state/LIVE_STEP_LOG.md)', existsSync(path.join(AGENTS_DIR, 'state', 'LIVE_STEP_LOG.md')));
 check('Cross-CLI file lock registry (.agents/state/locks.json)', existsSync(path.join(AGENTS_DIR, 'state', 'locks.json')));
 check('Modular domain data layer (src/lib/data/index.ts)', existsSync(path.join(ROOT_DIR, 'src', 'lib', 'data', 'index.ts')));
+check('Hexagonal domain layer (src/domain/index.ts)', existsSync(path.join(ROOT_DIR, 'src', 'domain', 'index.ts')));
+check('Infrastructure repositories (src/infrastructure/index.ts)', existsSync(path.join(ROOT_DIR, 'src', 'infrastructure', 'index.ts')));
 
 // 6. Prisma Validation
 console.log('\n🗄️ 6. Validating Prisma Database Schema...');

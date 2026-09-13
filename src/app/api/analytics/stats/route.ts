@@ -9,6 +9,7 @@ export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const range = searchParams.get('range') || '30d';
+    const filter = searchParams.get('filter') || 'real'; // 'real' | 'all' | 'test' | 'bot'
 
     let startDate: Date;
     const now = new Date();
@@ -24,8 +25,18 @@ export async function GET(request: Request) {
       startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
     }
 
+    let trafficCondition: any = {};
+    if (filter === 'real') {
+      trafficCondition = { trafficType: 'real' };
+    } else if (filter === 'test') {
+      trafficCondition = { isTest: true };
+    } else if (filter === 'bot') {
+      trafficCondition = { trafficType: 'bot' };
+    }
+
     const whereClause = {
       createdAt: { gte: startDate },
+      ...trafficCondition,
     };
 
     // Parallel fetch
@@ -64,6 +75,7 @@ export async function GET(request: Request) {
         orderBy: { createdAt: 'asc' },
       }),
       prisma.pageView.findMany({
+        where: trafficCondition,
         take: 15,
         orderBy: { createdAt: 'desc' },
         select: {
@@ -73,10 +85,12 @@ export async function GET(request: Request) {
           country: true,
           device: true,
           browser: true,
+          trafficType: true,
           createdAt: true,
         },
       }),
       prisma.clickEvent.findMany({
+        where: trafficCondition,
         take: 15,
         orderBy: { createdAt: 'desc' },
         select: {
@@ -85,6 +99,7 @@ export async function GET(request: Request) {
           eventType: true,
           elementText: true,
           country: true,
+          trafficType: true,
           createdAt: true,
         },
       }),
@@ -213,6 +228,7 @@ export async function GET(request: Request) {
         title: `Viewed page: ${pv.path}`,
         subtitle: `via ${pv.referrerHost || 'Direct'} • ${pv.browser || 'Browser'} on ${pv.device || 'desktop'}`,
         country: pv.country,
+        trafficType: pv.trafficType || 'real',
         createdAt: pv.createdAt,
       })),
       ...recentClicks.map((c) => ({
@@ -221,6 +237,7 @@ export async function GET(request: Request) {
         title: `Clicked ${c.eventType.replace(/_/g, ' ')}: "${c.elementText || c.targetUrl}"`,
         subtitle: `Target: ${c.targetUrl}`,
         country: c.country,
+        trafficType: c.trafficType || 'real',
         createdAt: c.createdAt,
       })),
     ]
@@ -229,6 +246,7 @@ export async function GET(request: Request) {
 
     return apiSuccess({
       range,
+      filter,
       summary: {
         totalViews,
         uniqueVisitors,

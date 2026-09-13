@@ -8,6 +8,7 @@ import {
   OrganizationLogoEntry,
 } from '@/lib/certification-logos';
 import { PortfolioIcon } from '@/components/PortfolioIcon';
+import { Modal } from '@/components/ui/Modal';
 
 interface LogoPickerModalProps {
   isOpen: boolean;
@@ -45,8 +46,6 @@ export function LogoPickerModal({
     });
   }, [activeCategory, searchQuery]);
 
-  if (!isOpen) return null;
-
   const handleSelect = (logo: OrganizationLogoEntry) => {
     onSelectLogo({
       name: logo.name,
@@ -68,20 +67,16 @@ export function LogoPickerModal({
   };
 
   return (
-    <div className={styles.modalOverlay} onClick={onClose}>
-      <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-        {/* Header */}
-        <div className={styles.modalHeader}>
-          <h2>
-            <span>🎨</span> Browse Organization & Academy Logos
-          </h2>
-          <button className={styles.closeButton} onClick={onClose} aria-label="Close modal">
-            ✕
-          </button>
-        </div>
-
-        {/* Body */}
-        <div className={styles.modalBody}>
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Browse Organization & Academy Logos"
+      icon={<span>🎨</span>}
+      size="lg"
+      bodyStyle={{ padding: 0 }}
+      ariaLabel="Logo Picker Dialog"
+    >
+      <div className={styles.modalBody}>
           {/* Search bar */}
           <div className={styles.searchBar}>
             <input
@@ -208,7 +203,6 @@ export function LogoPickerModal({
             Cancel
           </button>
         </div>
-      </div>
-    </div>
+    </Modal>
   );
 }

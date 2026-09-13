@@ -12,6 +12,7 @@
     "agent:doctor": "node scripts/agent-doctor.mjs",
     "agent:state": "node scripts/agent-state.mjs",
     "agent:issues": "node scripts/create-github-issues.mjs",
+    "audit": "node scripts/gap-audit.mjs",
     "docs:dev": "vitepress dev docs --port 3001",
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs --port 3001",

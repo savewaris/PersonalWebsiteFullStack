@@ -31,6 +31,8 @@ When executing tasks in this codebase, refer to and activate the corresponding p
 - **Feature Planning / Issue Scaffolding**: Use `.agents/skills/project-planner/SKILL.md`
 - **Codebase Auditing / Performance Research**: Use `.agents/skills/codebase-researcher/SKILL.md`
 - **Clean Code Modularization & File Locking**: Use `.agents/skills/clean-code-refactor/SKILL.md`
+- **Scanning Vulnerabilities, Missing Features & Logic Gaps**: Use `.agents/skills/gap-auditor/SKILL.md`
+- **Universal Slash Command Palette**: Use `.agents/skills/slash-commands/SKILL.md`
 
 ---
 

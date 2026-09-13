@@ -1,41 +1,37 @@
-import React, { useEffect } from 'react';
-import styles from './admin.module.css';
+'use client';
 
-interface AdminModalProps {
+import React from 'react';
+import { Modal } from '@/components/ui/Modal';
+import type { ModalSize } from '@/config/modal.config';
+
+export interface AdminModalProps {
   isOpen: boolean;
   onClose: () => void;
   title: string;
+  subtitle?: string;
+  size?: ModalSize;
   children: React.ReactNode;
 }
 
-export function AdminModal({ isOpen, onClose, title, children }: AdminModalProps) {
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    if (isOpen) {
-      window.addEventListener('keydown', handleKeyDown);
-      document.body.style.overflow = 'hidden';
-    }
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-      document.body.style.overflow = 'unset';
-    };
-  }, [isOpen, onClose]);
-
-  if (!isOpen) return null;
-
+export function AdminModal({
+  isOpen,
+  onClose,
+  title,
+  subtitle,
+  size = 'md',
+  children,
+}: AdminModalProps) {
   return (
-    <div className={styles.modalOverlay} onClick={onClose}>
-      <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-        <div className={styles.modalHeader}>
-          <h2 className={styles.modalTitle}>{title}</h2>
-          <button type="button" onClick={onClose} className={styles.closeButton} aria-label="Close">
-            ✕
-          </button>
-        </div>
-        {children}
-      </div>
-    </div>
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={title}
+      subtitle={subtitle}
+      size={size}
+    >
+      {children}
+    </Modal>
   );
 }
+
+export default AdminModal;

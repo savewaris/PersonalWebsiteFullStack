@@ -1,55 +1,7 @@
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { prisma } from '@/lib/prisma';
-
-function extractHost(referrer?: string | null): string | null {
-  if (!referrer || !referrer.trim()) return null;
-  try {
-    const url = new URL(referrer);
-    const host = url.hostname.toLowerCase().replace(/^www\./, '');
-    if (host.includes('linkedin')) return 'linkedin.com';
-    if (host.includes('github')) return 'github.com';
-    if (host.includes('google')) return 'google.com';
-    if (host.includes('twitter') || host === 't.co' || host.includes('x.com')) return 'x.com';
-    if (host.includes('facebook') || host.includes('fb.')) return 'facebook.com';
-    if (host.includes('instagram')) return 'instagram.com';
-    if (host.includes('reddit')) return 'reddit.com';
-    if (host.includes('youtube')) return 'youtube.com';
-    return host;
-  } catch {
-    return 'Direct / Bookmark';
-  }
-}
-
-function parseUserAgent(ua: string): { device: string; browser: string; os: string } {
-  const uaLower = ua.toLowerCase();
-
-  // Device
-  let device = 'desktop';
-  if (/mobile|iphone|ipod|android.*mobile|windows phone/i.test(uaLower)) {
-    device = 'mobile';
-  } else if (/ipad|android(?!.*mobile)|tablet/i.test(uaLower)) {
-    device = 'tablet';
-  }
-
-  // OS
-  let os = 'Other';
-  if (/windows/i.test(uaLower)) os = 'Windows';
-  else if (/macintosh|mac os x/i.test(uaLower)) os = 'macOS';
-  else if (/iphone|ipad|ipod/i.test(uaLower)) os = 'iOS';
-  else if (/android/i.test(uaLower)) os = 'Android';
-  else if (/linux/i.test(uaLower)) os = 'Linux';
-
-  // Browser
-  let browser = 'Other';
-  if (/edg/i.test(uaLower)) browser = 'Edge';
-  else if (/chrome|crios/i.test(uaLower) && !/edg/i.test(uaLower)) browser = 'Chrome';
-  else if (/safari/i.test(uaLower) && !/chrome|crios/i.test(uaLower)) browser = 'Safari';
-  else if (/firefox|fxios/i.test(uaLower)) browser = 'Firefox';
-  else if (/opr|opera/i.test(uaLower)) browser = 'Opera';
-
-  return { device, browser, os };
-}
+import { parseUserAgent, extractReferrerHost, classifyTraffic } from '@/domain/analytics';
 
 export async function POST(request: Request) {
   try {
@@ -59,7 +11,17 @@ export async function POST(request: Request) {
     }
 
     const payload = JSON.parse(rawBody);
-    const { type, path, referrer, targetUrl, eventType, elementText, sourcePath } = payload;
+    const {
+      type,
+      path,
+      referrer,
+      targetUrl,
+      eventType,
+      elementText,
+      sourcePath,
+      hostname,
+      isTestFlag,
+    } = payload;
 
     const headers = request.headers;
     const clientIp =
@@ -67,6 +29,20 @@ export async function POST(request: Request) {
       headers.get('x-real-ip') ||
       '127.0.0.1';
     const userAgent = headers.get('user-agent') || '';
+    const origin = headers.get('origin') || headers.get('host') || '';
+    const cookieHeader = headers.get('cookie') || '';
+    const hasAdminSession = cookieHeader.includes('admin_token=');
+
+    // Run multi-signal domain classifier
+    const { trafficType, isTest } = classifyTraffic({
+      hostname: hostname || origin,
+      userAgent,
+      clientIp,
+      hasAdminSession,
+      isTestFlag: Boolean(isTestFlag),
+      origin,
+    });
+
     const today = new Date().toISOString().split('T')[0];
     const salt = process.env.ADMIN_PASSWORD || 'portfolio-analytics-salt';
 
@@ -86,7 +62,7 @@ export async function POST(request: Request) {
     const { device, browser, os } = parseUserAgent(userAgent);
 
     if (type === 'pageview') {
-      const referrerHost = extractHost(referrer);
+      const referrerHost = extractReferrerHost(referrer);
       await prisma.pageView.create({
         data: {
           path: path || '/',
@@ -98,6 +74,8 @@ export async function POST(request: Request) {
           device,
           browser,
           os,
+          isTest,
+          trafficType,
         },
       });
     } else if (type === 'click') {
@@ -110,13 +88,15 @@ export async function POST(request: Request) {
             sourcePath: sourcePath || '/',
             visitorHash,
             country,
+            isTest,
+            trafficType,
           },
         });
       }
     }
 
     return NextResponse.json(
-      { ok: true },
+      { ok: true, trafficType },
       {
         status: 200,
         headers: {

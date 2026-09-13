@@ -62,6 +62,7 @@ interface AnalyticsData {
     title: string;
     subtitle: string;
     country: string | null;
+    trafficType?: string;
     createdAt: string;
   }>;
 }
@@ -69,16 +70,17 @@ interface AnalyticsData {
 export default function AnalyticsClient({ initialData }: { initialData: AnalyticsData }) {
   const [data, setData] = useState<AnalyticsData>(initialData);
   const [range, setRange] = useState<string>(initialData.range || '30d');
+  const [trafficFilter, setTrafficFilter] = useState<'real' | 'all' | 'test'>('real');
   const [isLoading, setIsLoading] = useState(false);
   const [hoveredPoint, setHoveredPoint] = useState<{ date: string; views: number; visitors: number; clicks: number } | null>(null);
 
-  const fetchStats = async (selectedRange: string) => {
+  const fetchStats = async (selectedRange: string = range, selectedFilter: 'real' | 'all' | 'test' = trafficFilter) => {
     setIsLoading(true);
     try {
-      const res = await fetch(`/api/analytics/stats?range=${selectedRange}`);
+      const res = await fetch(`/api/analytics/stats?range=${selectedRange}&filter=${selectedFilter}`);
       if (res.ok) {
         const json = await res.json();
-        setData(json);
+        setData(json.data || json);
       }
     } catch (err) {
       console.error('Failed to fetch analytics:', err);
@@ -89,16 +91,21 @@ export default function AnalyticsClient({ initialData }: { initialData: Analytic
 
   const handleRangeChange = (newRange: string) => {
     setRange(newRange);
-    fetchStats(newRange);
+    fetchStats(newRange, trafficFilter);
+  };
+
+  const handleFilterChange = (newFilter: 'real' | 'all' | 'test') => {
+    setTrafficFilter(newFilter);
+    fetchStats(range, newFilter);
   };
 
   // Auto-refresh stats every 30 seconds
   useEffect(() => {
     const interval = setInterval(() => {
-      fetchStats(range);
+      fetchStats(range, trafficFilter);
     }, 30000);
     return () => clearInterval(interval);
-  }, [range]);
+  }, [range, trafficFilter]);
 
   const maxViews = Math.max(...data.timeseries.map((t) => t.views), 1);
 
@@ -118,7 +125,7 @@ export default function AnalyticsClient({ initialData }: { initialData: Analytic
       >
         <button
           type="button"
-          onClick={() => fetchStats(range)}
+          onClick={() => fetchStats(range, trafficFilter)}
           disabled={isLoading}
           className={styles.rangeButton}
           style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
@@ -127,22 +134,49 @@ export default function AnalyticsClient({ initialData }: { initialData: Analytic
         </button>
       </AdminPageHeader>
 
-      {/* Range Selector Bar */}
+      {/* Controls Bar: Audience Segment & Timeframe */}
       <div className={styles.rangeBar}>
-        <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--text-secondary)', fontWeight: 500 }}>
-          Telemetry Timeframe
-        </div>
-        <div className={styles.rangeGroup}>
-          {['7d', '30d', '90d', 'all'].map((r) => (
+        <div className={styles.filterSection}>
+          <span className={styles.controlLabel}>Audience Segment</span>
+          <div className={styles.segmentedControl}>
             <button
-              key={r}
               type="button"
-              className={`${styles.rangeButton} ${range === r ? styles.rangeButtonActive : ''}`}
-              onClick={() => handleRangeChange(r)}
+              className={`${styles.segmentBtn} ${trafficFilter === 'real' ? styles.segmentBtnActive : ''}`}
+              onClick={() => handleFilterChange('real')}
             >
-              {r === '7d' ? 'Last 7 Days' : r === '30d' ? 'Last 30 Days' : r === '90d' ? 'Last 90 Days' : 'All Time'}
+              👤 Real Users
             </button>
-          ))}
+            <button
+              type="button"
+              className={`${styles.segmentBtn} ${trafficFilter === 'all' ? styles.segmentBtnActive : ''}`}
+              onClick={() => handleFilterChange('all')}
+            >
+              🌐 All Traffic
+            </button>
+            <button
+              type="button"
+              className={`${styles.segmentBtn} ${trafficFilter === 'test' ? styles.segmentBtnActive : ''}`}
+              onClick={() => handleFilterChange('test')}
+            >
+              🧪 Test & Admin
+            </button>
+          </div>
+        </div>
+
+        <div className={styles.filterSection}>
+          <span className={styles.controlLabel}>Timeframe</span>
+          <div className={styles.rangeGroup}>
+            {['7d', '30d', '90d', 'all'].map((r) => (
+              <button
+                key={r}
+                type="button"
+                className={`${styles.rangeButton} ${range === r ? styles.rangeButtonActive : ''}`}
+                onClick={() => handleRangeChange(r)}
+              >
+                {r === '7d' ? '7 Days' : r === '30d' ? '30 Days' : r === '90d' ? '90 Days' : 'All Time'}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -387,18 +421,37 @@ export default function AnalyticsClient({ initialData }: { initialData: Analytic
             <div className={styles.emptyState}>No activity captured yet. Visit the website to generate live telemetry.</div>
           ) : (
             <div className={styles.liveFeedList}>
-              {data.recentFeed.map((item) => (
-                <div key={item.id} className={styles.liveFeedItem}>
-                  <div className={styles.livePulse} />
-                  <div className={styles.feedContent}>
-                    <div className={styles.feedTitle}>{item.title}</div>
-                    <div className={styles.feedSubtitle}>
-                      {item.subtitle} {item.country ? `• 🌍 ${item.country}` : ''}
+              {data.recentFeed.map((item) => {
+                const isTest = item.trafficType === 'test';
+                const isBot = item.trafficType === 'bot';
+                return (
+                  <div key={item.id} className={styles.liveFeedItem}>
+                    <div
+                      className={`${styles.livePulse} ${
+                        isTest ? styles.pulseAmber : isBot ? styles.pulsePurple : ''
+                      }`}
+                    />
+                    <div className={styles.feedContent}>
+                      <div className={styles.feedTitle}>
+                        {item.title}
+                        {isTest && (
+                          <span className={`${styles.trafficBadge} ${styles.trafficBadgeTest}`}>Test / Admin</span>
+                        )}
+                        {isBot && (
+                          <span className={`${styles.trafficBadge} ${styles.trafficBadgeBot}`}>Bot / Crawler</span>
+                        )}
+                        {!isTest && !isBot && (
+                          <span className={`${styles.trafficBadge} ${styles.trafficBadgeReal}`}>Real</span>
+                        )}
+                      </div>
+                      <div className={styles.feedSubtitle}>
+                        {item.subtitle} {item.country ? `• 🌍 ${item.country}` : ''}
+                      </div>
                     </div>
+                    <div className={styles.feedTime}>{formatRelativeTime(item.createdAt)}</div>
                   </div>
-                  <div className={styles.feedTime}>{formatRelativeTime(item.createdAt)}</div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>

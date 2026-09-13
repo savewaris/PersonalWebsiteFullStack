@@ -11,6 +11,7 @@ interface ProjectMediaPreviewProps {
   videoPreviewUrl: string | null;
   galleryImages: string[];
   onOpenGallery: (index?: number) => void;
+  height?: string;
 }
 
 export function ProjectMediaPreview({
@@ -19,6 +20,7 @@ export function ProjectMediaPreview({
   videoPreviewUrl,
   galleryImages,
   onOpenGallery,
+  height = '125px',
 }: ProjectMediaPreviewProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
@@ -52,7 +54,7 @@ export function ProjectMediaPreview({
     <div
       className={styles.projectImageContainer}
       style={{
-        height: '210px',
+        height,
         position: 'relative',
         cursor: hasGallery || allImages.length > 0 ? 'pointer' : 'default',
         overflow: 'hidden',

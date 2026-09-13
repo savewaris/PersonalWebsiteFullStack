@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import styles from './Login.module.css';
@@ -10,6 +10,11 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,8 +37,9 @@ export default function LoginPage() {
       } else {
         setError(data.error || 'Invalid password');
       }
-    } catch (err: any) {
-      setError(err?.message || 'Login failed. Please try again.');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Login failed. Please try again.';
+      setError(message);
     } finally {
       setLoading(false);
     }
@@ -50,12 +56,13 @@ export default function LoginPage() {
         {error && <p className={styles.error}>{error}</p>}
 
         <input
+          ref={inputRef}
           type="password"
           placeholder="Enter Admin Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
-          autoFocus
+          suppressHydrationWarning
           className={styles.input}
         />
 

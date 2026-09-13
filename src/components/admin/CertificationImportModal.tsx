@@ -4,6 +4,7 @@ import { useState, useRef } from 'react';
 import { FaTimes, FaFileUpload, FaLink, FaCode, FaCheck, FaExclamationTriangle, FaPalette } from 'react-icons/fa';
 import { PortfolioIcon } from '@/components/PortfolioIcon';
 import { LogoPickerModal } from '@/components/admin/LogoPickerModal';
+import { Modal } from '@/components/ui/Modal';
 import styles from './CertificationImportModal.module.css';
 import adminStyles from '@/components/admin/admin.module.css';
 
@@ -42,8 +43,6 @@ export function CertificationImportModal({ isOpen, onClose, onSuccess }: Certifi
   const [urlIssuer, setUrlIssuer] = useState('');
 
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  if (!isOpen) return null;
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -199,20 +198,15 @@ export function CertificationImportModal({ isOpen, onClose, onSuccess }: Certifi
   const selectedCount = items.filter((i) => i.selected).length;
 
   return (
-    <div className={styles.modalOverlay} onClick={onClose}>
-      <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-        {/* Header */}
-        <div className={styles.modalHeader}>
-          <div className={styles.headerTitle}>
-            <FaFileUpload className={styles.headerIcon} />
-            <h2>Import LinkedIn & External Certifications</h2>
-          </div>
-          <button className={styles.closeButton} onClick={onClose} aria-label="Close">
-            <FaTimes />
-          </button>
-        </div>
-
-        {/* Body */}
+    <>
+      <Modal
+        isOpen={isOpen}
+        onClose={onClose}
+        title="Import LinkedIn & External Certifications"
+        icon={<FaFileUpload />}
+        size="lg"
+        bodyStyle={{ padding: 0 }}
+      >
         <div className={styles.modalBody}>
           {error && <div className={styles.errorBanner}>{error}</div>}
 
@@ -444,7 +438,7 @@ export function CertificationImportModal({ isOpen, onClose, onSuccess }: Certifi
             )}
           </button>
         </div>
-      </div>
+      </Modal>
 
       {/* Row-level Logo Picker Modal */}
       <LogoPickerModal
@@ -453,6 +447,6 @@ export function CertificationImportModal({ isOpen, onClose, onSuccess }: Certifi
         onSelectLogo={handleRowLogoSelect}
         currentIconKey={editingRowIdx !== null ? items[editingRowIdx]?.badgeImageUrl || '' : ''}
       />
-    </div>
+    </>
   );
 }

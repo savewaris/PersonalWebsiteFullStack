@@ -92,6 +92,8 @@ Activate skills when undertaking specialized multi-step tasks:
 11. `project-planner`: Translating user requirements into production-ready GitHub Issues.
 12. `codebase-researcher`: Deep audits of dependencies, code quality, and architecture.
 13. `clean-code-refactor`: Domain decomposition and cross-CLI dynamic file locking.
+14. `gap-auditor`: Autonomous scanning for vulnerabilities, missing features, logic gaps, and recruiter blindspots with 1-click numbered fixes.
+15. `slash-commands`: Universal Slash Command Palette and Fast-Trigger Dispatcher (/audit, /scan, /fix, /doctor, /verify, /clean, /sync, /plan).
 
 ---
 

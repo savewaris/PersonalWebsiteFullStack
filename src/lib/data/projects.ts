@@ -1,9 +1,10 @@
-import { prisma } from '@/lib/prisma';
+import { projectRepository } from '@/infrastructure/repositories';
 import type { Project } from '@prisma/client';
 
 export async function getProjects(): Promise<Project[]> {
   try {
-    return await prisma.project.findMany({ orderBy: { createdAt: 'desc' } });
+    const projects = await projectRepository.findAll();
+    return projects as Project[];
   } catch (error) {
     console.error('[DATA_ERROR:projects]:', error);
     return [];

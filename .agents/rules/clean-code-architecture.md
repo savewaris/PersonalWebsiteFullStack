@@ -15,7 +15,17 @@ description: Clean code engineering standards, domain-driven modularity, single-
 
 ---
 
-## 2. Cross-CLI Dynamic File-Locking Protocol
+## 2. Hexagonal 3-Tier Architecture Standard
+
+To guarantee that system logic is decoupled from web framework changes:
+1. **Domain Layer (`src/domain/`)**: Pure business logic, entity validation, value objects, calculations, and repository interface contracts.
+2. **Infrastructure Layer (`src/infrastructure/`)**: Concrete data repositories (Prisma ORM), external API clients, file storage, and data adapters implementing domain contracts.
+3. **Presentation Layer (`src/app/`, `src/components/`)**: Thin presentation adapters (React 19 components, Next.js route handlers, CSS Modules, Framer Motion springs).
+4. **Import Best Practices**: Use frameworks and UI libraries where they belong by design (UI in presentation, ORM in infrastructure, pure logic in domain).
+
+---
+
+## 3. Cross-CLI Dynamic File-Locking Protocol
 
 When multiple AI sessions or CLI windows run simultaneously:
 1. **Declare File Locks Before Modifying**:
@@ -34,7 +44,7 @@ When multiple AI sessions or CLI windows run simultaneously:
 
 ---
 
-## 3. Import & Dependency Hygiene
+## 4. Import & Dependency Hygiene
 
 - **Use Clean Aliases**: Use `@/` alias imports (`@/lib/prisma`, `@/lib/data`, `@/components/...`).
 - **Barrel Cleanliness**: Maintain explicit exports in `src/lib/data/index.ts` to support backward-compatible imports while preserving modular underlying files.
@@ -42,7 +52,7 @@ When multiple AI sessions or CLI windows run simultaneously:
 
 ---
 
-## 4. Code Quality & Lint Gates
+## 5. Code Quality & Lint Gates
 
 - Run automated linting and formatting fixes:
   ```bash

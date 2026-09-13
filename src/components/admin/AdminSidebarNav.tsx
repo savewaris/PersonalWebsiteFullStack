@@ -15,6 +15,7 @@ import {
   FaLanguage,
   FaShareAlt,
   FaEnvelope,
+  FaFilePdf,
   FaExternalLinkAlt,
   FaSignOutAlt,
 } from 'react-icons/fa';
@@ -23,6 +24,7 @@ import styles from '@/app/admin/AdminLayout.module.css';
 const NAV_ITEMS = [
   { href: '/admin', label: 'Dashboard', icon: FaTachometerAlt, exact: true },
   { href: '/admin/analytics', label: 'Analytics', icon: FaChartLine },
+  { href: '/admin/resumes', label: 'Resumes', icon: FaFilePdf },
   { href: '/admin/skills', label: 'Skills', icon: FaCode },
   { href: '/admin/projects', label: 'Projects', icon: FaFolderOpen },
   { href: '/admin/experience', label: 'Experience', icon: FaBriefcase },

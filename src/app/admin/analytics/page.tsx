@@ -5,7 +5,7 @@ export const revalidate = 0;
 
 async function fetchInitialAnalyticsData() {
   const startDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
-  const whereClause = { createdAt: { gte: startDate } };
+  const whereClause = { createdAt: { gte: startDate }, trafficType: 'real' };
 
   const [pageViews, clicks, recentPageViews, recentClicks] = await Promise.all([
     prisma.pageView.findMany({
@@ -37,6 +37,7 @@ async function fetchInitialAnalyticsData() {
       orderBy: { createdAt: 'asc' },
     }),
     prisma.pageView.findMany({
+      where: { trafficType: 'real' },
       take: 15,
       orderBy: { createdAt: 'desc' },
       select: {
@@ -46,10 +47,12 @@ async function fetchInitialAnalyticsData() {
         country: true,
         device: true,
         browser: true,
+        trafficType: true,
         createdAt: true,
       },
     }),
     prisma.clickEvent.findMany({
+      where: { trafficType: 'real' },
       take: 15,
       orderBy: { createdAt: 'desc' },
       select: {
@@ -58,6 +61,7 @@ async function fetchInitialAnalyticsData() {
         eventType: true,
         elementText: true,
         country: true,
+        trafficType: true,
         createdAt: true,
       },
     }),
@@ -171,6 +175,7 @@ async function fetchInitialAnalyticsData() {
       title: `Viewed page: ${pv.path}`,
       subtitle: `via ${pv.referrerHost || 'Direct'} • ${pv.browser || 'Browser'} on ${pv.device || 'desktop'}`,
       country: pv.country,
+      trafficType: pv.trafficType || 'real',
       createdAt: pv.createdAt.toISOString(),
     })),
     ...recentClicks.map((c) => ({
@@ -179,6 +184,7 @@ async function fetchInitialAnalyticsData() {
       title: `Clicked ${c.eventType.replace(/_/g, ' ')}: "${c.elementText || c.targetUrl}"`,
       subtitle: `Target: ${c.targetUrl}`,
       country: c.country,
+      trafficType: c.trafficType || 'real',
       createdAt: c.createdAt.toISOString(),
     })),
   ]

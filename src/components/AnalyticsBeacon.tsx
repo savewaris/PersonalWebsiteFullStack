@@ -3,6 +3,21 @@
 import { useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 
+function getClientTelemetryContext() {
+  if (typeof window === 'undefined') {
+    return { hostname: '', isTest: false };
+  }
+  const hostname = window.location.hostname;
+  const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1';
+  const urlParams = new URLSearchParams(window.location.search);
+  const isTestParam = urlParams.get('test') === 'true' || urlParams.get('preview') === 'true';
+  const hasAdminCookie = document.cookie.includes('admin_token=');
+  return {
+    hostname,
+    isTest: isLocalhost || isTestParam || hasAdminCookie,
+  };
+}
+
 export function AnalyticsBeacon() {
   const pathname = usePathname();
 
@@ -14,10 +29,13 @@ export function AnalyticsBeacon() {
         return;
       }
 
+      const clientContext = getClientTelemetryContext();
       const payload = {
         type: 'pageview',
         path: window.location.pathname + window.location.hash,
         referrer: document.referrer || '',
+        hostname: clientContext.hostname,
+        isTestFlag: clientContext.isTest,
       };
 
       if (navigator.sendBeacon) {
@@ -86,12 +104,15 @@ export function AnalyticsBeacon() {
           return;
         }
 
+        const clientContext = getClientTelemetryContext();
         const payload = {
           type: 'click',
           targetUrl,
           eventType,
           elementText: elementText.slice(0, 80),
           sourcePath: window.location.pathname + window.location.hash,
+          hostname: clientContext.hostname,
+          isTestFlag: clientContext.isTest,
         };
 
         if (navigator.sendBeacon) {
@@ -105,14 +126,12 @@ export function AnalyticsBeacon() {
           }).catch(() => {});
         }
       } catch {
-        // Silently ignore
+        // Ignore telemetry errors
       }
     };
 
-    document.addEventListener('click', handleClick, { capture: true });
-    return () => {
-      document.removeEventListener('click', handleClick, { capture: true });
-    };
+    window.addEventListener('click', handleClick, { capture: true });
+    return () => window.removeEventListener('click', handleClick, { capture: true });
   }, []);
 
   return null;

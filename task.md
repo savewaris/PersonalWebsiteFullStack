@@ -1,41 +1,28 @@
-# Task: Issue #35 — [Enhancement] Standardize Universal Modal & In-Place Edit Functionality Across All Admin Manager Sections
+# Task: Portfolio Linear Bento Upgrade & Curated GitHub Projects Auto-Import
 
-**Issue Link:** [GitHub #35](https://github.com/savewaris/PersonalWebsiteFullStack/issues/35)  
-**Status:** In Progress  
-**Started:** 2026-09-03T09:55:18.184Z
-
-## 🎯 Objective
-Audit and standardize full in-place and modal **Edit functionality** across every entity manager in the Admin CMS (`/admin/certifications`, `/admin/projects`, `/admin/skills`, `/admin/experience`, `/admin/education`, `/admin/interests`, `/admin/hobbies`, `/admin/languages`, `/admin/socials`). Ensure all fields, relations, image previews, emojis, and arrays are pre-populated accurately on edit click and updated reactively with zero page reloads.
-
----
-
-## 📁 Target Scope
-Not explicitly specified in issue body
-
-## 📋 Technical Requirements
-1. **Certifications Management (`/admin/certifications`)**:
-   - Verify Edit Modal opens with pre-populated `title`, `issuer`, `issueDate`, `expiryDate`, `credentialId`, `credentialUrl`, `badgeImageUrl`, and `order`.
-   - Ensure `LogoPickerModal` can update the certification logo in edit mode without clearing other fields.
-
-2. **Projects Management (`/admin/projects`)**:
-   - Pre-populate all fields including media gallery, video URL, tags/technologies array, demo URL, and repo URL.
-   - Support editing gallery screenshots without losing existing uploads.
-
-3. **Experience & Education (`/admin/experience`, `/admin/education`)**:
-   - Correctly pre-populate date ranges (`startDate`, `endDate`, `current`), descriptions (bullet points/markdown), company/school logos, and employment types.
-
-4. **Skills, Interests, Hobbies, Languages & Socials**:
-   - Support instant emoji / icon re-selection in edit mode.
-   - Provide clean typecasting for numeric proficiencies and orders.
-
-5. **State & Cache Reactivity**:
-   - `saveItem` updates the client state immediately and triggers Next.js server cache revalidation (`revalidatePortfolioData`).
-   - Clean error banners if validation or network requests fail.
+**Author:** Waris (@savewaris)  
+**Status:** Completed  
+**Design Archetype:** Linear / Vercel Ultra Bento Grid  
+**Aligned Decisions (Grill-Me Protocol):**
+1. **Design System**: Linear / Vercel Ultra Bento Grid (dark zinc, glassmorphism sheen, radial glow micro-interactions, responsive asymmetric cards).
+2. **Curated GitHub Projects Auto-Imported (Strictly 2 Selected by User)**:
+   - `hexagonal-architecture` (TypeScript, Domain-Driven Design, Ports & Adapters)
+   - `Nutrition-Assistant-Application-Nutrin-` (Flutter/Dart, Mobile Health & Diet Tracking)
+   *(Note: Removed 3 unselected projects: TaskFlow, Empire Video, and Real-Time Chat)*
+3. **Projects Showcase UX Enhancements**:
+   - Dynamic filter category pills (`All`, `Full-Stack`, `Architecture`, `Mobile`), auto-hiding empty tags.
+   - Interactive Architecture & Code Structure Preview Modal for backend/architecture projects (`hexagonal-architecture`).
+   - Live Demo Modal with responsive device simulator (desktop, tablet, mobile) and guest credentials for web apps.
+4. **Database Strategy**:
+   - Pushed updated Prisma schema safely (`npx prisma db push`).
+   - Seeded and preserved strictly the user's approved projects alongside original portfolio items.
 
 ---
 
-## ✅ Acceptance Criteria & Verification
-- [ ] Every admin manager module provides a fully functional, pre-populated Edit modal.
-- [ ] Editing any field (text, date, select, emoji, logo, media gallery) persists correctly via the corresponding `PUT` API endpoint.
-- [ ] UI reflects changes immediately without requiring manual browser refresh.
-- [ ] 0 TypeScript errors (`npx tsc --noEmit`) and clean production build (`npm run build`).
+## 📋 Implementation Checklist
+- [x] Step 1: Database Schema Push (`npx prisma db push`) to synchronize `demoType`, `demoCredentials`, `demoNote`, `isEmbeddable` in Neon PostgreSQL.
+- [x] Step 2: Seed strictly the 2 approved repositories (`hexagonal-architecture` and `Nutrin`).
+- [x] Step 3: Remove unwanted projects (`TaskFlow`, `Empire Video`, `Real-Time Socket.IO Chat`) from database.
+- [x] Step 4: Scaffold `ArchitectureModal.tsx` & `ArchitectureModal.module.css` for Ports & Adapters diagram and code snippets.
+- [x] Step 5: Upgrade `ProjectsSection.tsx` & `Projects.module.css` with dynamic category filtering, Linear Bento visual polish, and architecture modal integration.
+- [x] Step 6: Verification & Quality Gate (`npx tsc --noEmit`: 0 errors, `npm run agent:doctor`: 51/51 PASS).

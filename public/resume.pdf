@@ -1,0 +1,86 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>
+endobj
+4 0 obj
+<< /Length 1683 >>
+stream
+BT
+/F1 22 Tf
+50 740 Td
+(WARIS KHAMKAWEEPART) Tj
+/F1 14 Tf
+0 -26 Td
+(FULL-STACK SOFTWARE ENGINEER & WEB ARCHITECT) Tj
+/F1 10 Tf
+0 -20 Td
+(Email: contact@waris.dev  |  Location: Bangkok, Thailand  |  Portfolio: waris.dev) Tj
+0 -15 Td
+(GitHub: github.com/savewaris  |  LinkedIn: linkedin.com/in/waris-khamkaweepart) Tj
+
+/F1 13 Tf
+0 -30 Td
+(PROFESSIONAL SUMMARY) Tj
+/F1 10 Tf
+0 -16 Td
+(High-performance full-stack engineer specializing in Next.js 16, TypeScript, and Hexagonal Architecture.) Tj
+0 -14 Td
+(Proven expertise building decoupled domain logic, responsive bento interfaces, and reliable data layers.) Tj
+
+/F1 13 Tf
+0 -26 Td
+(CORE TECHNICAL SKILLS) Tj
+/F1 10 Tf
+0 -16 Td
+(Frontend: Next.js 16 (App Router), React 19, TypeScript, CSS Modules, Framer Motion.) Tj
+0 -14 Td
+(Backend: Node.js, Prisma ORM, PostgreSQL (Neon), REST API Design, Server Actions.) Tj
+0 -14 Td
+(Architecture: Hexagonal (Ports & Adapters), WCAG 2.2 AA Accessibility, CI/CD GitHub Actions.) Tj
+
+/F1 13 Tf
+0 -26 Td
+(KEY ARCHITECTURE & HIGHLIGHTS) Tj
+/F1 10 Tf
+0 -16 Td
+(- Architected full-stack personal engineering portfolio with 55-point automated health gate.) Tj
+0 -14 Td
+(- Implemented decoupled Domain-First infrastructure isolating Prisma repositories from UI presentation.) Tj
+0 -14 Td
+(- Built zero-overflow responsive Bento Grid layout with hardware-accelerated Framer Motion physics.) Tj
+0 -14 Td
+(- Authored end-to-end automated UX/UI verification suite utilizing Playwright and Axe-Core.) Tj
+
+/F1 13 Tf
+0 -26 Td
+(EDUCATION) Tj
+/F1 10 Tf
+0 -16 Td
+(Chulalongkorn University  -  Engineering & Technology) Tj
+0 -14 Td
+(Focus on Scalable Software Systems, Distributed Architectures & AI Systems) Tj
+ET
+endstream
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000241 00000 n 
+0000001976 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R >>
+startxref
+2051
+%%EOF

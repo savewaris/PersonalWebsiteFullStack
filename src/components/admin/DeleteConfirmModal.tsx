@@ -20,7 +20,7 @@ export function DeleteConfirmModal({
   onConfirm,
 }: DeleteConfirmModalProps) {
   return (
-    <AdminModal isOpen={isOpen} onClose={onClose} title={title}>
+    <AdminModal isOpen={isOpen} onClose={onClose} title={title} size="sm">
       <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
         <p style={{ color: 'var(--text-secondary)', lineHeight: 1.6 }}>
           Are you sure you want to delete {itemName ? <strong>&ldquo;{itemName}&rdquo;</strong> : 'this item'}? This action

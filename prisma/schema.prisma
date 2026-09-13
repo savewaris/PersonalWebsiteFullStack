@@ -132,12 +132,15 @@ model PageView {
   device       String?  // "mobile" | "tablet" | "desktop"
   browser      String?  // "Chrome" | "Safari" | "Firefox" | "Edge"
   os           String?  // "Windows" | "macOS" | "iOS" | "Android" | "Linux"
+  isTest       Boolean  @default(false)
+  trafficType  String   @default("real") // "real" | "test" | "bot"
   createdAt    DateTime @default(now())
 
   @@index([createdAt])
   @@index([path])
   @@index([referrerHost])
   @@index([visitorHash, createdAt])
+  @@index([trafficType, createdAt])
 }
 
 model ClickEvent {
@@ -148,10 +151,31 @@ model ClickEvent {
   sourcePath  String   // Page/section where click occurred
   visitorHash String   // Daily salted hash
   country     String?
+  isTest      Boolean  @default(false)
+  trafficType String   @default("real") // "real" | "test" | "bot"
   createdAt   DateTime @default(now())
 
   @@index([createdAt])
   @@index([eventType])
   @@index([targetUrl])
+  @@index([trafficType, createdAt])
 }
+
+model Resume {
+  id           String   @id @default(uuid())
+  title        String   // e.g. "Full-Stack Software Engineer"
+  roleCategory String   @default("General") // "Full-Stack" | "AI Systems" | "Frontend" | "Backend"
+  fileUrl      String   // Path or external URL
+  fileName     String   // Original or sanitized filename
+  fileSize     Int?     // Size in bytes
+  isPrimary    Boolean  @default(false)
+  isActive     Boolean  @default(true)
+  order        Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([isActive, order])
+  @@index([isPrimary])
+}
+
 

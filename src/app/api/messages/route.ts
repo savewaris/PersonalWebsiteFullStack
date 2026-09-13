@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import { apiSuccess, apiError, parseJsonBody, requireAuthSession, revalidatePortfolioData } from '@/lib/api-utils';
+import { dispatchMessageNotification } from '@/lib/notifications';
 
 export async function GET() {
   const authError = await requireAuthSession();
@@ -40,6 +41,15 @@ export async function POST(request: Request) {
         message: data.message.trim(),
       },
     });
+
+    // Trigger non-blocking real-time notification (Discord webhook or email)
+    dispatchMessageNotification({
+      name: newMessage.name,
+      email: newMessage.email,
+      message: newMessage.message,
+      createdAt: newMessage.createdAt,
+    }).catch((err) => console.error('[API_MESSAGES] Notification dispatch failed:', err));
+
     revalidatePortfolioData();
     return apiSuccess(newMessage, 201);
   } catch (err: any) {

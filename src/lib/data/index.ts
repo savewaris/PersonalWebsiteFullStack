@@ -13,3 +13,4 @@ export * from './hobbies';
 export * from './socials';
 export * from './certifications';
 export * from './stats';
+export * from './resumes';
