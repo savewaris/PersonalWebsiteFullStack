@@ -127,9 +127,9 @@ async function auditModels() {
         description: hasCritical ? 'Model issues detected:\n' + issues.map(i => i.message).join('\n') : 'All AI model tiers verified live and healthy.\n\nDiscovered ' + newFrontierCandidates.length + ' new candidates.',
         color,
         fields: [
-          { name: 'Fast Tier', value: registry.tiers.fast.model, inline: true },
-          { name: 'Balanced Tier', value: registry.tiers.balanced.model, inline: true },
-          { name: 'Pro Tier', value: registry.tiers.pro.model, inline: true },
+          { name: 'Fast Tier', value: registry.tiers.fast?.model || 'Not Configured', inline: true },
+          { name: 'Balanced Tier', value: registry.tiers.balanced?.model || 'Not Configured', inline: true },
+          { name: 'Pro Tier', value: registry.tiers.pro?.model || 'Not Configured', inline: true },
           { name: 'New Frontier Candidates', value: newFrontierCandidates.slice(0, 3).join(', ') || 'None', inline: false }
         ],
         footer: { text: 'Agent Second Brain • Weekly Maintenance Protocol' },
