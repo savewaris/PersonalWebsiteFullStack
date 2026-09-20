@@ -43,7 +43,7 @@ export default async function Home() {
   return (
     <>
       <Navbar />
-      <main style={{ minHeight: 'calc(100vh - 200px)', paddingTop: '64px' }}>
+      <main className={styles.mainContent}>
         <div className={styles.page}>
           <StaggerContainer className={styles.bentoContainer}>
             <HeroSection />
