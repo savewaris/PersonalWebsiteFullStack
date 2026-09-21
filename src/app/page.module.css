@@ -4,6 +4,16 @@
   flex-direction: column;
 }
 
+.mainContent {
+  min-height: calc(100vh - 200px);
+}
+
+@media (min-width: 768px) {
+  .mainContent {
+    padding-left: 72px;
+  }
+}
+
 /* Hero Section */
 .hero {
   min-height: 80vh;
