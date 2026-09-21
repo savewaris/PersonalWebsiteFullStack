@@ -275,14 +275,22 @@ async function runAudit() {
             const pwField = page.locator('input[type="password"]').first();
             if (await pwField.isVisible({ timeout: 3000 }).catch(() => false)) {
               await pwField.fill(process.env.ADMIN_PASSWORD);
-              // Submit — try Enter key or submit button
+              // Submit — try Enter key or submit button, and wait for the actual
+              // auth response so we don't race the session cookie being set
+              const authResponse = page.waitForResponse(
+                (res) => res.url().includes('/api/auth') && res.request().method() === 'POST',
+                { timeout: 8000 }
+              ).catch(() => null);
               const submitBtn = page.locator('button[type="submit"], button:has-text("Login"), button:has-text("Sign in")').first();
               if (await submitBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
                 await submitBtn.click();
               } else {
                 await pwField.press('Enter');
               }
-              await page.waitForTimeout(2000);
+              const res = await authResponse;
+              if (res && !res.ok()) {
+                console.warn(`    ⚠️ Admin login POST returned ${res.status()} for route: ${route}`);
+              }
               console.log(`    🔑 Admin login attempted for route: ${route}`);
             }
           } catch (loginErr) {
