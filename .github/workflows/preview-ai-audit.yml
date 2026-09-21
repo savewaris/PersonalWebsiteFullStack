@@ -92,6 +92,7 @@ jobs:
         env:
           PORT: 3000
           DATABASE_URL: ${{ secrets.DATABASE_URL || 'postgresql://mock:mock@localhost:5432/mockdb' }}
+          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
 
       - name: Resolve Final Audit URL
         id: resolve-url
