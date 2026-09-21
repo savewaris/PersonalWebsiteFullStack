@@ -270,7 +270,7 @@ async function runAudit() {
         // Auto-login to admin panel if ADMIN_PASSWORD is set and route is /admin or /admin/*
         if (process.env.ADMIN_PASSWORD && (route === '/admin' || route.startsWith('/admin/'))) {
           try {
-            await page.goto('http://localhost:3000/login', { waitUntil: 'domcontentloaded', timeout: 10000 });
+            await page.goto(new URL('/login', TARGET_URL).toString(), { waitUntil: 'domcontentloaded', timeout: 10000 });
             // Fill password field — try common selectors
             const pwField = page.locator('input[type="password"]').first();
             if (await pwField.isVisible({ timeout: 3000 }).catch(() => false)) {
