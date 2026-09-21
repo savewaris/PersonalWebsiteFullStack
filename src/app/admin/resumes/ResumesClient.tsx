@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import {
   FaFilePdf,
-  FaPlus,
   FaTrash,
   FaDownload,
   FaExternalLinkAlt,
@@ -12,10 +11,13 @@ import {
   FaTimes,
   FaUpload,
 } from 'react-icons/fa';
+import { useAdminCrud } from '@/lib/useAdminCrud';
+import { AdminPageHeader } from '@/components/admin/AdminPageHeader';
 import { AdminModal } from '@/components/admin/AdminModal';
-import styles from './resumes.module.css';
+import { DeleteConfirmModal } from '@/components/admin/DeleteConfirmModal';
+import styles from '@/components/admin/admin.module.css';
 
-interface SerializedResume {
+export interface SerializedResume {
   id: string;
   title: string;
   roleCategory: string;
@@ -33,19 +35,39 @@ interface ResumesClientProps {
   initialResumes: SerializedResume[];
 }
 
-export default function ResumesClient({ initialResumes }: ResumesClientProps) {
-  const [resumes, setResumes] = useState<SerializedResume[]>(initialResumes);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+const ROLE_CATEGORIES = [
+  { value: 'Full-Stack', label: 'Full-Stack Software Engineer' },
+  { value: 'AI Systems', label: 'AI & Autonomous Systems Engineer' },
+  { value: 'Frontend', label: 'Frontend & UI/UX Specialist' },
+  { value: 'Backend', label: 'Backend & Database Systems' },
+  { value: 'General', label: 'General Software Engineer' },
+];
 
-  // Form State
+function formatBytes(bytes: number | null) {
+  if (!bytes) return '';
+  const kb = bytes / 1024;
+  return kb > 1024 ? `${(kb / 1024).toFixed(1)} MB` : `${Math.round(kb)} KB`;
+}
+
+export default function ResumesClient({ initialResumes }: ResumesClientProps) {
+  const {
+    items: resumes,
+    setItems: setResumes,
+    deletingItem,
+    setDeletingItem,
+    isSubmitting,
+    deleteItem,
+  } = useAdminCrud<SerializedResume>(initialResumes, '/api/resumes');
+
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+
+  // Upload form state (bespoke: multipart file upload, not JSON via useAdminCrud.saveItem)
   const [title, setTitle] = useState('');
   const [roleCategory, setRoleCategory] = useState('Full-Stack');
   const [isPrimary, setIsPrimary] = useState(false);
   const [isActive, setIsActive] = useState(true);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [bannerSuccess, setBannerSuccess] = useState<string | null>(null);
-  const [bannerError, setBannerError] = useState<string | null>(null);
   const [modalError, setModalError] = useState<string | null>(null);
 
   const resetForm = () => {
@@ -75,7 +97,7 @@ export default function ResumesClient({ initialResumes }: ResumesClientProps) {
       return;
     }
 
-    setIsSubmitting(true);
+    setIsUploading(true);
     try {
       const formData = new FormData();
       formData.append('file', selectedFile);
@@ -103,14 +125,12 @@ export default function ResumesClient({ initialResumes }: ResumesClientProps) {
         return [created, ...list];
       });
 
-      setIsModalOpen(false);
+      setIsUploadModalOpen(false);
       resetForm();
-      setBannerSuccess(`Successfully uploaded and published "${created.title}".`);
-      setTimeout(() => setBannerSuccess(null), 6000);
     } catch (err: any) {
       setModalError(err.message || 'Upload failed');
     } finally {
-      setIsSubmitting(false);
+      setIsUploading(false);
     }
   };
 
@@ -151,204 +171,198 @@ export default function ResumesClient({ initialResumes }: ResumesClientProps) {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this resume?')) return;
-    try {
-      const res = await fetch(`/api/resumes/${id}`, { method: 'DELETE' });
-      if (res.ok) {
-        setResumes((prev) => prev.filter((r) => r.id !== id));
-      }
-    } catch (err) {
-      console.error('Error deleting resume:', err);
-    }
-  };
-
-  const formatBytes = (bytes: number | null) => {
-    if (!bytes) return '';
-    const kb = bytes / 1024;
-    return kb > 1024 ? `${(kb / 1024).toFixed(1)} MB` : `${Math.round(kb)} KB`;
-  };
-
   return (
-    <div className={styles.container}>
-      <div className={styles.headerRow}>
-        <div>
-          <h1 className={styles.pageTitle}>
-            <FaFilePdf style={{ color: 'var(--accent-primary, #5e6ad2)' }} />
-            Resume Management
-          </h1>
-          <p className={styles.pageSubtitle}>
-            Upload and organize real PDF resumes for your portfolio and plugin adapter
-          </p>
-        </div>
+    <div>
+      <AdminPageHeader
+        title="Resume Management"
+        description="Upload and organize real PDF resumes for your portfolio and plugin adapter."
+        count={resumes.length}
+      >
         <button
           type="button"
-          className={styles.addBtn}
           onClick={() => {
             resetForm();
-            setIsModalOpen(true);
+            setIsUploadModalOpen(true);
           }}
+          className={styles.primaryButton}
         >
-          <FaPlus size={13} />
-          <span>Upload Real Resume</span>
+          + Upload Real Resume
         </button>
-      </div>
+      </AdminPageHeader>
 
-      {bannerSuccess && (
-        <div className={styles.bannerSuccess}>
-          <FaCheck /> {bannerSuccess}
-        </div>
-      )}
-
-      {bannerError && (
-        <div className={styles.bannerError}>
-          <FaTimes /> {bannerError}
-        </div>
-      )}
-
-      {resumes.length === 0 ? (
-        <div className={styles.emptyState}>
-          <div className={styles.emptyIcon}>
-            <FaFilePdf />
+      <div className={styles.tableContainer}>
+        {resumes.length === 0 ? (
+          <div className={styles.emptyState}>
+            <FaFilePdf size={40} style={{ opacity: 0.3, marginBottom: '12px' }} />
+            <p>No resumes uploaded yet.</p>
+            <button
+              type="button"
+              onClick={() => setIsUploadModalOpen(true)}
+              className={styles.primaryButton}
+              style={{ marginTop: '12px' }}
+            >
+              Upload Your First Resume
+            </button>
           </div>
-          <h3>No resumes uploaded yet</h3>
-          <p style={{ color: 'var(--text-secondary)', marginBottom: '20px' }}>
-            Upload your real PDF resume here. It will immediately replace any mockup placeholders.
-          </p>
-          <button
-            type="button"
-            className={styles.addBtn}
-            onClick={() => setIsModalOpen(true)}
-          >
-            <FaUpload size={13} />
-            <span>Upload Your First Resume</span>
-          </button>
-        </div>
-      ) : (
-        <div className={styles.grid}>
-          {resumes.map((resume) => (
-            <div key={resume.id} className={styles.card}>
-              <div className={styles.cardHeader}>
-                <div className={styles.fileIconBox}>
-                  <FaFilePdf />
-                </div>
-                <div className={styles.cardInfo}>
-                  <h3 className={styles.resumeTitle}>{resume.title}</h3>
-                  <span className={styles.roleTag}>{resume.roleCategory}</span>
-                  {resume.isPrimary && (
-                    <span className={styles.primaryBadge}>Primary Default</span>
-                  )}
-                  <div className={styles.metaText}>
-                    {resume.fileName} • {formatBytes(resume.fileSize)}
-                  </div>
-                </div>
-              </div>
-
-              <div className={styles.actionsRow}>
-                <div className={styles.leftActions}>
-                  <a
-                    href={resume.fileUrl}
-                    download={resume.fileName}
-                    className={styles.actionBtn}
-                    title="Download File"
-                  >
-                    <FaDownload size={11} />
-                    <span>Download</span>
-                  </a>
-                  <a
-                    href={resume.fileUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={styles.actionBtn}
-                    title="Preview in Tab"
-                  >
-                    <FaExternalLinkAlt size={10} />
-                    <span>Preview</span>
-                  </a>
-                  <button
-                    type="button"
-                    onClick={() => handleTogglePrimary(resume.id)}
-                    className={styles.actionBtn}
-                    style={{
-                      color: resume.isPrimary ? '#4ade80' : undefined,
-                    }}
-                    title={resume.isPrimary ? 'Current primary default' : 'Set as primary default'}
-                  >
-                    <FaStar size={11} />
-                    <span>{resume.isPrimary ? 'Primary' : 'Make Primary'}</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleToggleActive(resume.id, resume.isActive)}
-                    className={styles.actionBtn}
-                    style={{
-                      color: resume.isActive ? '#60a5fa' : '#94a3b8',
-                    }}
-                    title={resume.isActive ? 'Active on homepage' : 'Hidden from homepage'}
-                  >
-                    {resume.isActive ? <FaCheck size={11} /> : <FaTimes size={11} />}
-                    <span>{resume.isActive ? 'Active' : 'Hidden'}</span>
-                  </button>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => handleDelete(resume.id)}
-                  className={`${styles.actionBtn} ${styles.deleteBtn}`}
-                  title="Delete Resume"
-                >
-                  <FaTrash size={11} />
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+        ) : (
+          <table className={styles.table}>
+            <thead>
+              <tr>
+                <th>Resume</th>
+                <th>Role Specialization</th>
+                <th>File</th>
+                <th>Primary</th>
+                <th>Visibility</th>
+                <th style={{ textAlign: 'right' }}>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {resumes.map((resume) => (
+                <tr key={resume.id}>
+                  <td>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <div
+                        style={{
+                          width: '32px',
+                          height: '32px',
+                          borderRadius: '6px',
+                          background: 'var(--bg-tertiary)',
+                          border: '1px solid var(--border)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          flexShrink: 0,
+                        }}
+                      >
+                        <FaFilePdf size={14} />
+                      </div>
+                      <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{resume.title}</span>
+                    </div>
+                  </td>
+                  <td>
+                    <span
+                      style={{
+                        display: 'inline-block',
+                        padding: '2px 8px',
+                        borderRadius: '4px',
+                        fontSize: '0.78rem',
+                        background: 'var(--bg-tertiary)',
+                        border: '1px solid var(--border)',
+                        color: 'var(--text-secondary)',
+                      }}
+                    >
+                      {resume.roleCategory}
+                    </span>
+                  </td>
+                  <td style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                    <div>{resume.fileName}</div>
+                    <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>{formatBytes(resume.fileSize)}</div>
+                  </td>
+                  <td>
+                    <button
+                      type="button"
+                      onClick={() => handleTogglePrimary(resume.id)}
+                      className={styles.iconButton}
+                      style={{ color: resume.isPrimary ? '#4ade80' : undefined }}
+                      title={resume.isPrimary ? 'Current primary default' : 'Set as primary default'}
+                    >
+                      <FaStar size={13} />
+                    </button>
+                  </td>
+                  <td>
+                    <button
+                      type="button"
+                      onClick={() => handleToggleActive(resume.id, resume.isActive)}
+                      className={styles.iconButton}
+                      style={{ color: resume.isActive ? '#60a5fa' : '#94a3b8' }}
+                      title={resume.isActive ? 'Active on homepage' : 'Hidden from homepage'}
+                    >
+                      {resume.isActive ? <FaCheck size={13} /> : <FaTimes size={13} />}
+                    </button>
+                  </td>
+                  <td style={{ textAlign: 'right' }}>
+                    <div style={{ display: 'inline-flex', gap: '6px' }}>
+                      <a
+                        href={resume.fileUrl}
+                        download={resume.fileName}
+                        className={styles.iconButton}
+                        title="Download File"
+                      >
+                        <FaDownload size={13} />
+                      </a>
+                      <a
+                        href={resume.fileUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={styles.iconButton}
+                        title="Preview in Tab"
+                      >
+                        <FaExternalLinkAlt size={12} />
+                      </a>
+                      <button
+                        onClick={() => setDeletingItem(resume)}
+                        className={`${styles.iconButton} ${styles.dangerButton}`}
+                        title="Delete Resume"
+                        aria-label="Delete"
+                      >
+                        <FaTrash size={13} />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
 
       {/* Upload Modal */}
       <AdminModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        isOpen={isUploadModalOpen}
+        onClose={() => setIsUploadModalOpen(false)}
         title="Upload Real Resume PDF"
       >
-        <form onSubmit={handleCreateResume}>
+        <form onSubmit={handleCreateResume} className={styles.form}>
           {modalError && (
-            <div className={styles.bannerError} style={{ margin: '0 0 16px 0' }}>
-              <FaTimes /> {modalError}
+            <div style={{ color: '#f87171', fontSize: '0.85rem', marginBottom: '4px' }}>
+              <FaTimes style={{ marginRight: '6px' }} /> {modalError}
             </div>
           )}
+
           <div className={styles.formGroup}>
-            <label className={styles.label}>Resume Title</label>
+            <label>Resume Title</label>
             <input
               type="text"
-              className={styles.input}
-              placeholder="e.g. Full-Stack Software Engineer"
+              required
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              required
+              placeholder="e.g. Full-Stack Software Engineer"
             />
           </div>
 
           <div className={styles.formGroup}>
-            <label className={styles.label}>Role Specialization</label>
-            <select
-              className={styles.select}
-              value={roleCategory}
-              onChange={(e) => setRoleCategory(e.target.value)}
-            >
-              <option value="Full-Stack">Full-Stack Software Engineer</option>
-              <option value="AI Systems">AI & Autonomous Systems Engineer</option>
-              <option value="Frontend">Frontend & UI/UX Specialist</option>
-              <option value="Backend">Backend & Database Systems</option>
-              <option value="General">General Software Engineer</option>
+            <label>Role Specialization</label>
+            <select value={roleCategory} onChange={(e) => setRoleCategory(e.target.value)}>
+              {ROLE_CATEGORIES.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
             </select>
           </div>
 
           <div className={styles.formGroup}>
-            <label className={styles.label}>Select PDF File</label>
+            <label>Select PDF File</label>
             <div
-              className={styles.dropzone}
               onClick={() => document.getElementById('resumeFileInput')?.click()}
+              style={{
+                border: '1px dashed var(--border)',
+                borderRadius: 'var(--radius-sm)',
+                padding: '20px',
+                textAlign: 'center',
+                cursor: 'pointer',
+                background: 'var(--bg-tertiary)',
+              }}
             >
               <input
                 id="resumeFileInput"
@@ -365,61 +379,57 @@ export default function ResumesClient({ initialResumes }: ResumesClientProps) {
                   }
                 }}
               />
-              <FaUpload size={24} style={{ color: 'var(--accent-primary)', marginBottom: '8px' }} />
+              <FaUpload size={22} style={{ color: 'var(--accent)', marginBottom: '8px' }} />
               {selectedFile ? (
                 <div>
-                  <strong style={{ color: '#fff' }}>{selectedFile.name}</strong>
-                  <div style={{ fontSize: '0.8rem', color: '#94a3b8' }}>
+                  <strong style={{ color: 'var(--text-primary)' }}>{selectedFile.name}</strong>
+                  <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
                     {formatBytes(selectedFile.size)}
                   </div>
                 </div>
               ) : (
                 <div>
-                  <strong style={{ color: '#fff' }}>Click to select a PDF resume</strong>
-                  <div style={{ fontSize: '0.8rem', color: '#94a3b8' }}>PDF files up to 10MB</div>
+                  <strong style={{ color: 'var(--text-primary)' }}>Click to select a PDF resume</strong>
+                  <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>PDF files up to 10MB</div>
                 </div>
               )}
             </div>
           </div>
 
-          <div style={{ display: 'flex', gap: '20px', margin: '20px 0' }}>
-            <label className={styles.checkboxRow}>
-              <input
-                type="checkbox"
-                checked={isPrimary}
-                onChange={(e) => setIsPrimary(e.target.checked)}
-              />
+          <div style={{ display: 'flex', gap: '20px' }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem' }}>
+              <input type="checkbox" checked={isPrimary} onChange={(e) => setIsPrimary(e.target.checked)} />
               <span>Set as primary default resume</span>
             </label>
 
-            <label className={styles.checkboxRow}>
-              <input
-                type="checkbox"
-                checked={isActive}
-                onChange={(e) => setIsActive(e.target.checked)}
-              />
+            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem' }}>
+              <input type="checkbox" checked={isActive} onChange={(e) => setIsActive(e.target.checked)} />
               <span>Visible on public homepage</span>
             </label>
           </div>
 
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '24px' }}>
-            <button
-              type="button"
-              className={styles.actionBtn}
-              onClick={() => setIsModalOpen(false)}
-            >
+          <div className={styles.modalFooter}>
+            <button type="button" onClick={() => setIsUploadModalOpen(false)} className={styles.secondaryButton}>
               Cancel
             </button>
-            <button
-              type="submit"
-              className={styles.addBtn}
-              disabled={isSubmitting || !selectedFile}
-            >
-              {isSubmitting ? 'Uploading...' : 'Save & Publish'}
+            <button type="submit" disabled={isUploading || !selectedFile} className={styles.primaryButton}>
+              {isUploading ? 'Uploading...' : 'Save & Publish'}
             </button>
           </div>
         </form>
       </AdminModal>
+
+      {/* Delete Modal */}
+      <DeleteConfirmModal
+        isOpen={Boolean(deletingItem)}
+        onClose={() => setDeletingItem(null)}
+        onConfirm={() => {
+          if (deletingItem) deleteItem(deletingItem.id);
+        }}
+        title="Delete Resume"
+        itemName={deletingItem ? deletingItem.title : ''}
+        isDeleting={isSubmitting}
+      />
     </div>
   );
 }
