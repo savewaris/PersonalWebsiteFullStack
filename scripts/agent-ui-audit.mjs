@@ -384,7 +384,17 @@ async function runAudit() {
         if (IS_INTERACTIVE && vp.width >= 1024) {
           console.log('    🖱️ [3/4] Running interactive click & modal tests...');
           
-          const buttons = await page.$$('button:visible, [role="button"]:visible');
+          // Skip session-ending / destructive controls -- clicking these mid-audit
+          // (e.g. Logout) invalidates the session for every subsequent interaction
+          // and route on this page, producing unauthenticated errors that have
+          // nothing to do with an actual bug.
+          const UNSAFE_BUTTON_TEXT = /logout|sign\s*out|log\s*out|delete|remove|destroy|reset\s+all|clear\s+all/i;
+          const candidateButtons = await page.$$('button:visible, [role="button"]:visible');
+          const buttons = [];
+          for (const btn of candidateButtons) {
+            const text = (await btn.innerText().catch(() => '')).trim();
+            if (!UNSAFE_BUTTON_TEXT.test(text)) buttons.push(btn);
+          }
           let clickedCount = 0;
           for (const btn of buttons.slice(0, 5)) {
             try {
