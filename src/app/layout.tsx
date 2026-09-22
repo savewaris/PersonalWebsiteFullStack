@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { AnalyticsBeacon } from '@/components/AnalyticsBeacon';
+import { PostHogAnalytics } from '@/components/PostHogAnalytics';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -31,6 +32,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className="overflow-x-hidden w-full antialiased bg-background text-foreground">
         <AnalyticsBeacon />
+        <PostHogAnalytics />
         {children}
       </body>
     </html>
