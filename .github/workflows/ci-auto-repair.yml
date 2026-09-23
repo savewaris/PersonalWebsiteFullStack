@@ -78,7 +78,10 @@ jobs:
           node-version: 22
 
       - name: Install Dependencies
-        run: npm ci || npm install
+        # Falls back to --legacy-peer-deps so a branch with an unresolvable peer-dependency
+        # conflict (e.g. a Dependabot bump) doesn't kill this job before the AI repair step
+        # ever runs — that conflict is exactly the kind of thing this job exists to fix.
+        run: npm ci || npm install || npm install --legacy-peer-deps
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL != '' && secrets.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/mockdb?schema=public' }}
 
