@@ -24,6 +24,8 @@ export async function POST(request: Request) {
     score?: string;
     startDate?: string;
     endDate?: string;
+    isVisible?: boolean;
+    isFeatured?: boolean;
   }>(request);
 
   if (error || !data?.degree || !data?.institution || !data?.startDate) {
@@ -40,6 +42,8 @@ export async function POST(request: Request) {
         score: data.score?.trim() || null,
         startDate: new Date(data.startDate),
         endDate: data.endDate ? new Date(data.endDate) : null,
+        isVisible: data.isVisible ?? true,
+        isFeatured: data.isFeatured ?? false,
       },
     });
     revalidatePortfolioData();

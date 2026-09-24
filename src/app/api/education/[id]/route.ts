@@ -14,6 +14,8 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
     score?: string;
     startDate?: string;
     endDate?: string;
+    isVisible?: boolean;
+    isFeatured?: boolean;
   }>(request);
 
   if (error || !data) {
@@ -31,6 +33,8 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
         ...(data.score !== undefined ? { score: data.score ? data.score.trim() : null } : {}),
         ...(data.startDate ? { startDate: new Date(data.startDate) } : {}),
         ...(data.endDate !== undefined ? { endDate: data.endDate ? new Date(data.endDate) : null } : {}),
+        ...(data.isVisible !== undefined ? { isVisible: Boolean(data.isVisible) } : {}),
+        ...(data.isFeatured !== undefined ? { isFeatured: Boolean(data.isFeatured) } : {}),
       },
     });
     revalidatePortfolioData();

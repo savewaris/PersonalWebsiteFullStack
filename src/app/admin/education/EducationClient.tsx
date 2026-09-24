@@ -2,10 +2,11 @@
 
 import { useState } from 'react';
 import { FaEdit, FaTrash } from 'react-icons/fa';
-import { useAdminCrud } from '@/lib/useAdminCrud';
+import { useAdminCrud, useQuickAddParam } from '@/lib/useAdminCrud';
 import { AdminPageHeader } from '@/components/admin/AdminPageHeader';
 import { AdminModal } from '@/components/admin/AdminModal';
 import { DeleteConfirmModal } from '@/components/admin/DeleteConfirmModal';
+import { StatusToggleButtons } from '@/components/admin/StatusToggleButtons';
 import styles from '@/components/admin/admin.module.css';
 
 export interface Education {
@@ -17,11 +18,14 @@ export interface Education {
   startDate: string;
   endDate: string | null;
   score: string | null;
+  isVisible: boolean;
+  isFeatured: boolean;
 }
 
 export default function EducationClient({ initialEducation }: { initialEducation: Education[] }) {
   const {
     items: educationList,
+    setItems,
     isModalOpen,
     editingItem,
     deletingItem,
@@ -34,6 +38,8 @@ export default function EducationClient({ initialEducation }: { initialEducation
     saveItem,
     deleteItem,
   } = useAdminCrud<Education>(initialEducation, '/api/education');
+
+  useQuickAddParam(openCreate);
 
   const [formData, setFormData] = useState<Partial<Education>>({
     institution: '',
@@ -147,6 +153,7 @@ export default function EducationClient({ initialEducation }: { initialEducation
                   </td>
                   <td>
                     <div className={styles.tableActions}>
+                      <StatusToggleButtons item={edu} endpoint="/api/education" setItems={setItems} />
                       <button
                         type="button"
                         onClick={() => handleOpenEdit(edu)}
