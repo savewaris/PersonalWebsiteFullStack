@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, type Dispatch, type SetStateAction } from 'react';
+import { useSearchParams } from 'next/navigation';
 
 export interface Identifiable {
   id: string;
@@ -109,4 +110,38 @@ export function useAdminCrud<T extends Identifiable>(initialItems: T[], endpoint
     saveItem,
     deleteItem,
   };
+}
+
+export async function toggleAdminFlag<T extends Identifiable>(
+  endpoint: string,
+  item: T,
+  field: 'isVisible' | 'isFeatured',
+  setItems: Dispatch<SetStateAction<T[]>>
+): Promise<void> {
+  const current = (item as unknown as Record<string, boolean>)[field];
+  const next = !current;
+
+  setItems((prev) => prev.map((i) => (i.id === item.id ? { ...i, [field]: next } : i)));
+
+  try {
+    const res = await fetch(`${endpoint}/${item.id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ [field]: next }),
+    });
+    if (!res.ok) throw new Error('Toggle request failed');
+  } catch {
+    setItems((prev) => prev.map((i) => (i.id === item.id ? { ...i, [field]: current } : i)));
+  }
+}
+
+export function useQuickAddParam(openCreate: () => void): void {
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    if (searchParams.get('new') === '1') {
+      openCreate();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
 }
