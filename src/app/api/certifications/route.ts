@@ -28,6 +28,8 @@ export async function POST(request: Request) {
     credentialUrl?: string;
     badgeImageUrl?: string | null;
     order?: number;
+    isVisible?: boolean;
+    isFeatured?: boolean;
   }>(request);
 
   if (error || !data?.title || !data?.issuer || !data?.issueDate || !data?.credentialUrl) {
@@ -45,6 +47,8 @@ export async function POST(request: Request) {
         credentialUrl: ensureHttps(data.credentialUrl) || data.credentialUrl.trim(),
         badgeImageUrl: data.badgeImageUrl?.trim() || null,
         order: typeof data.order === 'number' ? data.order : 0,
+        isVisible: data.isVisible ?? true,
+        isFeatured: data.isFeatured ?? false,
       },
     });
     revalidatePortfolioData();

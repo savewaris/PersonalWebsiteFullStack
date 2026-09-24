@@ -2,12 +2,13 @@
 
 import { useState } from 'react';
 import { FaEdit, FaTrash, FaExternalLinkAlt, FaCertificate, FaFileUpload, FaPalette } from 'react-icons/fa';
-import { useAdminCrud } from '@/lib/useAdminCrud';
+import { useAdminCrud, useQuickAddParam } from '@/lib/useAdminCrud';
 import { AdminPageHeader } from '@/components/admin/AdminPageHeader';
 import { AdminModal } from '@/components/admin/AdminModal';
 import { DeleteConfirmModal } from '@/components/admin/DeleteConfirmModal';
 import { CertificationImportModal } from '@/components/admin/CertificationImportModal';
 import { LogoPickerModal } from '@/components/admin/LogoPickerModal';
+import { StatusToggleButtons } from '@/components/admin/StatusToggleButtons';
 import { PortfolioIcon } from '@/components/PortfolioIcon';
 import { resolveCertificationLogo } from '@/lib/resolve-certification-logo';
 import styles from '@/components/admin/admin.module.css';
@@ -22,6 +23,8 @@ export interface CertificationItem {
   credentialUrl: string;
   badgeImageUrl: string | null;
   order: number;
+  isVisible: boolean;
+  isFeatured: boolean;
 }
 
 const ISSUER_PRESETS = [
@@ -43,6 +46,7 @@ export default function CertificationsClient({
 }) {
   const {
     items: certifications,
+    setItems,
     isModalOpen,
     editingItem,
     deletingItem,
@@ -54,6 +58,8 @@ export default function CertificationsClient({
     saveItem,
     deleteItem,
   } = useAdminCrud<CertificationItem>(initialCertifications, '/api/certifications');
+
+  useQuickAddParam(openCreate);
 
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isLogoPickerOpen, setIsLogoPickerOpen] = useState(false);
@@ -272,7 +278,8 @@ export default function CertificationsClient({
                       )}
                     </td>
                     <td style={{ textAlign: 'right' }}>
-                      <div style={{ display: 'inline-flex', gap: '6px' }}>
+                      <div style={{ display: 'inline-flex', gap: '6px', alignItems: 'center' }}>
+                        <StatusToggleButtons item={cert} endpoint="/api/certifications" setItems={setItems} />
                         <button
                           onClick={() => handleOpenEdit(cert)}
                           className={styles.iconButton}

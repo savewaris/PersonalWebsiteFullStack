@@ -4,6 +4,7 @@ import type { Certification } from '@prisma/client';
 export async function getCertifications(): Promise<Certification[]> {
   try {
     return await prisma.certification.findMany({
+      where: { isVisible: true },
       orderBy: [
         { order: 'asc' },
         { issueDate: 'desc' },

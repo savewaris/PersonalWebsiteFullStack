@@ -15,6 +15,8 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
     credentialUrl?: string;
     badgeImageUrl?: string | null;
     order?: number;
+    isVisible?: boolean;
+    isFeatured?: boolean;
   }>(request);
 
   if (error || !data) {
@@ -33,6 +35,8 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
         ...(data.credentialUrl ? { credentialUrl: ensureHttps(data.credentialUrl) || data.credentialUrl.trim() } : {}),
         ...(data.badgeImageUrl !== undefined ? { badgeImageUrl: data.badgeImageUrl?.trim() || null } : {}),
         ...(typeof data.order === 'number' ? { order: data.order } : {}),
+        ...(data.isVisible !== undefined ? { isVisible: Boolean(data.isVisible) } : {}),
+        ...(data.isFeatured !== undefined ? { isFeatured: Boolean(data.isFeatured) } : {}),
       },
     });
     revalidatePortfolioData();
