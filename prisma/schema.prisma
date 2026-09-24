@@ -13,6 +13,8 @@ model Skill {
   proficiency Int      // 0-100
   category    String   // e.g., "Frontend", "Backend", "Tools"
   icon        String?  // Class name or SVG string
+  isVisible   Boolean  @default(true)
+  isFeatured  Boolean  @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
@@ -31,6 +33,8 @@ model Project {
   demoCredentials String?  // Preconfigured guest credentials (e.g. guest / guest123)
   demoNote        String?  // Guidance text (e.g. Read-only guest session)
   isEmbeddable    Boolean  @default(true)
+  isVisible       Boolean  @default(true)
+  isFeatured      Boolean  @default(false)
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 }
@@ -45,6 +49,8 @@ model Experience {
   startDate      DateTime
   endDate        DateTime? // Null means "Present"
   description    String
+  isVisible      Boolean   @default(true)
+  isFeatured     Boolean   @default(false)
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
 }
@@ -58,6 +64,8 @@ model Education {
   startDate    DateTime
   endDate      DateTime?
   score        String?
+  isVisible    Boolean  @default(true)
+  isFeatured   Boolean  @default(false)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 }
@@ -66,6 +74,8 @@ model Hobby {
   id          String   @id @default(uuid())
   name        String
   emoji       String?
+  isVisible   Boolean  @default(true)
+  isFeatured  Boolean  @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
@@ -75,6 +85,8 @@ model Interest {
   name        String
   category    String   @default("Engineering & Core Tech")
   emoji       String?
+  isVisible   Boolean  @default(true)
+  isFeatured  Boolean  @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
@@ -83,6 +95,8 @@ model Language {
   id          String   @id @default(uuid())
   name        String
   proficiency String
+  isVisible   Boolean  @default(true)
+  isFeatured  Boolean  @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
@@ -103,6 +117,8 @@ model SocialLink {
   icon       String?  // Optional custom emoji or icon class
   actionType String   @default("redirect") // "redirect" | "copy"
   order      Int      @default(0)
+  isVisible  Boolean  @default(true)
+  isFeatured Boolean  @default(false)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 }
@@ -117,6 +133,8 @@ model Certification {
   credentialUrl String    // External verification URL (Credly / Coursera / etc.)
   badgeImageUrl String?   // Optional badge image or logo URL
   order         Int       @default(0)
+  isVisible     Boolean   @default(true)
+  isFeatured    Boolean   @default(false)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 }
