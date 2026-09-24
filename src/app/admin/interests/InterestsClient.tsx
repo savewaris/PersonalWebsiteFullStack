@@ -2,12 +2,13 @@
 
 import { useState } from 'react';
 import { FaEdit, FaTrash, FaLayerGroup } from 'react-icons/fa';
-import { useAdminCrud } from '@/lib/useAdminCrud';
+import { useAdminCrud, useQuickAddParam } from '@/lib/useAdminCrud';
 import { AdminPageHeader } from '@/components/admin/AdminPageHeader';
 import { AdminModal } from '@/components/admin/AdminModal';
 import { DeleteConfirmModal } from '@/components/admin/DeleteConfirmModal';
 import { PresetChips } from '@/components/admin/PresetChips';
 import { EmojiPicker } from '@/components/admin/EmojiPicker';
+import { StatusToggleButtons } from '@/components/admin/StatusToggleButtons';
 import { INTEREST_SUGGESTIONS, INTEREST_CATEGORIES } from '@/lib/recommendations';
 import styles from '@/components/admin/admin.module.css';
 
@@ -16,11 +17,14 @@ export interface Interest {
   name: string;
   category: string;
   emoji: string | null;
+  isVisible: boolean;
+  isFeatured: boolean;
 }
 
 export default function InterestsClient({ initialInterests }: { initialInterests: Interest[] }) {
   const {
     items: interests,
+    setItems,
     isModalOpen,
     editingItem,
     deletingItem,
@@ -33,6 +37,8 @@ export default function InterestsClient({ initialInterests }: { initialInterests
     saveItem,
     deleteItem,
   } = useAdminCrud<Interest>(initialInterests, '/api/interests');
+
+  useQuickAddParam(openCreate);
 
   const [formData, setFormData] = useState<Partial<Interest>>({
     name: '',
@@ -170,6 +176,7 @@ export default function InterestsClient({ initialInterests }: { initialInterests
                   </td>
                   <td>
                     <div className={styles.tableActions}>
+                      <StatusToggleButtons item={interest} endpoint="/api/interests" setItems={setItems} />
                       <button
                         type="button"
                         onClick={() => handleOpenEdit(interest)}

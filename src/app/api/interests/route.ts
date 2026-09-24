@@ -20,7 +20,7 @@ export async function POST(request: Request) {
   const authError = await requireAuthSession();
   if (authError) return authError;
 
-  const { data, error } = await parseJsonBody<{ name?: string; emoji?: string; category?: string }>(request);
+  const { data, error } = await parseJsonBody<{ name?: string; emoji?: string; category?: string; isVisible?: boolean; isFeatured?: boolean }>(request);
   if (error || !data?.name) {
     return apiError('Name is required', 400);
   }
@@ -31,6 +31,8 @@ export async function POST(request: Request) {
         name: data.name.trim(),
         category: data.category?.trim() || 'Engineering & Core Tech',
         emoji: data.emoji?.trim() || null,
+        isVisible: data.isVisible ?? true,
+        isFeatured: data.isFeatured ?? false,
       },
     });
     revalidatePortfolioData();
