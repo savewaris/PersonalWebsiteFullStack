@@ -2,11 +2,12 @@
 
 import { useState } from 'react';
 import { FaEdit, FaTrash } from 'react-icons/fa';
-import { useAdminCrud } from '@/lib/useAdminCrud';
+import { useAdminCrud, useQuickAddParam } from '@/lib/useAdminCrud';
 import { AdminPageHeader } from '@/components/admin/AdminPageHeader';
 import { AdminModal } from '@/components/admin/AdminModal';
 import { DeleteConfirmModal } from '@/components/admin/DeleteConfirmModal';
 import { PresetChips } from '@/components/admin/PresetChips';
+import { StatusToggleButtons } from '@/components/admin/StatusToggleButtons';
 import { LANGUAGE_SUGGESTIONS } from '@/lib/recommendations';
 import styles from '@/components/admin/admin.module.css';
 
@@ -14,11 +15,14 @@ export interface Language {
   id: string;
   name: string;
   proficiency: string;
+  isVisible: boolean;
+  isFeatured: boolean;
 }
 
 export default function LanguagesClient({ initialLanguages }: { initialLanguages: Language[] }) {
   const {
     items: languages,
+    setItems,
     isModalOpen,
     editingItem,
     deletingItem,
@@ -31,6 +35,8 @@ export default function LanguagesClient({ initialLanguages }: { initialLanguages
     saveItem,
     deleteItem,
   } = useAdminCrud<Language>(initialLanguages, '/api/languages');
+
+  useQuickAddParam(openCreate);
 
   const [formData, setFormData] = useState<Partial<Language>>({ name: '', proficiency: 'Professional Working' });
 
@@ -112,6 +118,7 @@ export default function LanguagesClient({ initialLanguages }: { initialLanguages
                   </td>
                   <td>
                     <div className={styles.tableActions}>
+                      <StatusToggleButtons item={lang} endpoint="/api/languages" setItems={setItems} />
                       <button
                         type="button"
                         onClick={() => handleOpenEdit(lang)}

@@ -6,7 +6,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
   if (authError) return authError;
 
   const { id } = await params;
-  const { data, error } = await parseJsonBody<{ name?: string; proficiency?: string }>(request);
+  const { data, error } = await parseJsonBody<{ name?: string; proficiency?: string; isVisible?: boolean; isFeatured?: boolean }>(request);
   if (error || !data) {
     return apiError('Invalid request payload', 400);
   }
@@ -17,6 +17,8 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
       data: {
         ...(data.name ? { name: data.name.trim() } : {}),
         ...(data.proficiency ? { proficiency: data.proficiency.trim() } : {}),
+        ...(data.isVisible !== undefined ? { isVisible: Boolean(data.isVisible) } : {}),
+        ...(data.isFeatured !== undefined ? { isFeatured: Boolean(data.isFeatured) } : {}),
       },
     });
     revalidatePortfolioData();
