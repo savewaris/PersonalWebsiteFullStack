@@ -9,6 +9,7 @@ import type {
 export class PrismaProjectRepository implements IProjectRepository {
   async findAll(): Promise<ProjectEntity[]> {
     return await prisma.project.findMany({
+      where: { isVisible: true },
       orderBy: { createdAt: 'desc' },
     });
   }
@@ -34,6 +35,8 @@ export class PrismaProjectRepository implements IProjectRepository {
         demoCredentials: data.demoCredentials,
         demoNote: data.demoNote,
         isEmbeddable: data.isEmbeddable ?? true,
+        isVisible: data.isVisible ?? true,
+        isFeatured: data.isFeatured ?? false,
       },
     });
   }

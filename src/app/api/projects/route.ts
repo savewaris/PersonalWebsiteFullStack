@@ -33,6 +33,8 @@ export async function POST(request: Request) {
     demoCredentials?: string;
     demoNote?: string;
     isEmbeddable?: boolean;
+    isVisible?: boolean;
+    isFeatured?: boolean;
   }>(request);
 
   if (error || !data?.title || !data.description) {
@@ -68,6 +70,8 @@ export async function POST(request: Request) {
         demoCredentials: data.demoCredentials ? data.demoCredentials.trim() : null,
         demoNote: data.demoNote ? data.demoNote.trim() : null,
         isEmbeddable: data.isEmbeddable ?? true,
+        isVisible: data.isVisible ?? true,
+        isFeatured: data.isFeatured ?? false,
       },
     });
     revalidatePortfolioData();

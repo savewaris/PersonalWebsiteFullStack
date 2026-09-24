@@ -22,6 +22,8 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
     demoCredentials?: string | null;
     demoNote?: string | null;
     isEmbeddable?: boolean;
+    isVisible?: boolean;
+    isFeatured?: boolean;
   }>(request);
 
   if (error || !data) {
@@ -68,6 +70,8 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
         ...(data.demoCredentials !== undefined ? { demoCredentials: data.demoCredentials ? data.demoCredentials.trim() : null } : {}),
         ...(data.demoNote !== undefined ? { demoNote: data.demoNote ? data.demoNote.trim() : null } : {}),
         ...(data.isEmbeddable !== undefined ? { isEmbeddable: data.isEmbeddable } : {}),
+        ...(data.isVisible !== undefined ? { isVisible: Boolean(data.isVisible) } : {}),
+        ...(data.isFeatured !== undefined ? { isFeatured: Boolean(data.isFeatured) } : {}),
       },
     });
     revalidatePortfolioData();

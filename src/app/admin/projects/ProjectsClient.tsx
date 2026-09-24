@@ -2,9 +2,10 @@
 
 import { useState } from 'react';
 import { FaEdit, FaTrash, FaExternalLinkAlt, FaGithub, FaVideo, FaImages, FaLock, FaGlobe } from 'react-icons/fa';
-import { useAdminCrud } from '@/lib/useAdminCrud';
+import { useAdminCrud, useQuickAddParam } from '@/lib/useAdminCrud';
 import { AdminPageHeader } from '@/components/admin/AdminPageHeader';
 import { DeleteConfirmModal } from '@/components/admin/DeleteConfirmModal';
+import { StatusToggleButtons } from '@/components/admin/StatusToggleButtons';
 import { ProjectFormModal, type ProjectFormData } from './ProjectFormModal';
 import styles from '@/components/admin/admin.module.css';
 
@@ -22,6 +23,8 @@ export interface Project {
   demoCredentials?: string | null;
   demoNote?: string | null;
   isEmbeddable?: boolean;
+  isVisible: boolean;
+  isFeatured: boolean;
 }
 
 const DEFAULT_FORM: ProjectFormData = {
@@ -42,6 +45,7 @@ const DEFAULT_FORM: ProjectFormData = {
 export default function ProjectsClient({ initialProjects }: { initialProjects: Project[] }) {
   const {
     items: projects,
+    setItems,
     isModalOpen,
     editingItem,
     deletingItem,
@@ -54,6 +58,8 @@ export default function ProjectsClient({ initialProjects }: { initialProjects: P
     saveItem,
     deleteItem,
   } = useAdminCrud<Project>(initialProjects, '/api/projects');
+
+  useQuickAddParam(openCreate);
 
   const [formData, setFormData] = useState<ProjectFormData>(DEFAULT_FORM);
 
@@ -224,6 +230,7 @@ export default function ProjectsClient({ initialProjects }: { initialProjects: P
                     </td>
                     <td>
                       <div className={styles.tableActions}>
+                        <StatusToggleButtons item={project} endpoint="/api/projects" setItems={setItems} />
                         <button type="button" onClick={() => handleOpenEdit(project)} className={styles.actionBtn} title="Edit Project">
                           <FaEdit />
                         </button>

@@ -20,6 +20,8 @@ export interface ProjectEntity {
   isEmbeddable?: boolean;
   demoNote?: string | null;
   demoCredentials?: string | null;
+  isVisible?: boolean;
+  isFeatured?: boolean;
   tags: string;
   featured?: boolean;
   order?: number;
