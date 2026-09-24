@@ -2,10 +2,11 @@
 
 import { useState } from 'react';
 import { FaEdit, FaTrash } from 'react-icons/fa';
-import { useAdminCrud } from '@/lib/useAdminCrud';
+import { useAdminCrud, useQuickAddParam } from '@/lib/useAdminCrud';
 import { AdminPageHeader } from '@/components/admin/AdminPageHeader';
 import { AdminModal } from '@/components/admin/AdminModal';
 import { DeleteConfirmModal } from '@/components/admin/DeleteConfirmModal';
+import { StatusToggleButtons } from '@/components/admin/StatusToggleButtons';
 import styles from '@/components/admin/admin.module.css';
 
 export interface Experience {
@@ -18,6 +19,8 @@ export interface Experience {
   startDate: string;
   endDate: string | null;
   description: string;
+  isVisible: boolean;
+  isFeatured: boolean;
 }
 
 const EMPLOYMENT_TYPES = ['Full-time', 'Part-time', 'Internship', 'Contract', 'Freelance'];
@@ -26,6 +29,7 @@ const LOCATION_TYPES = ['On-site', 'Hybrid', 'Remote'];
 export default function ExperienceClient({ initialExperience }: { initialExperience: Experience[] }) {
   const {
     items: experiences,
+    setItems,
     isModalOpen,
     editingItem,
     deletingItem,
@@ -38,6 +42,8 @@ export default function ExperienceClient({ initialExperience }: { initialExperie
     saveItem,
     deleteItem,
   } = useAdminCrud<Experience>(initialExperience, '/api/experience');
+
+  useQuickAddParam(openCreate);
 
   const [formData, setFormData] = useState<Partial<Experience>>({
     role: '',
@@ -170,6 +176,7 @@ export default function ExperienceClient({ initialExperience }: { initialExperie
                   </td>
                   <td>
                     <div className={styles.tableActions}>
+                      <StatusToggleButtons item={exp} endpoint="/api/experience" setItems={setItems} />
                       <button
                         type="button"
                         onClick={() => handleOpenEdit(exp)}

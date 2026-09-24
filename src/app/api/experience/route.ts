@@ -25,6 +25,8 @@ export async function POST(request: Request) {
     description?: string;
     startDate?: string;
     endDate?: string;
+    isVisible?: boolean;
+    isFeatured?: boolean;
   }>(request);
 
   if (error || !data?.role || !data?.company || !data?.description || !data?.startDate) {
@@ -42,6 +44,8 @@ export async function POST(request: Request) {
         description: data.description.trim(),
         startDate: new Date(data.startDate),
         endDate: data.endDate ? new Date(data.endDate) : null,
+        isVisible: data.isVisible ?? true,
+        isFeatured: data.isFeatured ?? false,
       },
     });
     revalidatePortfolioData();
