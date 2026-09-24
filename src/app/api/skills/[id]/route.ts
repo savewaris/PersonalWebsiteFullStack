@@ -11,6 +11,8 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
     proficiency?: number | string;
     category?: string;
     icon?: string;
+    isVisible?: boolean;
+    isFeatured?: boolean;
   }>(request);
 
   if (error || !data) {
@@ -27,6 +29,8 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
           : {}),
         ...(data.category ? { category: data.category.trim() } : {}),
         ...(data.icon !== undefined ? { icon: data.icon ? data.icon.trim() : null } : {}),
+        ...(data.isVisible !== undefined ? { isVisible: Boolean(data.isVisible) } : {}),
+        ...(data.isFeatured !== undefined ? { isFeatured: Boolean(data.isFeatured) } : {}),
       },
     });
     revalidatePortfolioData();

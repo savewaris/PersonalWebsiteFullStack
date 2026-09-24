@@ -2,13 +2,14 @@
 
 import { useState } from 'react';
 import { FaEdit, FaTrash } from 'react-icons/fa';
-import { useAdminCrud } from '@/lib/useAdminCrud';
+import { useAdminCrud, useQuickAddParam } from '@/lib/useAdminCrud';
 import { AdminPageHeader } from '@/components/admin/AdminPageHeader';
 import { AdminModal } from '@/components/admin/AdminModal';
 import { DeleteConfirmModal } from '@/components/admin/DeleteConfirmModal';
 import { PresetChips } from '@/components/admin/PresetChips';
 import { PortfolioIcon } from '@/components/PortfolioIcon';
 import { EmojiPicker } from '@/components/admin/EmojiPicker';
+import { StatusToggleButtons } from '@/components/admin/StatusToggleButtons';
 import { SKILL_SUGGESTIONS } from '@/lib/recommendations';
 import styles from '@/components/admin/admin.module.css';
 
@@ -18,11 +19,14 @@ export interface Skill {
   proficiency: number;
   category: string;
   icon: string | null;
+  isVisible: boolean;
+  isFeatured: boolean;
 }
 
 export default function SkillsClient({ initialSkills }: { initialSkills: Skill[] }) {
   const {
     items: skills,
+    setItems,
     isModalOpen,
     editingItem,
     deletingItem,
@@ -35,6 +39,8 @@ export default function SkillsClient({ initialSkills }: { initialSkills: Skill[]
     saveItem,
     deleteItem,
   } = useAdminCrud<Skill>(initialSkills, '/api/skills');
+
+  useQuickAddParam(openCreate);
 
   const [formData, setFormData] = useState<Partial<Skill>>({
     name: '',
@@ -169,6 +175,7 @@ export default function SkillsClient({ initialSkills }: { initialSkills: Skill[]
                   </td>
                   <td>
                     <div className={styles.tableActions}>
+                      <StatusToggleButtons item={skill} endpoint="/api/skills" setItems={setItems} />
                       <button
                         type="button"
                         onClick={() => handleOpenEdit(skill)}

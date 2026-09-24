@@ -21,6 +21,8 @@ export async function POST(request: Request) {
     proficiency?: number | string;
     category?: string;
     icon?: string;
+    isVisible?: boolean;
+    isFeatured?: boolean;
   }>(request);
 
   if (error || !data?.name || data.proficiency === undefined || !data.category) {
@@ -34,6 +36,8 @@ export async function POST(request: Request) {
         proficiency: Math.min(100, Math.max(0, Number(data.proficiency))),
         category: data.category.trim(),
         icon: data.icon?.trim() || null,
+        isVisible: data.isVisible ?? true,
+        isFeatured: data.isFeatured ?? false,
       },
     });
     revalidatePortfolioData();
