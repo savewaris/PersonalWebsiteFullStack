@@ -2,12 +2,13 @@
 
 import { useState } from 'react';
 import { FaEdit, FaTrash } from 'react-icons/fa';
-import { useAdminCrud } from '@/lib/useAdminCrud';
+import { useAdminCrud, useQuickAddParam } from '@/lib/useAdminCrud';
 import { AdminPageHeader } from '@/components/admin/AdminPageHeader';
 import { AdminModal } from '@/components/admin/AdminModal';
 import { DeleteConfirmModal } from '@/components/admin/DeleteConfirmModal';
 import { PresetChips } from '@/components/admin/PresetChips';
 import { EmojiPicker } from '@/components/admin/EmojiPicker';
+import { StatusToggleButtons } from '@/components/admin/StatusToggleButtons';
 import { HOBBY_SUGGESTIONS } from '@/lib/recommendations';
 import styles from '@/components/admin/admin.module.css';
 
@@ -15,11 +16,14 @@ export interface Hobby {
   id: string;
   name: string;
   emoji: string | null;
+  isVisible: boolean;
+  isFeatured: boolean;
 }
 
 export default function HobbiesClient({ initialHobbies }: { initialHobbies: Hobby[] }) {
   const {
     items: hobbies,
+    setItems,
     isModalOpen,
     editingItem,
     deletingItem,
@@ -32,6 +36,8 @@ export default function HobbiesClient({ initialHobbies }: { initialHobbies: Hobb
     saveItem,
     deleteItem,
   } = useAdminCrud<Hobby>(initialHobbies, '/api/hobbies');
+
+  useQuickAddParam(openCreate);
 
   const [formData, setFormData] = useState<Partial<Hobby>>({ name: '', emoji: '' });
 
@@ -101,6 +107,7 @@ export default function HobbiesClient({ initialHobbies }: { initialHobbies: Hobb
                   </td>
                   <td>
                     <div className={styles.tableActions}>
+                      <StatusToggleButtons item={hobby} endpoint="/api/hobbies" setItems={setItems} />
                       <button
                         type="button"
                         onClick={() => handleOpenEdit(hobby)}

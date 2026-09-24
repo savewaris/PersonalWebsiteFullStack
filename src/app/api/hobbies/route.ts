@@ -14,7 +14,7 @@ export async function POST(request: Request) {
   const authError = await requireAuthSession();
   if (authError) return authError;
 
-  const { data, error } = await parseJsonBody<{ name?: string; emoji?: string }>(request);
+  const { data, error } = await parseJsonBody<{ name?: string; emoji?: string; isVisible?: boolean; isFeatured?: boolean }>(request);
   if (error || !data?.name) {
     return apiError('Name is required', 400);
   }
@@ -24,6 +24,8 @@ export async function POST(request: Request) {
       data: {
         name: data.name.trim(),
         emoji: data.emoji?.trim() || null,
+        isVisible: data.isVisible ?? true,
+        isFeatured: data.isFeatured ?? false,
       },
     });
     revalidatePortfolioData();
