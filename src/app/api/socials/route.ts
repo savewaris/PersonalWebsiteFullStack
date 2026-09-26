@@ -22,6 +22,8 @@ export async function POST(request: Request) {
     icon?: string;
     actionType?: string;
     order?: number;
+    isVisible?: boolean;
+    isFeatured?: boolean;
   }>(request);
 
   if (error || !data?.platform || !data.url) {
@@ -43,6 +45,8 @@ export async function POST(request: Request) {
         icon: data.icon?.trim() || null,
         actionType: isCopy ? 'copy' : 'redirect',
         order: Number(data.order) || 0,
+        isVisible: data.isVisible ?? true,
+        isFeatured: data.isFeatured ?? false,
       },
     });
     revalidatePortfolioData();

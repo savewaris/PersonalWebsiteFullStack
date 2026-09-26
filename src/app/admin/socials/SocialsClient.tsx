@@ -2,13 +2,14 @@
 
 import { useState } from 'react';
 import { FaEdit, FaTrash, FaCopy, FaGlobe } from 'react-icons/fa';
-import { useAdminCrud } from '@/lib/useAdminCrud';
+import { useAdminCrud, useQuickAddParam } from '@/lib/useAdminCrud';
 import { AdminPageHeader } from '@/components/admin/AdminPageHeader';
 import { AdminModal } from '@/components/admin/AdminModal';
 import { DeleteConfirmModal } from '@/components/admin/DeleteConfirmModal';
 import { PresetChips } from '@/components/admin/PresetChips';
 import { PortfolioIcon } from '@/components/PortfolioIcon';
 import { EmojiPicker } from '@/components/admin/EmojiPicker';
+import { StatusToggleButtons } from '@/components/admin/StatusToggleButtons';
 import { SOCIAL_SUGGESTIONS } from '@/lib/recommendations';
 import styles from '@/components/admin/admin.module.css';
 
@@ -19,11 +20,14 @@ export interface SocialLink {
   icon: string | null;
   actionType: string;
   order: number;
+  isVisible: boolean;
+  isFeatured: boolean;
 }
 
 export default function SocialsClient({ initialSocials }: { initialSocials: SocialLink[] }) {
   const {
     items: socials,
+    setItems,
     isModalOpen,
     editingItem,
     deletingItem,
@@ -36,6 +40,8 @@ export default function SocialsClient({ initialSocials }: { initialSocials: Soci
     saveItem,
     deleteItem,
   } = useAdminCrud<SocialLink>(initialSocials, '/api/socials');
+
+  useQuickAddParam(openCreate);
 
   const [formData, setFormData] = useState<Partial<SocialLink>>({
     platform: '',
@@ -187,6 +193,7 @@ export default function SocialsClient({ initialSocials }: { initialSocials: Soci
                   </td>
                   <td>
                     <div className={styles.tableActions}>
+                      <StatusToggleButtons item={social} endpoint="/api/socials" setItems={setItems} />
                       <button
                         type="button"
                         onClick={() => handleOpenEdit(social)}

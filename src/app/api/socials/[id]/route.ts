@@ -12,6 +12,8 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
     icon?: string;
     actionType?: string;
     order?: number;
+    isVisible?: boolean;
+    isFeatured?: boolean;
   }>(request);
 
   if (error || !data) {
@@ -37,6 +39,8 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
         ...(data.icon !== undefined ? { icon: data.icon ? data.icon.trim() : null } : {}),
         ...(data.actionType !== undefined ? { actionType: data.actionType === 'copy' ? 'copy' : 'redirect' } : {}),
         ...(data.order !== undefined ? { order: Number(data.order) } : {}),
+        ...(data.isVisible !== undefined ? { isVisible: Boolean(data.isVisible) } : {}),
+        ...(data.isFeatured !== undefined ? { isFeatured: Boolean(data.isFeatured) } : {}),
       },
     });
     revalidatePortfolioData();

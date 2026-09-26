@@ -252,3 +252,11 @@ This file is the official handover memory across developer sessions and AI agent
   - Closed #67 (Resume Upload Fix) and #68 (Unified Modal System & 1-File Config); 55/55 doctor checks pass, clean build
 - **Queue Status**: 1 tasks remaining in queue.
 - **Recent Completed**: ISSUE-2, ISSUE-3, ISSUE-4
+
+## Session Checkpoint: 2026-09-13
+- **Active Milestone**: `v1.2 — Content Architecture & Taxonomy`
+- **Active Task**: `None (Queue Ready)`
+- **Summary / Key Handoff Notes**:
+  - Pushed commit a7a9563 to GitHub origin main; working tree clean
+- **Queue Status**: 1 tasks remaining in queue.
+- **Recent Completed**: ISSUE-2, ISSUE-3, ISSUE-4
