@@ -1,5 +1,5 @@
 # Model Registry and Drift Audit Report
-Audited At: 2026-09-21T01:53:03.306Z
+Audited At: 2026-09-28T02:07:48.572Z
 Active Provider: Google AI Studio / Gemini API
 
 ## Tier Health Summary
@@ -44,8 +44,9 @@ Active Provider: Google AI Studio / Gemini API
 - gemini-3.8-flash
 - lyria-3-pro-preview
 - gemini-3.1-flash-tts-preview
+- gemini-3.8-flash-tts
+- gemini-3.8-flash-lite-tts
 - deep-research-pro-preview-12-2025
-- gemini-2.5-flash-native-audio-latest
 
 ## Maintenance Status
 - Registry remains on current baseline.
