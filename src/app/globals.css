@@ -11,6 +11,7 @@
   --text-secondary: #878787;
   --text-tertiary: #5E5E5E;
 
+  --danger: #ef4444;
   --accent: #5e6ad2;
   --accent-hover: #7b85e0;
   --accent-glow: rgba(94, 106, 210, 0.15);
@@ -35,6 +36,11 @@
 html {
   scroll-behavior: smooth;
   scroll-padding-top: 80px;
+}
+
+/* Admin: no animated scrolling — it makes drag-and-drop (dnd-kit) measure rows mid-scroll */
+html:has([data-admin-root]) {
+  scroll-behavior: auto;
 }
 
 html,

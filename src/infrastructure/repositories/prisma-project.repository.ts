@@ -10,7 +10,7 @@ export class PrismaProjectRepository implements IProjectRepository {
   async findAll(): Promise<ProjectEntity[]> {
     return await prisma.project.findMany({
       where: { isVisible: true },
-      orderBy: { createdAt: 'desc' },
+      orderBy: [{ order: 'asc' }, { createdAt: 'desc' }],
     });
   }
 

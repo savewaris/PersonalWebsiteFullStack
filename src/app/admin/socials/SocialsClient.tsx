@@ -10,6 +10,7 @@ import { PresetChips } from '@/components/admin/PresetChips';
 import { PortfolioIcon } from '@/components/PortfolioIcon';
 import { EmojiPicker } from '@/components/admin/EmojiPicker';
 import { StatusToggleButtons } from '@/components/admin/StatusToggleButtons';
+import { SortableTable, SortableRow, SortableHandleTh } from '@/components/admin/SortableTable';
 import { SOCIAL_SUGGESTIONS } from '@/lib/recommendations';
 import styles from '@/components/admin/admin.module.css';
 
@@ -111,9 +112,10 @@ export default function SocialsClient({ initialSocials }: { initialSocials: Soci
         <div className={styles.emptyState}>No social links added yet. Click &ldquo;+ Add Social Link&rdquo; or pick from suggestions above.</div>
       ) : (
         <div className={styles.tableContainer}>
-          <table className={styles.table}>
+          <SortableTable items={socials} setItems={setItems} resource="socials" className={styles.table}>
             <thead>
               <tr>
+                <SortableHandleTh />
                 <th style={{ width: '48px' }}>Icon</th>
                 <th>Platform</th>
                 <th>Target URL / Handle</th>
@@ -124,7 +126,7 @@ export default function SocialsClient({ initialSocials }: { initialSocials: Soci
             </thead>
             <tbody>
               {socials.map((social) => (
-                <tr key={social.id}>
+                <SortableRow key={social.id} id={social.id} label={social.platform}>
                   <td>
                     <div
                       style={{
@@ -212,10 +214,10 @@ export default function SocialsClient({ initialSocials }: { initialSocials: Soci
                       </button>
                     </div>
                   </td>
-                </tr>
+                </SortableRow>
               ))}
             </tbody>
-          </table>
+          </SortableTable>
         </div>
       )}
 

@@ -9,6 +9,7 @@ import { DeleteConfirmModal } from '@/components/admin/DeleteConfirmModal';
 import { PresetChips } from '@/components/admin/PresetChips';
 import { EmojiPicker } from '@/components/admin/EmojiPicker';
 import { StatusToggleButtons } from '@/components/admin/StatusToggleButtons';
+import { SortableTable, SortableRow, SortableHandleTh } from '@/components/admin/SortableTable';
 import { INTEREST_SUGGESTIONS, INTEREST_CATEGORIES } from '@/lib/recommendations';
 import styles from '@/components/admin/admin.module.css';
 
@@ -138,9 +139,10 @@ export default function InterestsClient({ initialInterests }: { initialInterests
         </div>
       ) : (
         <div className={styles.tableContainer}>
-          <table className={styles.table}>
+          <SortableTable items={filteredInterests} allItems={interests} setItems={setItems} resource="interests" className={styles.table}>
             <thead>
               <tr>
+                <SortableHandleTh />
                 <th style={{ width: '50px' }}>Emoji</th>
                 <th>Interest Name</th>
                 <th>Category</th>
@@ -149,7 +151,7 @@ export default function InterestsClient({ initialInterests }: { initialInterests
             </thead>
             <tbody>
               {filteredInterests.map((interest) => (
-                <tr key={interest.id}>
+                <SortableRow key={interest.id} id={interest.id} label={interest.name}>
                   <td>
                     <span style={{ fontSize: '1.4rem' }}>{interest.emoji || '💡'}</span>
                   </td>
@@ -195,10 +197,10 @@ export default function InterestsClient({ initialInterests }: { initialInterests
                       </button>
                     </div>
                   </td>
-                </tr>
+                </SortableRow>
               ))}
             </tbody>
-          </table>
+          </SortableTable>
         </div>
       )}
 

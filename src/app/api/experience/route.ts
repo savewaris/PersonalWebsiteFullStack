@@ -4,7 +4,7 @@ import { apiSuccess, apiError, parseJsonBody, requireAuthSession, revalidatePort
 export async function GET() {
   try {
     const experiences = await prisma.experience.findMany({
-      orderBy: { startDate: 'desc' },
+      orderBy: [{ order: 'asc' }, { startDate: 'desc' }],
     });
     return apiSuccess(experiences);
   } catch (error: any) {

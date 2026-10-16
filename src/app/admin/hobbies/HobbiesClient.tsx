@@ -9,6 +9,7 @@ import { DeleteConfirmModal } from '@/components/admin/DeleteConfirmModal';
 import { PresetChips } from '@/components/admin/PresetChips';
 import { EmojiPicker } from '@/components/admin/EmojiPicker';
 import { StatusToggleButtons } from '@/components/admin/StatusToggleButtons';
+import { SortableTable, SortableRow, SortableHandleTh } from '@/components/admin/SortableTable';
 import { HOBBY_SUGGESTIONS } from '@/lib/recommendations';
 import styles from '@/components/admin/admin.module.css';
 
@@ -88,9 +89,10 @@ export default function HobbiesClient({ initialHobbies }: { initialHobbies: Hobb
         <div className={styles.emptyState}>No hobbies added yet. Pick from the suggestions above or click &ldquo;+ Add Hobby&rdquo;.</div>
       ) : (
         <div className={styles.tableContainer}>
-          <table className={styles.table}>
+          <SortableTable items={hobbies} setItems={setItems} resource="hobbies" className={styles.table}>
             <thead>
               <tr>
+                <SortableHandleTh />
                 <th style={{ width: '50px' }}>Emoji</th>
                 <th>Hobby Name</th>
                 <th style={{ textAlign: 'right', width: '100px' }}>Actions</th>
@@ -98,7 +100,7 @@ export default function HobbiesClient({ initialHobbies }: { initialHobbies: Hobb
             </thead>
             <tbody>
               {hobbies.map((hobby) => (
-                <tr key={hobby.id}>
+                <SortableRow key={hobby.id} id={hobby.id} label={hobby.name}>
                   <td>
                     <span style={{ fontSize: '1.4rem' }}>{hobby.emoji || '✨'}</span>
                   </td>
@@ -126,10 +128,10 @@ export default function HobbiesClient({ initialHobbies }: { initialHobbies: Hobb
                       </button>
                     </div>
                   </td>
-                </tr>
+                </SortableRow>
               ))}
             </tbody>
-          </table>
+          </SortableTable>
         </div>
       )}
 

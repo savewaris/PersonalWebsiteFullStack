@@ -4,7 +4,7 @@ import { apiSuccess, apiError, parseJsonBody, requireAuthSession, revalidatePort
 export async function GET() {
   try {
     const projects = await prisma.project.findMany({
-      orderBy: { createdAt: 'desc' },
+      orderBy: [{ order: 'asc' }, { createdAt: 'desc' }],
     });
     return apiSuccess(projects);
   } catch (error: unknown) {

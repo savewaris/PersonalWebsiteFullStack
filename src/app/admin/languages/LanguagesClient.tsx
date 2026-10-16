@@ -8,6 +8,7 @@ import { AdminModal } from '@/components/admin/AdminModal';
 import { DeleteConfirmModal } from '@/components/admin/DeleteConfirmModal';
 import { PresetChips } from '@/components/admin/PresetChips';
 import { StatusToggleButtons } from '@/components/admin/StatusToggleButtons';
+import { SortableTable, SortableRow, SortableHandleTh } from '@/components/admin/SortableTable';
 import { LANGUAGE_SUGGESTIONS } from '@/lib/recommendations';
 import styles from '@/components/admin/admin.module.css';
 
@@ -87,9 +88,10 @@ export default function LanguagesClient({ initialLanguages }: { initialLanguages
         <div className={styles.emptyState}>No languages added yet. Pick from the suggestions above or click &ldquo;+ Add Language&rdquo;.</div>
       ) : (
         <div className={styles.tableContainer}>
-          <table className={styles.table}>
+          <SortableTable items={languages} setItems={setItems} resource="languages" className={styles.table}>
             <thead>
               <tr>
+                <SortableHandleTh />
                 <th>Language</th>
                 <th>Proficiency Level</th>
                 <th style={{ textAlign: 'right', width: '100px' }}>Actions</th>
@@ -97,7 +99,7 @@ export default function LanguagesClient({ initialLanguages }: { initialLanguages
             </thead>
             <tbody>
               {languages.map((lang) => (
-                <tr key={lang.id}>
+                <SortableRow key={lang.id} id={lang.id} label={lang.name}>
                   <td>
                     <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{lang.name}</span>
                   </td>
@@ -137,10 +139,10 @@ export default function LanguagesClient({ initialLanguages }: { initialLanguages
                       </button>
                     </div>
                   </td>
-                </tr>
+                </SortableRow>
               ))}
             </tbody>
-          </table>
+          </SortableTable>
         </div>
       )}
 

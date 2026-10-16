@@ -9,6 +9,7 @@ import { DeleteConfirmModal } from '@/components/admin/DeleteConfirmModal';
 import { CertificationImportModal } from '@/components/admin/CertificationImportModal';
 import { LogoPickerModal } from '@/components/admin/LogoPickerModal';
 import { StatusToggleButtons } from '@/components/admin/StatusToggleButtons';
+import { SortableTable, SortableRow, SortableHandleTh } from '@/components/admin/SortableTable';
 import { PortfolioIcon } from '@/components/PortfolioIcon';
 import { resolveCertificationLogo } from '@/lib/resolve-certification-logo';
 import styles from '@/components/admin/admin.module.css';
@@ -178,9 +179,10 @@ export default function CertificationsClient({
             </button>
           </div>
         ) : (
-          <table className={styles.table}>
+          <SortableTable items={certifications} setItems={setItems} resource="certifications" className={styles.table}>
             <thead>
               <tr>
+                <SortableHandleTh />
                 <th style={{ width: '45px' }}>Logo</th>
                 <th>Certification Title</th>
                 <th>Issuing Organization</th>
@@ -200,7 +202,7 @@ export default function CertificationsClient({
                   badgeImageUrl: cert.badgeImageUrl,
                 });
                 return (
-                  <tr key={cert.id}>
+                  <SortableRow key={cert.id} id={cert.id} label={cert.title}>
                     <td>
                       <div
                         style={{
@@ -298,11 +300,11 @@ export default function CertificationsClient({
                         </button>
                       </div>
                     </td>
-                  </tr>
+                  </SortableRow>
                 );
               })}
             </tbody>
-          </table>
+          </SortableTable>
         )}
       </div>
 

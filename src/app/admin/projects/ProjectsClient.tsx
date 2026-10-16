@@ -6,6 +6,7 @@ import { useAdminCrud, useQuickAddParam } from '@/lib/useAdminCrud';
 import { AdminPageHeader } from '@/components/admin/AdminPageHeader';
 import { DeleteConfirmModal } from '@/components/admin/DeleteConfirmModal';
 import { StatusToggleButtons } from '@/components/admin/StatusToggleButtons';
+import { SortableTable, SortableRow, SortableHandleTh } from '@/components/admin/SortableTable';
 import { ProjectFormModal, type ProjectFormData } from './ProjectFormModal';
 import styles from '@/components/admin/admin.module.css';
 
@@ -105,9 +106,10 @@ export default function ProjectsClient({ initialProjects }: { initialProjects: P
         </div>
       ) : (
         <div className={styles.tableContainer}>
-          <table className={styles.table}>
+          <SortableTable items={projects} setItems={setItems} resource="projects" className={styles.table}>
             <thead>
               <tr>
+                <SortableHandleTh />
                 <th style={{ width: '60px' }}>Media</th>
                 <th>Project Title & Description</th>
                 <th>Tech Stack</th>
@@ -123,7 +125,7 @@ export default function ProjectsClient({ initialProjects }: { initialProjects: P
                   : 0;
 
                 return (
-                  <tr key={project.id}>
+                  <SortableRow key={project.id} id={project.id} label={project.title}>
                     <td>
                       <div
                         style={{
@@ -239,11 +241,11 @@ export default function ProjectsClient({ initialProjects }: { initialProjects: P
                         </button>
                       </div>
                     </td>
-                  </tr>
+                  </SortableRow>
                 );
               })}
             </tbody>
-          </table>
+          </SortableTable>
         </div>
       )}
 

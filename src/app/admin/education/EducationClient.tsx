@@ -7,6 +7,7 @@ import { AdminPageHeader } from '@/components/admin/AdminPageHeader';
 import { AdminModal } from '@/components/admin/AdminModal';
 import { DeleteConfirmModal } from '@/components/admin/DeleteConfirmModal';
 import { StatusToggleButtons } from '@/components/admin/StatusToggleButtons';
+import { SortableTable, SortableRow, SortableHandleTh } from '@/components/admin/SortableTable';
 import styles from '@/components/admin/admin.module.css';
 
 export interface Education {
@@ -98,9 +99,10 @@ export default function EducationClient({ initialEducation }: { initialEducation
         <div className={styles.emptyState}>No education records found. Click &ldquo;+ Add Education&rdquo; to add your academic degrees.</div>
       ) : (
         <div className={styles.tableContainer}>
-          <table className={styles.table}>
+          <SortableTable items={educationList} setItems={setItems} resource="education" className={styles.table}>
             <thead>
               <tr>
+                <SortableHandleTh />
                 <th>Degree & Field</th>
                 <th>Institution & Faculty</th>
                 <th>Period</th>
@@ -110,7 +112,7 @@ export default function EducationClient({ initialEducation }: { initialEducation
             </thead>
             <tbody>
               {educationList.map((edu) => (
-                <tr key={edu.id}>
+                <SortableRow key={edu.id} id={edu.id} label={edu.degree}>
                   <td>
                     <div style={{ fontWeight: 600, color: 'var(--text-primary)' }}>
                       {edu.degree}
@@ -172,10 +174,10 @@ export default function EducationClient({ initialEducation }: { initialEducation
                       </button>
                     </div>
                   </td>
-                </tr>
+                </SortableRow>
               ))}
             </tbody>
-          </table>
+          </SortableTable>
         </div>
       )}
 

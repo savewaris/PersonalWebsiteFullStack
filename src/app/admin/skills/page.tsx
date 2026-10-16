@@ -3,7 +3,7 @@ import SkillsClient from './SkillsClient';
 
 export default async function SkillsPage() {
     const skills = await prisma.skill.findMany({
-        orderBy: { createdAt: 'desc' },
+        orderBy: [{ order: 'asc' }, { createdAt: 'desc' }],
     });
 
     return <SkillsClient initialSkills={skills} />;

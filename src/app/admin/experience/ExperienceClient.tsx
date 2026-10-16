@@ -7,6 +7,7 @@ import { AdminPageHeader } from '@/components/admin/AdminPageHeader';
 import { AdminModal } from '@/components/admin/AdminModal';
 import { DeleteConfirmModal } from '@/components/admin/DeleteConfirmModal';
 import { StatusToggleButtons } from '@/components/admin/StatusToggleButtons';
+import { SortableTable, SortableRow, SortableHandleTh } from '@/components/admin/SortableTable';
 import styles from '@/components/admin/admin.module.css';
 
 export interface Experience {
@@ -106,9 +107,10 @@ export default function ExperienceClient({ initialExperience }: { initialExperie
         <div className={styles.emptyState}>No work experience recorded. Click &ldquo;+ Add Experience&rdquo; to add your roles.</div>
       ) : (
         <div className={styles.tableContainer}>
-          <table className={styles.table}>
+          <SortableTable items={experiences} setItems={setItems} resource="experience" className={styles.table}>
             <thead>
               <tr>
+                <SortableHandleTh />
                 <th>Role & Position</th>
                 <th>Company & Location</th>
                 <th>Period</th>
@@ -118,7 +120,7 @@ export default function ExperienceClient({ initialExperience }: { initialExperie
             </thead>
             <tbody>
               {experiences.map((exp) => (
-                <tr key={exp.id}>
+                <SortableRow key={exp.id} id={exp.id} label={`${exp.role}`}>
                   <td>
                     <div style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{exp.role}</div>
                     <div
@@ -195,10 +197,10 @@ export default function ExperienceClient({ initialExperience }: { initialExperie
                       </button>
                     </div>
                   </td>
-                </tr>
+                </SortableRow>
               ))}
             </tbody>
-          </table>
+          </SortableTable>
         </div>
       )}
 

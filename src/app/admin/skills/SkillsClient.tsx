@@ -10,6 +10,7 @@ import { PresetChips } from '@/components/admin/PresetChips';
 import { PortfolioIcon } from '@/components/PortfolioIcon';
 import { EmojiPicker } from '@/components/admin/EmojiPicker';
 import { StatusToggleButtons } from '@/components/admin/StatusToggleButtons';
+import { SortableTable, SortableRow, SortableHandleTh } from '@/components/admin/SortableTable';
 import { SKILL_SUGGESTIONS } from '@/lib/recommendations';
 import styles from '@/components/admin/admin.module.css';
 
@@ -102,9 +103,10 @@ export default function SkillsClient({ initialSkills }: { initialSkills: Skill[]
         <div className={styles.emptyState}>No skills added yet. Add your first skill or pick from suggestions above.</div>
       ) : (
         <div className={styles.tableContainer}>
-          <table className={styles.table}>
+          <SortableTable items={skills} setItems={setItems} resource="skills" className={styles.table}>
             <thead>
               <tr>
+                <SortableHandleTh />
                 <th style={{ width: '48px' }}>Icon</th>
                 <th>Skill Name</th>
                 <th>Category</th>
@@ -114,7 +116,7 @@ export default function SkillsClient({ initialSkills }: { initialSkills: Skill[]
             </thead>
             <tbody>
               {skills.map((skill) => (
-                <tr key={skill.id}>
+                <SortableRow key={skill.id} id={skill.id} label={skill.name}>
                   <td>
                     <div
                       style={{
@@ -194,10 +196,10 @@ export default function SkillsClient({ initialSkills }: { initialSkills: Skill[]
                       </button>
                     </div>
                   </td>
-                </tr>
+                </SortableRow>
               ))}
             </tbody>
-          </table>
+          </SortableTable>
         </div>
       )}
 

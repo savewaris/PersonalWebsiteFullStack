@@ -16,7 +16,7 @@ export async function getActiveResumes(): Promise<Resume[]> {
 export async function getAllResumes(): Promise<Resume[]> {
   try {
     return await prisma.resume.findMany({
-      orderBy: [{ isPrimary: 'desc' }, { order: 'asc' }, { createdAt: 'desc' }],
+      orderBy: [{ order: 'asc' }, { createdAt: 'desc' }] // admin list follows the manual drag order,
     });
   } catch (error) {
     console.error('[DATA_ERROR] getAllResumes:', error);
