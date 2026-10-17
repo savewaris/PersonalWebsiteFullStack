@@ -1,13 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import { FaEdit, FaTrash, FaExternalLinkAlt, FaCertificate, FaFileUpload, FaPalette } from 'react-icons/fa';
+import { FaEdit, FaExternalLinkAlt, FaCertificate, FaFileUpload, FaPalette } from 'react-icons/fa';
 import { useAdminCrud, useQuickAddParam } from '@/lib/useAdminCrud';
 import { AdminPageHeader } from '@/components/admin/AdminPageHeader';
 import { AdminModal } from '@/components/admin/AdminModal';
 import { DeleteConfirmModal } from '@/components/admin/DeleteConfirmModal';
 import { CertificationImportModal } from '@/components/admin/CertificationImportModal';
 import { LogoPickerModal } from '@/components/admin/LogoPickerModal';
+import { RowActions } from '@/components/admin/RowActions';
 import { StatusToggleButtons } from '@/components/admin/StatusToggleButtons';
 import { SortableTable, SortableRow, SortableHandleTh } from '@/components/admin/SortableTable';
 import { PortfolioIcon } from '@/components/PortfolioIcon';
@@ -282,22 +283,12 @@ export default function CertificationsClient({
                     <td style={{ textAlign: 'right' }}>
                       <div style={{ display: 'inline-flex', gap: '6px', alignItems: 'center' }}>
                         <StatusToggleButtons item={cert} endpoint="/api/certifications" setItems={setItems} />
-                        <button
-                          onClick={() => handleOpenEdit(cert)}
-                          className={styles.iconButton}
-                          title="Edit Certification"
-                          aria-label="Edit"
-                        >
-                          <FaEdit />
-                        </button>
-                        <button
-                          onClick={() => setDeletingItem(cert)}
-                          className={`${styles.iconButton} ${styles.dangerButton}`}
-                          title="Delete Certification"
-                          aria-label="Delete"
-                        >
-                          <FaTrash />
-                        </button>
+                        <RowActions
+                          itemName={cert.title}
+                          primary={{ label: 'Edit', icon: <FaEdit size={13} aria-hidden="true" />, onClick: () => handleOpenEdit(cert) }}
+                          onDelete={() => setDeletingItem(cert)}
+                          deleteLabel="Delete certification"
+                        />
                       </div>
                     </td>
                   </SortableRow>
