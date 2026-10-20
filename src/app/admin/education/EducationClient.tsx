@@ -1,11 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import { FaEdit, FaTrash } from 'react-icons/fa';
+import { FaEdit } from 'react-icons/fa';
 import { useAdminCrud, useQuickAddParam } from '@/lib/useAdminCrud';
 import { AdminPageHeader } from '@/components/admin/AdminPageHeader';
 import { AdminModal } from '@/components/admin/AdminModal';
 import { DeleteConfirmModal } from '@/components/admin/DeleteConfirmModal';
+import { RowActions } from '@/components/admin/RowActions';
 import { StatusToggleButtons } from '@/components/admin/StatusToggleButtons';
 import { SortableTable, SortableRow, SortableHandleTh } from '@/components/admin/SortableTable';
 import styles from '@/components/admin/admin.module.css';
@@ -156,22 +157,12 @@ export default function EducationClient({ initialEducation }: { initialEducation
                   <td>
                     <div className={styles.tableActions}>
                       <StatusToggleButtons item={edu} endpoint="/api/education" setItems={setItems} />
-                      <button
-                        type="button"
-                        onClick={() => handleOpenEdit(edu)}
-                        className={styles.actionBtn}
-                        title="Edit Education"
-                      >
-                        <FaEdit />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setDeletingItem(edu)}
-                        className={`${styles.actionBtn} ${styles.deleteBtn}`}
-                        title="Delete Education"
-                      >
-                        <FaTrash />
-                      </button>
+                      <RowActions
+                        itemName={`${edu.degree} at ${edu.institution}`}
+                        primary={{ label: 'Edit', icon: <FaEdit size={13} aria-hidden="true" />, onClick: () => handleOpenEdit(edu) }}
+                        onDelete={() => setDeletingItem(edu)}
+                        deleteLabel="Delete education"
+                      />
                     </div>
                   </td>
                 </SortableRow>

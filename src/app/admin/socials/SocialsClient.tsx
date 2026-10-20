@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { FaEdit, FaTrash, FaCopy, FaGlobe } from 'react-icons/fa';
+import { FaEdit, FaCopy, FaGlobe } from 'react-icons/fa';
 import { useAdminCrud, useQuickAddParam } from '@/lib/useAdminCrud';
 import { AdminPageHeader } from '@/components/admin/AdminPageHeader';
 import { AdminModal } from '@/components/admin/AdminModal';
@@ -9,6 +9,7 @@ import { DeleteConfirmModal } from '@/components/admin/DeleteConfirmModal';
 import { PresetChips } from '@/components/admin/PresetChips';
 import { PortfolioIcon } from '@/components/PortfolioIcon';
 import { EmojiPicker } from '@/components/admin/EmojiPicker';
+import { RowActions } from '@/components/admin/RowActions';
 import { StatusToggleButtons } from '@/components/admin/StatusToggleButtons';
 import { SortableTable, SortableRow, SortableHandleTh } from '@/components/admin/SortableTable';
 import { SOCIAL_SUGGESTIONS } from '@/lib/recommendations';
@@ -196,22 +197,12 @@ export default function SocialsClient({ initialSocials }: { initialSocials: Soci
                   <td>
                     <div className={styles.tableActions}>
                       <StatusToggleButtons item={social} endpoint="/api/socials" setItems={setItems} />
-                      <button
-                        type="button"
-                        onClick={() => handleOpenEdit(social)}
-                        className={styles.actionBtn}
-                        title="Edit Social Link"
-                      >
-                        <FaEdit />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setDeletingItem(social)}
-                        className={`${styles.actionBtn} ${styles.deleteBtn}`}
-                        title="Delete Social Link"
-                      >
-                        <FaTrash />
-                      </button>
+                      <RowActions
+                        itemName={social.platform}
+                        primary={{ label: 'Edit', icon: <FaEdit size={13} aria-hidden="true" />, onClick: () => handleOpenEdit(social) }}
+                        onDelete={() => setDeletingItem(social)}
+                        deleteLabel="Delete social link"
+                      />
                     </div>
                   </td>
                 </SortableRow>

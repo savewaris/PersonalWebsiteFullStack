@@ -507,6 +507,7 @@ export default function ResumesClient({ initialResumes }: ResumesClientProps) {
           <div className={styles.formGroup}>
             <label>Role Specialization</label>
             <select value={editRole} onChange={(e) => setEditRole(e.target.value)}>
+              {!ROLE_CATEGORIES.some((opt) => opt.value === editRole) && <option value={editRole}>{editRole}</option>}
               {ROLE_CATEGORIES.map((opt) => (
                 <option key={opt.value} value={opt.value}>
                   {opt.label}

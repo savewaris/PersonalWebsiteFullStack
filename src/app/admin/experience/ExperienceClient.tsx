@@ -1,11 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import { FaEdit, FaTrash } from 'react-icons/fa';
+import { FaEdit } from 'react-icons/fa';
 import { useAdminCrud, useQuickAddParam } from '@/lib/useAdminCrud';
 import { AdminPageHeader } from '@/components/admin/AdminPageHeader';
 import { AdminModal } from '@/components/admin/AdminModal';
 import { DeleteConfirmModal } from '@/components/admin/DeleteConfirmModal';
+import { RowActions } from '@/components/admin/RowActions';
 import { StatusToggleButtons } from '@/components/admin/StatusToggleButtons';
 import { SortableTable, SortableRow, SortableHandleTh } from '@/components/admin/SortableTable';
 import styles from '@/components/admin/admin.module.css';
@@ -179,22 +180,12 @@ export default function ExperienceClient({ initialExperience }: { initialExperie
                   <td>
                     <div className={styles.tableActions}>
                       <StatusToggleButtons item={exp} endpoint="/api/experience" setItems={setItems} />
-                      <button
-                        type="button"
-                        onClick={() => handleOpenEdit(exp)}
-                        className={styles.actionBtn}
-                        title="Edit Experience"
-                      >
-                        <FaEdit />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setDeletingItem(exp)}
-                        className={`${styles.actionBtn} ${styles.deleteBtn}`}
-                        title="Delete Experience"
-                      >
-                        <FaTrash />
-                      </button>
+                      <RowActions
+                        itemName={`${exp.role} at ${exp.company}`}
+                        primary={{ label: 'Edit', icon: <FaEdit size={13} aria-hidden="true" />, onClick: () => handleOpenEdit(exp) }}
+                        onDelete={() => setDeletingItem(exp)}
+                        deleteLabel="Delete experience"
+                      />
                     </div>
                   </td>
                 </SortableRow>

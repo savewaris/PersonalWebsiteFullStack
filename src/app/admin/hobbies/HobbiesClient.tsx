@@ -1,13 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import { FaEdit, FaTrash } from 'react-icons/fa';
+import { FaEdit } from 'react-icons/fa';
 import { useAdminCrud, useQuickAddParam } from '@/lib/useAdminCrud';
 import { AdminPageHeader } from '@/components/admin/AdminPageHeader';
 import { AdminModal } from '@/components/admin/AdminModal';
 import { DeleteConfirmModal } from '@/components/admin/DeleteConfirmModal';
 import { PresetChips } from '@/components/admin/PresetChips';
 import { EmojiPicker } from '@/components/admin/EmojiPicker';
+import { RowActions } from '@/components/admin/RowActions';
 import { StatusToggleButtons } from '@/components/admin/StatusToggleButtons';
 import { SortableTable, SortableRow, SortableHandleTh } from '@/components/admin/SortableTable';
 import { HOBBY_SUGGESTIONS } from '@/lib/recommendations';
@@ -110,22 +111,12 @@ export default function HobbiesClient({ initialHobbies }: { initialHobbies: Hobb
                   <td>
                     <div className={styles.tableActions}>
                       <StatusToggleButtons item={hobby} endpoint="/api/hobbies" setItems={setItems} />
-                      <button
-                        type="button"
-                        onClick={() => handleOpenEdit(hobby)}
-                        className={styles.actionBtn}
-                        title="Edit Hobby"
-                      >
-                        <FaEdit />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setDeletingItem(hobby)}
-                        className={`${styles.actionBtn} ${styles.deleteBtn}`}
-                        title="Delete Hobby"
-                      >
-                        <FaTrash />
-                      </button>
+                      <RowActions
+                        itemName={hobby.name}
+                        primary={{ label: 'Edit', icon: <FaEdit size={13} aria-hidden="true" />, onClick: () => handleOpenEdit(hobby) }}
+                        onDelete={() => setDeletingItem(hobby)}
+                        deleteLabel="Delete hobby"
+                      />
                     </div>
                   </td>
                 </SortableRow>

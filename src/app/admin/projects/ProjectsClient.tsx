@@ -1,10 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { FaEdit, FaTrash, FaExternalLinkAlt, FaGithub, FaVideo, FaImages, FaLock, FaGlobe } from 'react-icons/fa';
+import { FaEdit, FaExternalLinkAlt, FaGithub, FaVideo, FaImages, FaLock, FaGlobe } from 'react-icons/fa';
 import { useAdminCrud, useQuickAddParam } from '@/lib/useAdminCrud';
 import { AdminPageHeader } from '@/components/admin/AdminPageHeader';
 import { DeleteConfirmModal } from '@/components/admin/DeleteConfirmModal';
+import { RowActions } from '@/components/admin/RowActions';
 import { StatusToggleButtons } from '@/components/admin/StatusToggleButtons';
 import { SortableTable, SortableRow, SortableHandleTh } from '@/components/admin/SortableTable';
 import { ProjectFormModal, type ProjectFormData } from './ProjectFormModal';
@@ -233,12 +234,12 @@ export default function ProjectsClient({ initialProjects }: { initialProjects: P
                     <td>
                       <div className={styles.tableActions}>
                         <StatusToggleButtons item={project} endpoint="/api/projects" setItems={setItems} />
-                        <button type="button" onClick={() => handleOpenEdit(project)} className={styles.actionBtn} title="Edit Project">
-                          <FaEdit />
-                        </button>
-                        <button type="button" onClick={() => setDeletingItem(project)} className={`${styles.actionBtn} ${styles.deleteBtn}`} title="Delete Project">
-                          <FaTrash />
-                        </button>
+                        <RowActions
+                        itemName={project.title}
+                        primary={{ label: 'Edit', icon: <FaEdit size={13} aria-hidden="true" />, onClick: () => handleOpenEdit(project) }}
+                        onDelete={() => setDeletingItem(project)}
+                        deleteLabel="Delete project"
+                      />
                       </div>
                     </td>
                   </SortableRow>
