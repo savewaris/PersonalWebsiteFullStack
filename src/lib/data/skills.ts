@@ -5,7 +5,7 @@ export async function getSkills(): Promise<Skill[]> {
   try {
     return await prisma.skill.findMany({
       where: { isVisible: true },
-      orderBy: { proficiency: 'desc' },
+      orderBy: [{ order: 'asc' }, { proficiency: 'desc' }],
     });
   } catch (error) {
     console.error('[DATA_ERROR:skills]:', error);

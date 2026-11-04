@@ -1,0 +1,114 @@
+.root {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.primary,
+.trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 32px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.primary {
+  padding: 6px 12px;
+}
+
+.trigger {
+  width: 32px;
+  padding: 0;
+}
+
+.primary:hover,
+.trigger:hover,
+.trigger[data-state='open'] {
+  border-color: var(--text-secondary);
+  background: var(--bg-tertiary);
+}
+
+.primary:focus-visible,
+.trigger:focus-visible,
+.item:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.content {
+  z-index: 1000;
+  min-width: 180px;
+  padding: 6px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-hover);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 36px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-size: 0.88rem;
+  color: var(--text-primary);
+  text-decoration: none;
+  cursor: pointer;
+  outline: none;
+  user-select: none;
+}
+
+.item[data-highlighted] {
+  background: var(--bg-elevated);
+}
+
+.separator {
+  height: 1px;
+  margin: 6px 4px;
+  background: var(--border-hover);
+}
+
+.danger {
+  color: var(--danger);
+}
+
+.danger[data-highlighted] {
+  background: color-mix(in srgb, var(--danger) 14%, transparent);
+}
+
+/* Primary action duplicate in the menu: only needed when the inline button is hidden */
+.touchOnly {
+  display: none;
+}
+
+/* Touch: kebab only, 44px targets (WCAG 2.5.5 goal; 2.5.8 AA floor is 24px) */
+@media (pointer: coarse) {
+  .primary {
+    display: none;
+  }
+
+  .trigger {
+    width: 44px;
+    min-height: 44px;
+  }
+
+  .item {
+    min-height: 44px;
+  }
+
+  .touchOnly {
+    display: flex;
+  }
+}

@@ -1,12 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import { FaEdit, FaTrash } from 'react-icons/fa';
+import { FaEdit } from 'react-icons/fa';
 import { useAdminCrud, useQuickAddParam } from '@/lib/useAdminCrud';
 import { AdminPageHeader } from '@/components/admin/AdminPageHeader';
 import { AdminModal } from '@/components/admin/AdminModal';
 import { DeleteConfirmModal } from '@/components/admin/DeleteConfirmModal';
+import { RowActions } from '@/components/admin/RowActions';
 import { StatusToggleButtons } from '@/components/admin/StatusToggleButtons';
+import { SortableTable, SortableRow, SortableHandleTh } from '@/components/admin/SortableTable';
 import styles from '@/components/admin/admin.module.css';
 
 export interface Education {
@@ -98,9 +100,10 @@ export default function EducationClient({ initialEducation }: { initialEducation
         <div className={styles.emptyState}>No education records found. Click &ldquo;+ Add Education&rdquo; to add your academic degrees.</div>
       ) : (
         <div className={styles.tableContainer}>
-          <table className={styles.table}>
+          <SortableTable items={educationList} setItems={setItems} resource="education" className={styles.table}>
             <thead>
               <tr>
+                <SortableHandleTh />
                 <th>Degree & Field</th>
                 <th>Institution & Faculty</th>
                 <th>Period</th>
@@ -110,7 +113,7 @@ export default function EducationClient({ initialEducation }: { initialEducation
             </thead>
             <tbody>
               {educationList.map((edu) => (
-                <tr key={edu.id}>
+                <SortableRow key={edu.id} id={edu.id} label={edu.degree}>
                   <td>
                     <div style={{ fontWeight: 600, color: 'var(--text-primary)' }}>
                       {edu.degree}
@@ -154,28 +157,18 @@ export default function EducationClient({ initialEducation }: { initialEducation
                   <td>
                     <div className={styles.tableActions}>
                       <StatusToggleButtons item={edu} endpoint="/api/education" setItems={setItems} />
-                      <button
-                        type="button"
-                        onClick={() => handleOpenEdit(edu)}
-                        className={styles.actionBtn}
-                        title="Edit Education"
-                      >
-                        <FaEdit />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setDeletingItem(edu)}
-                        className={`${styles.actionBtn} ${styles.deleteBtn}`}
-                        title="Delete Education"
-                      >
-                        <FaTrash />
-                      </button>
+                      <RowActions
+                        itemName={`${edu.degree} at ${edu.institution}`}
+                        primary={{ label: 'Edit', icon: <FaEdit size={13} aria-hidden="true" />, onClick: () => handleOpenEdit(edu) }}
+                        onDelete={() => setDeletingItem(edu)}
+                        deleteLabel="Delete education"
+                      />
                     </div>
                   </td>
-                </tr>
+                </SortableRow>
               ))}
             </tbody>
-          </table>
+          </SortableTable>
         </div>
       )}
 

@@ -4,7 +4,7 @@ import { apiSuccess, apiError, parseJsonBody, requireAuthSession, revalidatePort
 export async function GET() {
   try {
     const education = await prisma.education.findMany({
-      orderBy: { startDate: 'desc' },
+      orderBy: [{ order: 'asc' }, { startDate: 'desc' }],
     });
     return apiSuccess(education);
   } catch (error: any) {

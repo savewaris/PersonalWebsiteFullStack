@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { FaEdit, FaTrash } from 'react-icons/fa';
+import { FaEdit } from 'react-icons/fa';
 import { useAdminCrud, useQuickAddParam } from '@/lib/useAdminCrud';
 import { AdminPageHeader } from '@/components/admin/AdminPageHeader';
 import { AdminModal } from '@/components/admin/AdminModal';
@@ -9,7 +9,9 @@ import { DeleteConfirmModal } from '@/components/admin/DeleteConfirmModal';
 import { PresetChips } from '@/components/admin/PresetChips';
 import { PortfolioIcon } from '@/components/PortfolioIcon';
 import { EmojiPicker } from '@/components/admin/EmojiPicker';
+import { RowActions } from '@/components/admin/RowActions';
 import { StatusToggleButtons } from '@/components/admin/StatusToggleButtons';
+import { SortableTable, SortableRow, SortableHandleTh } from '@/components/admin/SortableTable';
 import { SKILL_SUGGESTIONS } from '@/lib/recommendations';
 import styles from '@/components/admin/admin.module.css';
 
@@ -102,9 +104,10 @@ export default function SkillsClient({ initialSkills }: { initialSkills: Skill[]
         <div className={styles.emptyState}>No skills added yet. Add your first skill or pick from suggestions above.</div>
       ) : (
         <div className={styles.tableContainer}>
-          <table className={styles.table}>
+          <SortableTable items={skills} setItems={setItems} resource="skills" className={styles.table}>
             <thead>
               <tr>
+                <SortableHandleTh />
                 <th style={{ width: '48px' }}>Icon</th>
                 <th>Skill Name</th>
                 <th>Category</th>
@@ -114,7 +117,7 @@ export default function SkillsClient({ initialSkills }: { initialSkills: Skill[]
             </thead>
             <tbody>
               {skills.map((skill) => (
-                <tr key={skill.id}>
+                <SortableRow key={skill.id} id={skill.id} label={skill.name}>
                   <td>
                     <div
                       style={{
@@ -176,28 +179,18 @@ export default function SkillsClient({ initialSkills }: { initialSkills: Skill[]
                   <td>
                     <div className={styles.tableActions}>
                       <StatusToggleButtons item={skill} endpoint="/api/skills" setItems={setItems} />
-                      <button
-                        type="button"
-                        onClick={() => handleOpenEdit(skill)}
-                        className={styles.actionBtn}
-                        title="Edit Skill"
-                      >
-                        <FaEdit />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setDeletingItem(skill)}
-                        className={`${styles.actionBtn} ${styles.deleteBtn}`}
-                        title="Delete Skill"
-                      >
-                        <FaTrash />
-                      </button>
+                      <RowActions
+                        itemName={skill.name}
+                        primary={{ label: 'Edit', icon: <FaEdit size={13} aria-hidden="true" />, onClick: () => handleOpenEdit(skill) }}
+                        onDelete={() => setDeletingItem(skill)}
+                        deleteLabel="Delete skill"
+                      />
                     </div>
                   </td>
-                </tr>
+                </SortableRow>
               ))}
             </tbody>
-          </table>
+          </SortableTable>
         </div>
       )}
 

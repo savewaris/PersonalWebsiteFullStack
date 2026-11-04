@@ -1,14 +1,16 @@
 'use client';
 
 import { useState } from 'react';
-import { FaEdit, FaTrash, FaExternalLinkAlt, FaCertificate, FaFileUpload, FaPalette } from 'react-icons/fa';
+import { FaEdit, FaExternalLinkAlt, FaCertificate, FaFileUpload, FaPalette } from 'react-icons/fa';
 import { useAdminCrud, useQuickAddParam } from '@/lib/useAdminCrud';
 import { AdminPageHeader } from '@/components/admin/AdminPageHeader';
 import { AdminModal } from '@/components/admin/AdminModal';
 import { DeleteConfirmModal } from '@/components/admin/DeleteConfirmModal';
 import { CertificationImportModal } from '@/components/admin/CertificationImportModal';
 import { LogoPickerModal } from '@/components/admin/LogoPickerModal';
+import { RowActions } from '@/components/admin/RowActions';
 import { StatusToggleButtons } from '@/components/admin/StatusToggleButtons';
+import { SortableTable, SortableRow, SortableHandleTh } from '@/components/admin/SortableTable';
 import { PortfolioIcon } from '@/components/PortfolioIcon';
 import { resolveCertificationLogo } from '@/lib/resolve-certification-logo';
 import styles from '@/components/admin/admin.module.css';
@@ -178,9 +180,10 @@ export default function CertificationsClient({
             </button>
           </div>
         ) : (
-          <table className={styles.table}>
+          <SortableTable items={certifications} setItems={setItems} resource="certifications" className={styles.table}>
             <thead>
               <tr>
+                <SortableHandleTh />
                 <th style={{ width: '45px' }}>Logo</th>
                 <th>Certification Title</th>
                 <th>Issuing Organization</th>
@@ -200,7 +203,7 @@ export default function CertificationsClient({
                   badgeImageUrl: cert.badgeImageUrl,
                 });
                 return (
-                  <tr key={cert.id}>
+                  <SortableRow key={cert.id} id={cert.id} label={cert.title}>
                     <td>
                       <div
                         style={{
@@ -280,29 +283,19 @@ export default function CertificationsClient({
                     <td style={{ textAlign: 'right' }}>
                       <div style={{ display: 'inline-flex', gap: '6px', alignItems: 'center' }}>
                         <StatusToggleButtons item={cert} endpoint="/api/certifications" setItems={setItems} />
-                        <button
-                          onClick={() => handleOpenEdit(cert)}
-                          className={styles.iconButton}
-                          title="Edit Certification"
-                          aria-label="Edit"
-                        >
-                          <FaEdit />
-                        </button>
-                        <button
-                          onClick={() => setDeletingItem(cert)}
-                          className={`${styles.iconButton} ${styles.dangerButton}`}
-                          title="Delete Certification"
-                          aria-label="Delete"
-                        >
-                          <FaTrash />
-                        </button>
+                        <RowActions
+                          itemName={cert.title}
+                          primary={{ label: 'Edit', icon: <FaEdit size={13} aria-hidden="true" />, onClick: () => handleOpenEdit(cert) }}
+                          onDelete={() => setDeletingItem(cert)}
+                          deleteLabel="Delete certification"
+                        />
                       </div>
                     </td>
-                  </tr>
+                  </SortableRow>
                 );
               })}
             </tbody>
-          </table>
+          </SortableTable>
         )}
       </div>
 

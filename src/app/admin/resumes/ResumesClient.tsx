@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import {
   FaFilePdf,
-  FaTrash,
+  FaEdit,
   FaDownload,
   FaExternalLinkAlt,
   FaStar,
@@ -14,6 +14,8 @@ import {
 import { useAdminCrud } from '@/lib/useAdminCrud';
 import { AdminPageHeader } from '@/components/admin/AdminPageHeader';
 import { AdminModal } from '@/components/admin/AdminModal';
+import { RowActions } from '@/components/admin/RowActions';
+import { SortableTable, SortableRow, SortableHandleTh } from '@/components/admin/SortableTable';
 import { DeleteConfirmModal } from '@/components/admin/DeleteConfirmModal';
 import styles from '@/components/admin/admin.module.css';
 
@@ -69,6 +71,73 @@ export default function ResumesClient({ initialResumes }: ResumesClientProps) {
   const [isActive, setIsActive] = useState(true);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [modalError, setModalError] = useState<string | null>(null);
+
+  // Edit-details modal state (multipart PUT: metadata + optional replacement PDF)
+  const [editingResume, setEditingResume] = useState<SerializedResume | null>(null);
+  const [editTitle, setEditTitle] = useState('');
+  const [editRole, setEditRole] = useState('General');
+  const [editOrder, setEditOrder] = useState(0);
+  const [editPrimary, setEditPrimary] = useState(false);
+  const [editActive, setEditActive] = useState(true);
+  const [editFile, setEditFile] = useState<File | null>(null);
+  const [editError, setEditError] = useState<string | null>(null);
+  const [isSavingEdit, setIsSavingEdit] = useState(false);
+
+  const openEdit = (r: SerializedResume) => {
+    setEditingResume(r);
+    setEditTitle(r.title);
+    setEditRole(r.roleCategory);
+    setEditOrder(r.order);
+    setEditPrimary(r.isPrimary);
+    setEditActive(r.isActive);
+    setEditFile(null);
+    setEditError(null);
+  };
+
+  const handleSaveEdit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingResume) return;
+    setEditError(null);
+
+    if (editFile) {
+      if (!editFile.name.toLowerCase().endsWith('.pdf')) {
+        setEditError('Invalid file type: Only PDF files are supported.');
+        return;
+      }
+      if (editFile.size > 10 * 1024 * 1024) {
+        setEditError(`File size exceeds 10MB limit (${(editFile.size / 1024 / 1024).toFixed(2)}MB).`);
+        return;
+      }
+    }
+
+    setIsSavingEdit(true);
+    try {
+      const formData = new FormData();
+      formData.append('title', editTitle);
+      formData.append('roleCategory', editRole);
+      formData.append('order', String(editOrder));
+      formData.append('isPrimary', String(editPrimary));
+      formData.append('isActive', String(editActive));
+      if (editFile) formData.append('file', editFile);
+
+      const res = await fetch(`/api/resumes/${editingResume.id}`, { method: 'PUT', body: formData });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || 'Failed to update resume');
+
+      const updated: SerializedResume = json.data || json;
+      setResumes((prev) =>
+        prev.map((r) => {
+          if (r.id === updated.id) return updated;
+          return updated.isPrimary ? { ...r, isPrimary: false } : r;
+        })
+      );
+      setEditingResume(null);
+    } catch (err: any) {
+      setEditError(err.message || 'Update failed');
+    } finally {
+      setIsSavingEdit(false);
+    }
+  };
 
   const resetForm = () => {
     setTitle('');
@@ -205,9 +274,10 @@ export default function ResumesClient({ initialResumes }: ResumesClientProps) {
             </button>
           </div>
         ) : (
-          <table className={styles.table}>
+          <SortableTable items={resumes} setItems={setResumes} resource="resumes" className={styles.table}>
             <thead>
               <tr>
+                <SortableHandleTh />
                 <th>Resume</th>
                 <th>Role Specialization</th>
                 <th>File</th>
@@ -218,7 +288,7 @@ export default function ResumesClient({ initialResumes }: ResumesClientProps) {
             </thead>
             <tbody>
               {resumes.map((resume) => (
-                <tr key={resume.id}>
+                <SortableRow key={resume.id} id={resume.id} label={resume.title}>
                   <td>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                       <div
@@ -265,6 +335,8 @@ export default function ResumesClient({ initialResumes }: ResumesClientProps) {
                       className={styles.iconButton}
                       style={{ color: resume.isPrimary ? '#4ade80' : undefined }}
                       title={resume.isPrimary ? 'Current primary default' : 'Set as primary default'}
+                      aria-label={`${resume.isPrimary ? 'Primary resume' : 'Set as primary'}: ${resume.title}`}
+                      aria-pressed={resume.isPrimary}
                     >
                       <FaStar size={13} />
                     </button>
@@ -276,43 +348,38 @@ export default function ResumesClient({ initialResumes }: ResumesClientProps) {
                       className={styles.iconButton}
                       style={{ color: resume.isActive ? '#60a5fa' : '#94a3b8' }}
                       title={resume.isActive ? 'Active on homepage' : 'Hidden from homepage'}
+                      aria-label={`${resume.isActive ? 'Hide' : 'Show'} on homepage: ${resume.title}`}
+                      aria-pressed={resume.isActive}
                     >
                       {resume.isActive ? <FaCheck size={13} /> : <FaTimes size={13} />}
                     </button>
                   </td>
                   <td style={{ textAlign: 'right' }}>
-                    <div style={{ display: 'inline-flex', gap: '6px' }}>
-                      <a
-                        href={resume.fileUrl}
-                        download={resume.fileName}
-                        className={styles.iconButton}
-                        title="Download File"
-                      >
-                        <FaDownload size={13} />
-                      </a>
-                      <a
-                        href={resume.fileUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={styles.iconButton}
-                        title="Preview in Tab"
-                      >
-                        <FaExternalLinkAlt size={12} />
-                      </a>
-                      <button
-                        onClick={() => setDeletingItem(resume)}
-                        className={`${styles.iconButton} ${styles.dangerButton}`}
-                        title="Delete Resume"
-                        aria-label="Delete"
-                      >
-                        <FaTrash size={13} />
-                      </button>
-                    </div>
+                    <RowActions
+                      itemName={resume.title}
+                      primary={{ label: 'Edit', icon: <FaEdit size={13} aria-hidden="true" />, onClick: () => openEdit(resume) }}
+                      menu={[
+                        {
+                          label: 'Download',
+                          icon: <FaDownload size={13} aria-hidden="true" />,
+                          href: resume.fileUrl,
+                          download: resume.fileName,
+                        },
+                        {
+                          label: 'Preview in tab',
+                          icon: <FaExternalLinkAlt size={12} aria-hidden="true" />,
+                          href: resume.fileUrl,
+                          external: true,
+                        },
+                      ]}
+                      onDelete={() => setDeletingItem(resume)}
+                      deleteLabel="Delete resume"
+                    />
                   </td>
-                </tr>
+                </SortableRow>
               ))}
             </tbody>
-          </table>
+          </SortableTable>
         )}
       </div>
 
@@ -414,6 +481,84 @@ export default function ResumesClient({ initialResumes }: ResumesClientProps) {
             </button>
             <button type="submit" disabled={isUploading || !selectedFile} className={styles.primaryButton}>
               {isUploading ? 'Uploading...' : 'Save & Publish'}
+            </button>
+          </div>
+        </form>
+      </AdminModal>
+
+      {/* Edit Details Modal */}
+      <AdminModal
+        isOpen={Boolean(editingResume)}
+        onClose={() => setEditingResume(null)}
+        title="Edit Resume Details"
+      >
+        <form onSubmit={handleSaveEdit} className={styles.form}>
+          {editError && (
+            <div style={{ color: '#f87171', fontSize: '0.85rem', marginBottom: '4px' }}>
+              <FaTimes style={{ marginRight: '6px' }} /> {editError}
+            </div>
+          )}
+
+          <div className={styles.formGroup}>
+            <label>Resume Title</label>
+            <input type="text" required value={editTitle} onChange={(e) => setEditTitle(e.target.value)} />
+          </div>
+
+          <div className={styles.formGroup}>
+            <label>Role Specialization</label>
+            <select value={editRole} onChange={(e) => setEditRole(e.target.value)}>
+              {!ROLE_CATEGORIES.some((opt) => opt.value === editRole) && <option value={editRole}>{editRole}</option>}
+              {ROLE_CATEGORIES.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className={styles.formGroup}>
+            <label>Display Order</label>
+            <input
+              type="number"
+              value={editOrder}
+              onChange={(e) => setEditOrder(parseInt(e.target.value, 10) || 0)}
+            />
+          </div>
+
+          <div className={styles.formGroup}>
+            <label>Current File</label>
+            <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+              {editingResume?.fileName} {editingResume ? `(${formatBytes(editingResume.fileSize)})` : ''}
+            </div>
+            <input
+              type="file"
+              accept=".pdf,application/pdf"
+              onChange={(e) => setEditFile(e.target.files?.[0] ?? null)}
+              aria-label="Replace PDF file"
+              style={{ marginTop: '8px' }}
+            />
+            <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+              Optional: choose a PDF (up to 10MB) to replace the current file.
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', gap: '20px' }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem' }}>
+              <input type="checkbox" checked={editPrimary} onChange={(e) => setEditPrimary(e.target.checked)} />
+              <span>Set as primary default resume</span>
+            </label>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem' }}>
+              <input type="checkbox" checked={editActive} onChange={(e) => setEditActive(e.target.checked)} />
+              <span>Visible on public homepage</span>
+            </label>
+          </div>
+
+          <div className={styles.modalFooter}>
+            <button type="button" onClick={() => setEditingResume(null)} className={styles.secondaryButton}>
+              Cancel
+            </button>
+            <button type="submit" disabled={isSavingEdit || !editTitle.trim()} className={styles.primaryButton}>
+              {isSavingEdit ? 'Saving...' : 'Save Changes'}
             </button>
           </div>
         </form>

@@ -3,7 +3,7 @@ import InterestsClient from './InterestsClient';
 
 export default async function InterestsPage() {
   const interests = await prisma.interest.findMany({
-    orderBy: [
+    orderBy: [{ order: 'asc' }, 
       { category: 'asc' },
       { createdAt: 'asc' },
     ],

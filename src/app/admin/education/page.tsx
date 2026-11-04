@@ -3,7 +3,7 @@ import EducationClient from './EducationClient';
 
 export default async function EducationPage() {
     const education = await prisma.education.findMany({
-        orderBy: { startDate: 'desc' },
+        orderBy: [{ order: 'asc' }, { startDate: 'desc' }],
     });
 
     // Fix connection with dates issue by converting to strings
