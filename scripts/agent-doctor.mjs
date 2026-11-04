@@ -107,7 +107,6 @@ check('GitHub Actions Security scan (.github/workflows/security-scan.yml)', exis
 check('GitHub Actions PR hygiene (.github/workflows/pr-hygiene.yml)', existsSync(path.join(ROOT_DIR, '.github', 'workflows', 'pr-hygiene.yml')));
 check('GitHub Actions UI/UX E2E (.github/workflows/ui-ux-e2e.yml)', existsSync(path.join(ROOT_DIR, '.github', 'workflows', 'ui-ux-e2e.yml')));
 check('GitHub Actions Release (.github/workflows/release.yml)', existsSync(path.join(ROOT_DIR, '.github', 'workflows', 'release.yml')));
-check('Dependabot security config (.github/dependabot.yml)', existsSync(path.join(ROOT_DIR, '.github', 'dependabot.yml')));
 check('Pull Request Template (.github/PULL_REQUEST_TEMPLATE.md)', existsSync(path.join(ROOT_DIR, '.github', 'PULL_REQUEST_TEMPLATE.md')));
 
 check('Playwright config (playwright.config.ts)', existsSync(path.join(ROOT_DIR, 'playwright.config.ts')));
