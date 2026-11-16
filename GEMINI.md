@@ -57,3 +57,9 @@ When user prompts involve UI/UX (in natural language, without needing special sy
 3. Ensure 0 TypeScript errors (`npx tsc --noEmit`), 0 UI test failures (`npm run test:ui`), and valid Next.js build (`npm run build`).
 4. For multi-action tasks (>1 domain), deploy the specialized subagent swarm and enable peer discussion across agents to validate interfaces before writing code.
 
+
+<!-- AGENT-KIT:BEGIN -->
+Read `AGENTS.md` first: it holds the working agreement for every agent in this repo. Then read
+`.agents/INDEX.md` for the skills, agents and tools the owner uses. There is no hook enforcement in
+this tool, so follow the task-file rules in `AGENTS.md` yourself.
+<!-- AGENT-KIT:END -->
