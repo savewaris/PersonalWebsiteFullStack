@@ -4,7 +4,7 @@ import { apiSuccess, apiError, parseJsonBody, requireAuthSession, revalidatePort
 export async function GET() {
   try {
     const interests = await prisma.interest.findMany({
-      orderBy: [
+      orderBy: [{ order: 'asc' }, 
         { category: 'asc' },
         { createdAt: 'asc' },
       ],

@@ -5,7 +5,7 @@ export async function getInterests(): Promise<Interest[]> {
   try {
     return await prisma.interest.findMany({
       where: { isVisible: true },
-      orderBy: [
+      orderBy: [{ order: 'asc' }, 
         { category: 'asc' },
         { createdAt: 'asc' },
       ],

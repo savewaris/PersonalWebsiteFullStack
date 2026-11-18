@@ -8,6 +8,7 @@ export async function getCertifications(): Promise<Certification[]> {
       orderBy: [
         { order: 'asc' },
         { issueDate: 'desc' },
+        { id: 'asc' }, // stable tie-break so equal rows don't shuffle between loads
       ],
     });
   } catch (error) {

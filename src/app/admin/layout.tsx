@@ -12,7 +12,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   }
 
   return (
-    <div className={styles.adminContainer}>
+    <div className={styles.adminContainer} data-admin-root>
       <aside className={styles.sidebar}>
         <div className={styles.sidebarHeader}>
           <h2>Portfolio Admin</h2>

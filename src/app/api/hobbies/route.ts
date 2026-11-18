@@ -3,7 +3,7 @@ import { apiSuccess, apiError, parseJsonBody, requireAuthSession, revalidatePort
 
 export async function GET() {
   try {
-    const hobbies = await prisma.hobby.findMany({ orderBy: { createdAt: 'asc' } });
+    const hobbies = await prisma.hobby.findMany({ orderBy: [{ order: 'asc' }, { createdAt: 'asc' }] });
     return apiSuccess(hobbies);
   } catch (error: any) {
     return apiError('Failed to fetch hobbies', 500, error?.message);

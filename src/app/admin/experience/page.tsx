@@ -3,7 +3,7 @@ import ExperienceClient from './ExperienceClient';
 
 export default async function ExperiencePage() {
     const experience = await prisma.experience.findMany({
-        orderBy: { startDate: 'desc' },
+        orderBy: [{ order: 'asc' }, { startDate: 'desc' }],
     });
 
     return <ExperienceClient initialExperience={experience.map(e => ({

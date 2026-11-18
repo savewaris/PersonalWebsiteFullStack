@@ -1,14 +1,16 @@
 'use client';
 
 import { useState } from 'react';
-import { FaEdit, FaTrash } from 'react-icons/fa';
+import { FaEdit } from 'react-icons/fa';
 import { useAdminCrud, useQuickAddParam } from '@/lib/useAdminCrud';
 import { AdminPageHeader } from '@/components/admin/AdminPageHeader';
 import { AdminModal } from '@/components/admin/AdminModal';
 import { DeleteConfirmModal } from '@/components/admin/DeleteConfirmModal';
 import { PresetChips } from '@/components/admin/PresetChips';
 import { EmojiPicker } from '@/components/admin/EmojiPicker';
+import { RowActions } from '@/components/admin/RowActions';
 import { StatusToggleButtons } from '@/components/admin/StatusToggleButtons';
+import { SortableTable, SortableRow, SortableHandleTh } from '@/components/admin/SortableTable';
 import { HOBBY_SUGGESTIONS } from '@/lib/recommendations';
 import styles from '@/components/admin/admin.module.css';
 
@@ -88,9 +90,10 @@ export default function HobbiesClient({ initialHobbies }: { initialHobbies: Hobb
         <div className={styles.emptyState}>No hobbies added yet. Pick from the suggestions above or click &ldquo;+ Add Hobby&rdquo;.</div>
       ) : (
         <div className={styles.tableContainer}>
-          <table className={styles.table}>
+          <SortableTable items={hobbies} setItems={setItems} resource="hobbies" className={styles.table}>
             <thead>
               <tr>
+                <SortableHandleTh />
                 <th style={{ width: '50px' }}>Emoji</th>
                 <th>Hobby Name</th>
                 <th style={{ textAlign: 'right', width: '100px' }}>Actions</th>
@@ -98,7 +101,7 @@ export default function HobbiesClient({ initialHobbies }: { initialHobbies: Hobb
             </thead>
             <tbody>
               {hobbies.map((hobby) => (
-                <tr key={hobby.id}>
+                <SortableRow key={hobby.id} id={hobby.id} label={hobby.name}>
                   <td>
                     <span style={{ fontSize: '1.4rem' }}>{hobby.emoji || '✨'}</span>
                   </td>
@@ -108,28 +111,18 @@ export default function HobbiesClient({ initialHobbies }: { initialHobbies: Hobb
                   <td>
                     <div className={styles.tableActions}>
                       <StatusToggleButtons item={hobby} endpoint="/api/hobbies" setItems={setItems} />
-                      <button
-                        type="button"
-                        onClick={() => handleOpenEdit(hobby)}
-                        className={styles.actionBtn}
-                        title="Edit Hobby"
-                      >
-                        <FaEdit />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setDeletingItem(hobby)}
-                        className={`${styles.actionBtn} ${styles.deleteBtn}`}
-                        title="Delete Hobby"
-                      >
-                        <FaTrash />
-                      </button>
+                      <RowActions
+                        itemName={hobby.name}
+                        primary={{ label: 'Edit', icon: <FaEdit size={13} aria-hidden="true" />, onClick: () => handleOpenEdit(hobby) }}
+                        onDelete={() => setDeletingItem(hobby)}
+                        deleteLabel="Delete hobby"
+                      />
                     </div>
                   </td>
-                </tr>
+                </SortableRow>
               ))}
             </tbody>
-          </table>
+          </SortableTable>
         </div>
       )}
 

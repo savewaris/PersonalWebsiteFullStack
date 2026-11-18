@@ -4,7 +4,7 @@ import { apiSuccess, apiError, parseJsonBody, requireAuthSession, revalidatePort
 export async function GET() {
   try {
     const skills = await prisma.skill.findMany({
-      orderBy: { proficiency: 'desc' },
+      orderBy: [{ order: 'asc' }, { proficiency: 'desc' }],
     });
     return apiSuccess(skills);
   } catch (error: any) {

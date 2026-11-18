@@ -3,7 +3,7 @@ import { apiSuccess, apiError, parseJsonBody, requireAuthSession, revalidatePort
 
 export async function GET() {
   try {
-    const languages = await prisma.language.findMany({ orderBy: { createdAt: 'asc' } });
+    const languages = await prisma.language.findMany({ orderBy: [{ order: 'asc' }, { createdAt: 'asc' }] });
     return apiSuccess(languages);
   } catch (error: any) {
     return apiError('Failed to fetch languages', 500, error?.message);

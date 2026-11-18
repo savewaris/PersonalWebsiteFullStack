@@ -5,7 +5,7 @@ export async function getExperiences(): Promise<Experience[]> {
   try {
     return await prisma.experience.findMany({
       where: { isVisible: true },
-      orderBy: { startDate: 'desc' },
+      orderBy: [{ order: 'asc' }, { startDate: 'desc' }],
     });
   } catch (error) {
     console.error('[DATA_ERROR:experience]:', error);
